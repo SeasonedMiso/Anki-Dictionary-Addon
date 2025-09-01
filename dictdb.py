@@ -8,13 +8,23 @@ import re
 import json
 addon_path = os.path.dirname(__file__)
 from aqt import mw
+from .init_db import initialize_sqlite_file
 
 class DictDB:
     conn = None
     c = None
 
     def __init__(self):
-        db_file = os.path.join(mw.pm.addonFolder(), addon_path, "user_files", "db", "dictionaries.sqlite")
+        db_dir = os.path.join(addon_path, "user_files", "db")
+        os.makedirs(db_dir, exist_ok=True)
+        db_file = os.path.join(db_dir, "dictionaries.sqlite")
+        
+        # create dictionary file if it doesn't exist
+        if not os.path.exists(db_file):
+            f = open(db_file, 'x')
+            f.close()
+            initialize_sqlite_file(db_file)
+                
         self.conn=sqlite3.connect(db_file, check_same_thread=False)
         self.c = self.conn.cursor()
         self.c.execute("PRAGMA foreign_keys = ON")

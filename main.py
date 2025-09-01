@@ -111,7 +111,6 @@ def showA(ar):
 dictWidget  = False
 
 js = QFile(':/qtwebchannel/qwebchannel.js')
-assert js.open(QIODevice.ReadOnly)
 js = bytes(js.readAll()).decode('utf-8')
 
 
