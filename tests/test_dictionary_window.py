@@ -9,6 +9,8 @@ from pathlib import Path
 import json
 import sys
 
+# Note: This test file extends the shared mocks from tests/mocks.py with
+# dictionary-window-specific implementations for complex widget testing
 
 # Create fake Qt base classes that preserve initialization logic
 class FakeQWidget:
@@ -157,8 +159,8 @@ class FakeAnkiWebView:
         self.url = url
 
 
-# Patch sys.modules before importing
-fake_qt_module = MagicMock()
+# Extend the shared mocks with dictionary-window-specific implementations
+fake_qt_module = sys.modules['aqt.qt']
 fake_qt_module.QWidget = FakeQWidget
 fake_qt_module.QVBoxLayout = FakeQVBoxLayout
 fake_qt_module.QHBoxLayout = FakeQHBoxLayout
@@ -171,26 +173,15 @@ fake_qt_module.QUrl = FakeQUrl
 fake_qt_module.QCloseEvent = Mock
 fake_qt_module.QHideEvent = Mock
 
-fake_aqt = MagicMock()
-fake_aqt.qt = fake_qt_module
+fake_aqt = sys.modules['aqt']
 fake_aqt.webview = MagicMock()
 fake_aqt.webview.AnkiWebView = FakeAnkiWebView
-fake_aqt.utils = MagicMock()
-fake_aqt.utils.showInfo = Mock()
-fake_aqt.utils.tooltip = Mock()
 
-fake_anki = MagicMock()
-fake_anki.utils = MagicMock()
+fake_anki = sys.modules['anki']
 fake_anki.utils.is_mac = False
 fake_anki.utils.is_win = False
 
-sys.modules['aqt'] = fake_aqt
-sys.modules['aqt.qt'] = fake_qt_module
 sys.modules['aqt.webview'] = fake_aqt.webview
-sys.modules['aqt.utils'] = fake_aqt.utils
-sys.modules['anki'] = fake_anki
-sys.modules['anki.utils'] = fake_anki.utils
-sys.modules['anki.hooks'] = MagicMock()
 
 # Now import the module under test
 from src.ui.dictionary_window import DictionaryWindow

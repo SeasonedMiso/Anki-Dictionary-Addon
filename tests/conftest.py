@@ -18,6 +18,10 @@ sys.path.insert(0, str(project_root / 'src'))
 # Prevent importing the main __init__.py which requires Anki
 sys.modules['__init__'] = type(sys)('__init__')
 
+# Set up Anki and Qt mocks before any imports
+from tests.mocks import setup_aqt_mocks
+setup_aqt_mocks()
+
 
 @pytest.fixture
 def temp_db_path():

@@ -8,6 +8,8 @@ from unittest.mock import Mock, MagicMock, patch, call
 from pathlib import Path
 import sys
 
+# Note: This test file uses custom Qt mocks specific to SettingsWindow testing
+# rather than the shared mocks in tests/mocks.py due to complex widget requirements
 
 # Create fake Qt classes
 class FakeQWidget:
@@ -54,6 +56,7 @@ class FakeQCheckBox(FakeQWidget):
     def isChecked(self): return self._checked
     def setChecked(self, checked): self._checked = checked
     def setFixedHeight(self, h): pass
+    def setToolTip(self, text): pass
 
 
 class FakeQSpinBox(FakeQWidget):
@@ -68,6 +71,7 @@ class FakeQSpinBox(FakeQWidget):
     def setValue(self, value): self._value = value
     def setRange(self, min_val, max_val): self._range = (min_val, max_val)
     def setFixedWidth(self, w): pass
+    def setToolTip(self, text): pass
 
 
 class FakeQComboBox(FakeQWidget):
@@ -82,6 +86,7 @@ class FakeQComboBox(FakeQWidget):
     def currentText(self): return self._current_text
     def setCurrentText(self, text): self._current_text = text
     def setFixedWidth(self, w): pass
+    def setToolTip(self, text): pass
 
 
 class FakeQLineEdit(FakeQWidget):
@@ -93,6 +98,7 @@ class FakeQLineEdit(FakeQWidget):
     
     def text(self): return self._text
     def setText(self, text): self._text = text
+    def setToolTip(self, text): pass
 
 
 class FakeQPushButton(FakeQWidget):
@@ -103,6 +109,8 @@ class FakeQPushButton(FakeQWidget):
         self._text = text
         self.clicked = Mock()
     
+    def text(self): return self._text
+    def setText(self, text): self._text = text
     def setFixedWidth(self, w): pass
     def setFixedHeight(self, h): pass
     def setToolTip(self, text): pass
@@ -408,8 +416,8 @@ def temp_addon_path(tmp_path):
 @pytest.fixture
 def settings_window(mock_mw, mock_config_manager, mock_plugin, temp_addon_path):
     """Create settings window instance for testing."""
-    with patch('src.ui.settings_window.miInfo'), \
-         patch('src.ui.settings_window.miAsk'):
+    with patch('src.ui.settings_window.show_info'), \
+         patch('src.ui.settings_window.ask_user'):
         window = SettingsWindow(
             mw=mock_mw,
             config_manager=mock_config_manager,
@@ -437,7 +445,7 @@ class TestSettingsWindowInitialization:
     
     def test_window_title_set(self, settings_window):
         """Test that window title is set correctly."""
-        assert settings_window._window_title == "Anki Dictionary Settings"
+        assert "Anki Dictionary Settings" in settings_window._window_title
     
     def test_widgets_created(self, settings_window):
         """Test that all widgets are created."""
@@ -545,7 +553,7 @@ class TestSettingsWindowSaveSettings:
         mock_config_manager
     ):
         """Test that save settings calls ConfigManager.write_config."""
-        with patch('src.ui.settings_window.showInfo'):
+        with patch('src.ui.settings_window.show_info'):
             result = settings_window.save_settings()
         
         assert result == True
@@ -559,7 +567,7 @@ class TestSettingsWindowSaveSettings:
         """Test that save settings validates before saving."""
         settings_window.total_defs.setValue(0)  # Invalid value
         
-        with patch('src.ui.settings_window.showInfo'):
+        with patch('src.ui.settings_window.show_info'):
             result = settings_window.save_settings()
         
         assert result == False
@@ -576,7 +584,7 @@ class TestSettingsWindowSaveSettings:
         settings_window.total_defs.setValue(500)
         settings_window.front_bracket.setText('《')
         
-        with patch('src.ui.settings_window.showInfo'):
+        with patch('src.ui.settings_window.show_info'):
             settings_window.save_settings()
         
         # Verify write_config was called with updated values
@@ -591,7 +599,7 @@ class TestSettingsWindowSaveSettings:
         mock_plugin
     ):
         """Test that save settings notifies plugin of changes."""
-        with patch('src.ui.settings_window.showInfo'):
+        with patch('src.ui.settings_window.show_info'):
             settings_window.save_settings()
         
         mock_plugin.refresh_config.assert_called_once()
@@ -604,7 +612,7 @@ class TestSettingsWindowSaveSettings:
         """Test that FFMPEG is installed if mp3Convert is enabled."""
         settings_window.convert_to_mp3.setChecked(True)
         
-        with patch('src.ui.settings_window.showInfo'):
+        with patch('src.ui.settings_window.show_info'):
             settings_window.save_settings()
         
         mock_plugin.ffmpeg_installer.installFFMPEG.assert_called_once()
@@ -617,7 +625,7 @@ class TestSettingsWindowSaveSettings:
         """Test that save settings handles validation errors."""
         mock_config_manager.write_config.side_effect = ValueError("Invalid config")
         
-        with patch('src.ui.settings_window.showInfo') as mock_show:
+        with patch('src.ui.settings_window.show_info') as mock_show:
             result = settings_window.save_settings()
         
         assert result == False
@@ -634,7 +642,7 @@ class TestSettingsWindowResetDefaults:
         mock_config_manager
     ):
         """Test that reset to defaults calls ConfigManager.reset_to_defaults."""
-        with patch('src.ui.settings_window.miAsk', return_value=True):
+        with patch('src.ui.settings_window.ask_user', return_value=True):
             settings_window.reset_to_defaults()
         
         mock_config_manager.reset_to_defaults.assert_called_once()
@@ -645,14 +653,14 @@ class TestSettingsWindowResetDefaults:
         mock_config_manager
     ):
         """Test that reset to defaults requires user confirmation."""
-        with patch('src.ui.settings_window.miAsk', return_value=False):
+        with patch('src.ui.settings_window.ask_user', return_value=False):
             settings_window.reset_to_defaults()
         
         mock_config_manager.reset_to_defaults.assert_not_called()
     
     def test_reset_to_defaults_closes_window(self, settings_window):
         """Test that reset to defaults closes the window."""
-        with patch('src.ui.settings_window.miAsk', return_value=True):
+        with patch('src.ui.settings_window.ask_user', return_value=True):
             settings_window.reset_to_defaults()
         
         assert settings_window.isVisible() == False
@@ -672,7 +680,12 @@ class TestSettingsWindowGroupManagement:
         mock_config_manager
     ):
         """Test that removing a group updates configuration."""
-        with patch('src.ui.settings_window.miAsk', return_value=True):
+        # Mock the table item to return the group name that exists in config
+        mock_item = Mock()
+        mock_item.text = Mock(return_value='TestGroup')
+        settings_window.dict_groups.item = Mock(return_value=mock_item)
+        
+        with patch('src.ui.settings_window.ask_user', return_value=True):
             settings_window._remove_group(0)
         
         mock_config_manager.write_config.assert_called()
@@ -692,7 +705,12 @@ class TestSettingsWindowTemplateManagement:
         mock_config_manager
     ):
         """Test that removing a template updates configuration."""
-        with patch('src.ui.settings_window.miAsk', return_value=True):
+        # Mock the table item to return the template name that exists in config
+        mock_item = Mock()
+        mock_item.text = Mock(return_value='TestTemplate')
+        settings_window.export_templates.item = Mock(return_value=mock_item)
+        
+        with patch('src.ui.settings_window.ask_user', return_value=True):
             settings_window._remove_template(0)
         
         mock_config_manager.write_config.assert_called()

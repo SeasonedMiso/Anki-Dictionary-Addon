@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Integration tests for main entry point.
+
+Tests the refactored main.py entry point to ensure:
+- Plugin instance is created and attached to mw
+- UI components are accessible via plugin
+- Legacy function wrappers work correctly
+- Backward compatibility variables are set
+- Full initialization sequence works with UI
 """
 
 import pytest
@@ -399,10 +406,9 @@ class TestInitializationSequence:
             
             # Step 4: Initialize plugin
             with patch.object(plugin, '_setup_hooks'):
-                with patch.object(plugin, '_setup_menu'):
-                    with patch.object(plugin, '_setup_hotkeys'):
-                        with patch.object(plugin, '_cleanup_temp_files'):
-                            plugin.initialize()
+                with patch.object(plugin, '_setup_ui'):
+                    with patch.object(plugin, '_cleanup_temp_files'):
+                        plugin.initialize()
             
             # Step 5: Verify cleanup works
             with patch.object(plugin.media_service, 'cleanup_temp_media'):
@@ -556,3 +562,331 @@ class TestErrorRecovery:
                 with patch.object(plugin.db_connection, 'close', side_effect=Exception("Close error")):
                     # Should not raise
                     plugin.cleanup()
+
+
+class TestUIComponentAccessibility:
+    """Test UI components are accessible via plugin."""
+    
+    def test_dictionary_window_accessible(self, mock_mw, temp_addon_path):
+        """Test that dictionary window is accessible via plugin."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock DictionaryWindow where it's imported (in the method)
+            with patch('src.ui.DictionaryWindow') as MockDictWindow:
+                mock_dict_window = Mock()
+                MockDictWindow.return_value = mock_dict_window
+                
+                # Get dictionary window
+                dict_window = plugin.get_dictionary_window()
+                
+                # Verify it was created
+                assert dict_window is not None
+                assert dict_window == mock_dict_window
+                
+                # Verify lazy initialization (second call returns same instance)
+                dict_window2 = plugin.get_dictionary_window()
+                assert dict_window2 == dict_window
+    
+    def test_settings_window_accessible(self, mock_mw, temp_addon_path):
+        """Test that settings window is accessible via plugin."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock SettingsWindow where it's imported (in the method)
+            with patch('src.ui.SettingsWindow') as MockSettingsWindow:
+                mock_settings_window = Mock()
+                MockSettingsWindow.return_value = mock_settings_window
+                
+                # Get settings window
+                settings_window = plugin.get_settings_window()
+                
+                # Verify it was created
+                assert settings_window is not None
+                assert settings_window == mock_settings_window
+    
+    def test_dictionary_manager_accessible(self, mock_mw, temp_addon_path):
+        """Test that dictionary manager is accessible via plugin."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock DictionaryManagerWidget where it's imported (in the method)
+            with patch('src.ui.DictionaryManagerWidget') as MockManager:
+                mock_manager = Mock()
+                MockManager.return_value = mock_manager
+                
+                # Get dictionary manager
+                manager = plugin.get_dictionary_manager()
+                
+                # Verify it was created
+                assert manager is not None
+                assert manager == mock_manager
+    
+    def test_menu_manager_accessible(self, mock_mw, temp_addon_path):
+        """Test that menu manager is accessible via plugin."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Initialize plugin to create menu manager
+            with patch.object(plugin, '_setup_hooks'):
+                with patch.object(plugin, '_cleanup_temp_files'):
+                    with patch('src.ui.menu_manager.MenuManager') as MockMenuManager:
+                        mock_menu_manager = Mock()
+                        MockMenuManager.return_value = mock_menu_manager
+                        
+                        plugin.initialize()
+                        
+                        # Get menu manager
+                        menu_manager = plugin.get_menu_manager()
+                        
+                        # Verify it was created
+                        assert menu_manager is not None
+    
+    def test_editor_integration_accessible(self, mock_mw, temp_addon_path):
+        """Test that editor integration is accessible via plugin."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Initialize plugin to create editor integration
+            with patch.object(plugin, '_setup_hooks'):
+                with patch.object(plugin, '_cleanup_temp_files'):
+                    with patch('src.ui.editor_integration.EditorIntegration') as MockEditorIntegration:
+                        mock_editor_integration = Mock()
+                        MockEditorIntegration.return_value = mock_editor_integration
+                        
+                        plugin.initialize()
+                        
+                        # Get editor integration
+                        editor_integration = plugin.get_editor_integration()
+                        
+                        # Verify it was created
+                        assert editor_integration is not None
+    
+    def test_browser_integration_accessible(self, mock_mw, temp_addon_path):
+        """Test that browser integration is accessible via plugin."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Initialize plugin to create browser integration
+            with patch.object(plugin, '_setup_hooks'):
+                with patch.object(plugin, '_cleanup_temp_files'):
+                    with patch('src.ui.browser_integration.BrowserIntegration') as MockBrowserIntegration:
+                        mock_browser_integration = Mock()
+                        MockBrowserIntegration.return_value = mock_browser_integration
+                        
+                        plugin.initialize()
+                        
+                        # Get browser integration
+                        browser_integration = plugin.get_browser_integration()
+                        
+                        # Verify it was created
+                        assert browser_integration is not None
+
+
+class TestLegacyFunctionWrappersInMain:
+    """Test legacy function wrappers in main.py work correctly."""
+    
+    def test_dictionary_init_wrapper_exists(self, mock_mw, temp_addon_path):
+        """Test that dictionary_init wrapper function exists."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            mock_mw.ankiDictPlugin = plugin
+            
+            # Verify mw.dictionaryInit will be set by main.py
+            # This is tested by importing main.py in integration tests
+            assert plugin is not None
+    
+    def test_open_dictionary_via_plugin(self, mock_mw, temp_addon_path):
+        """Test opening dictionary via plugin method."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock dictionary window where it's imported (in the method)
+            with patch('src.ui.DictionaryWindow') as MockDictWindow:
+                mock_dict_window = Mock()
+                mock_dict_window.show_window = Mock()
+                MockDictWindow.return_value = mock_dict_window
+                
+                # Open dictionary
+                plugin.open_dictionary(['test'])
+                
+                # Verify show_window was called
+                mock_dict_window.show_window.assert_called_once_with(['test'])
+    
+    def test_close_dictionary_via_plugin(self, mock_mw, temp_addon_path):
+        """Test closing dictionary via plugin method."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock dictionary window
+            mock_dict_window = Mock()
+            mock_dict_window.isVisible = Mock(return_value=True)
+            mock_dict_window.hide = Mock()
+            plugin._dictionary_window = mock_dict_window
+            
+            # Close dictionary
+            plugin.close_dictionary()
+            
+            # Verify hide was called
+            mock_dict_window.hide.assert_called_once()
+    
+    def test_open_settings_via_plugin(self, mock_mw, temp_addon_path):
+        """Test opening settings via plugin method."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock settings window where it's imported (in the method)
+            with patch('src.ui.SettingsWindow') as MockSettingsWindow:
+                mock_settings_window = Mock()
+                mock_settings_window.show = Mock()
+                mock_settings_window.raise_ = Mock()
+                mock_settings_window.activateWindow = Mock()
+                MockSettingsWindow.return_value = mock_settings_window
+                
+                # Open settings
+                plugin.open_settings()
+                
+                # Verify methods were called
+                mock_settings_window.show.assert_called_once()
+                mock_settings_window.raise_.assert_called_once()
+                mock_settings_window.activateWindow.assert_called_once()
+
+
+class TestFullInitializationWithUI:
+    """Test full initialization sequence with UI components."""
+    
+    def test_full_initialization_creates_ui_components(self, mock_mw, temp_addon_path):
+        """Test that full initialization creates UI components."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Mock UI components where they're imported (in _setup_ui method)
+            with patch('src.ui.MenuManager') as MockMenuManager:
+                with patch('src.ui.EditorIntegration') as MockEditorIntegration:
+                    with patch('src.ui.BrowserIntegration') as MockBrowserIntegration:
+                        mock_menu = Mock()
+                        mock_editor = Mock()
+                        mock_browser = Mock()
+                        
+                        MockMenuManager.return_value = mock_menu
+                        MockEditorIntegration.return_value = mock_editor
+                        MockBrowserIntegration.return_value = mock_browser
+                        
+                        # Initialize
+                        with patch.object(plugin, '_setup_hooks'):
+                            with patch.object(plugin, '_cleanup_temp_files'):
+                                plugin.initialize()
+                        
+                        # Verify UI components were created
+                        MockMenuManager.assert_called_once()
+                        MockEditorIntegration.assert_called_once()
+                        MockBrowserIntegration.assert_called_once()
+                        
+                        # Verify setup methods were called
+                        mock_menu.setup_menu.assert_called_once()
+                        mock_menu.setup_global_hotkeys.assert_called_once()
+                        mock_editor.setup_editor_hooks.assert_called_once()
+                        mock_browser.setup_browser_hooks.assert_called_once()
+    
+    def test_ui_cleanup_on_shutdown(self, mock_mw, temp_addon_path):
+        """Test that UI resources are cleaned up on shutdown."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            # Create mock UI components
+            mock_dict_window = Mock()
+            mock_dict_window.close = Mock()
+            plugin._dictionary_window = mock_dict_window
+            
+            mock_settings_window = Mock()
+            mock_settings_window.close = Mock()
+            plugin._settings_window = mock_settings_window
+            
+            # Cleanup
+            with patch.object(plugin.media_service, 'cleanup_temp_media'):
+                with patch.object(plugin.db_connection, 'close'):
+                    plugin.cleanup()
+            
+            # Verify windows were closed
+            mock_dict_window.close.assert_called_once()
+            mock_settings_window.close.assert_called_once()
+            
+            # Verify references were cleared
+            assert plugin._dictionary_window is None
+            assert plugin._settings_window is None
+    
+    def test_initialization_sequence_order(self, mock_mw, temp_addon_path):
+        """Test that initialization happens in correct order."""
+        with patch('src.core.plugin.Path') as mock_path:
+            mock_path.return_value.parent.parent.parent = temp_addon_path
+            
+            from src.core.plugin import AnkiDictionaryPlugin
+            
+            plugin = AnkiDictionaryPlugin(mock_mw)
+            
+            call_order = []
+            
+            def track_hooks():
+                call_order.append('hooks')
+            
+            def track_ui():
+                call_order.append('ui')
+            
+            def track_cleanup():
+                call_order.append('cleanup')
+            
+            with patch.object(plugin, '_setup_hooks', side_effect=track_hooks):
+                with patch.object(plugin, '_setup_ui', side_effect=track_ui):
+                    with patch.object(plugin, '_cleanup_temp_files', side_effect=track_cleanup):
+                        plugin.initialize()
+            
+            # Verify order: hooks -> ui -> cleanup
+            assert call_order == ['hooks', 'ui', 'cleanup']

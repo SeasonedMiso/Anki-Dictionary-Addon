@@ -119,8 +119,13 @@ def plugin(mock_mw, temp_addon_path, monkeypatch):
             temp_addon_path
         )
         
-        plugin.dictionary_window = None
-        plugin.settings_window = None
+        # UI Components (lazy initialization)
+        plugin._dictionary_window = None
+        plugin._settings_window = None
+        plugin._dictionary_manager = None
+        plugin._editor_integration = None
+        plugin._browser_integration = None
+        plugin._menu_manager = None
         
         # Initialize state
         plugin._initialize_state()
@@ -337,15 +342,13 @@ class TestInitializeMethod:
     def test_initialize_calls_setup_methods(self, plugin):
         """Test that initialize calls all setup methods."""
         with patch.object(plugin, '_setup_hooks') as mock_hooks:
-            with patch.object(plugin, '_setup_menu') as mock_menu:
-                with patch.object(plugin, '_setup_hotkeys') as mock_hotkeys:
-                    with patch.object(plugin, '_cleanup_temp_files') as mock_cleanup:
-                        plugin.initialize()
-                        
-                        mock_hooks.assert_called_once()
-                        mock_menu.assert_called_once()
-                        mock_hotkeys.assert_called_once()
-                        mock_cleanup.assert_called_once()
+            with patch.object(plugin, '_setup_ui') as mock_ui:
+                with patch.object(plugin, '_cleanup_temp_files') as mock_cleanup:
+                    plugin.initialize()
+                    
+                    mock_hooks.assert_called_once()
+                    mock_ui.assert_called_once()
+                    mock_cleanup.assert_called_once()
     
     def test_initialize_handles_errors(self, plugin):
         """Test that initialize handles errors gracefully."""
@@ -398,6 +401,304 @@ class TestDatabaseIntegration:
         
         # Connection should be closed
         assert plugin.db_connection.conn is None
+
+
+class TestUIComponentInitialization:
+    """Test UI component initialization."""
+    
+    def test_setup_ui_creates_ui_components(self, plugin):
+        """Test that _setup_ui creates UI components."""
+        # Call _setup_ui
+        plugin._setup_ui()
+        
+        # UI components should be initialized
+        assert plugin._menu_manager is not None
+        assert plugin._editor_integration is not None
+        assert plugin._browser_integration is not None
+    
+    def test_setup_ui_handles_errors(self, plugin):
+        """Test that _setup_ui handles errors gracefully."""
+        # Temporarily break the UI module import
+        import sys
+        original_ui = sys.modules.get('src.ui')
+        
+        # Create a mock that raises an error
+        mock_ui = Mock()
+        mock_ui.MenuManager = Mock(side_effect=Exception("UI error"))
+        sys.modules['src.ui'] = mock_ui
+        
+        try:
+            # Should not raise exception
+            plugin._setup_ui()
+        finally:
+            # Restore original module
+            if original_ui is not None:
+                sys.modules['src.ui'] = original_ui
+            elif 'src.ui' in sys.modules:
+                del sys.modules['src.ui']
+
+
+class TestUIComponentAccessors:
+    """Test UI component accessor methods."""
+    
+    def test_get_dictionary_window_lazy_initialization(self, plugin):
+        """Test that dictionary window is lazily initialized."""
+        assert plugin._dictionary_window is None
+        
+        # Get window - should create it
+        window = plugin.get_dictionary_window()
+        
+        # Window should be created
+        assert window is not None
+        assert plugin._dictionary_window is window
+    
+    def test_get_dictionary_window_returns_existing(self, plugin):
+        """Test that get_dictionary_window returns existing instance."""
+        mock_window = Mock()
+        plugin._dictionary_window = mock_window
+        
+        window = plugin.get_dictionary_window()
+        
+        assert window == mock_window
+    
+    def test_get_settings_window_lazy_initialization(self, plugin):
+        """Test that settings window is lazily initialized."""
+        assert plugin._settings_window is None
+        
+        # Get window - should create it
+        window = plugin.get_settings_window()
+        
+        # Window should be created
+        assert window is not None
+        assert plugin._settings_window is window
+    
+    def test_get_settings_window_returns_existing(self, plugin):
+        """Test that get_settings_window returns existing instance."""
+        mock_window = Mock()
+        plugin._settings_window = mock_window
+        
+        window = plugin.get_settings_window()
+        
+        assert window == mock_window
+    
+    def test_get_dictionary_manager_lazy_initialization(self, plugin):
+        """Test that dictionary manager is lazily initialized."""
+        assert plugin._dictionary_manager is None
+        
+        # Get manager - should create it
+        manager = plugin.get_dictionary_manager()
+        
+        # Manager should be created
+        assert manager is not None
+        assert plugin._dictionary_manager is manager
+    
+    def test_get_dictionary_manager_returns_existing(self, plugin):
+        """Test that get_dictionary_manager returns existing instance."""
+        mock_manager = Mock()
+        plugin._dictionary_manager = mock_manager
+        
+        manager = plugin.get_dictionary_manager()
+        
+        assert manager == mock_manager
+    
+    def test_get_menu_manager(self, plugin):
+        """Test getting menu manager."""
+        mock_menu = Mock()
+        plugin._menu_manager = mock_menu
+        
+        menu = plugin.get_menu_manager()
+        
+        assert menu == mock_menu
+    
+    def test_get_editor_integration(self, plugin):
+        """Test getting editor integration."""
+        mock_editor = Mock()
+        plugin._editor_integration = mock_editor
+        
+        editor = plugin.get_editor_integration()
+        
+        assert editor == mock_editor
+    
+    def test_get_browser_integration(self, plugin):
+        """Test getting browser integration."""
+        mock_browser = Mock()
+        plugin._browser_integration = mock_browser
+        
+        browser = plugin.get_browser_integration()
+        
+        assert browser == mock_browser
+
+
+class TestUIWindowOperations:
+    """Test UI window opening and closing operations."""
+    
+    def test_open_dictionary(self, plugin):
+        """Test opening dictionary window."""
+        mock_window = Mock()
+        plugin._dictionary_window = mock_window
+        
+        plugin.open_dictionary(['test', 'terms'])
+        
+        mock_window.show_window.assert_called_once_with(['test', 'terms'])
+    
+    def test_open_dictionary_without_terms(self, plugin):
+        """Test opening dictionary window without terms."""
+        mock_window = Mock()
+        plugin._dictionary_window = mock_window
+        
+        plugin.open_dictionary()
+        
+        mock_window.show_window.assert_called_once_with(None)
+    
+    def test_close_dictionary(self, plugin):
+        """Test closing dictionary window."""
+        mock_window = Mock()
+        mock_window.isVisible.return_value = True
+        plugin._dictionary_window = mock_window
+        
+        plugin.close_dictionary()
+        
+        mock_window.hide.assert_called_once()
+    
+    def test_close_dictionary_when_not_visible(self, plugin):
+        """Test closing dictionary window when not visible."""
+        mock_window = Mock()
+        mock_window.isVisible.return_value = False
+        plugin._dictionary_window = mock_window
+        
+        plugin.close_dictionary()
+        
+        mock_window.hide.assert_not_called()
+    
+    def test_close_dictionary_when_none(self, plugin):
+        """Test closing dictionary window when it doesn't exist."""
+        plugin._dictionary_window = None
+        
+        # Should not raise exception
+        plugin.close_dictionary()
+    
+    def test_open_settings(self, plugin):
+        """Test opening settings window."""
+        mock_window = Mock()
+        plugin._settings_window = mock_window
+        
+        plugin.open_settings()
+        
+        mock_window.show.assert_called_once()
+        mock_window.raise_.assert_called_once()
+        mock_window.activateWindow.assert_called_once()
+    
+    def test_open_dictionary_manager(self, plugin):
+        """Test opening dictionary manager."""
+        mock_manager = Mock()
+        plugin._dictionary_manager = mock_manager
+        
+        plugin.open_dictionary_manager()
+        
+        mock_manager.show.assert_called_once()
+        mock_manager.raise_.assert_called_once()
+        mock_manager.activateWindow.assert_called_once()
+
+
+class TestUICleanup:
+    """Test UI resource cleanup."""
+    
+    def test_cleanup_ui_resources_closes_dictionary_window(self, plugin):
+        """Test that cleanup closes dictionary window."""
+        mock_window = Mock()
+        plugin._dictionary_window = mock_window
+        
+        plugin._cleanup_ui_resources()
+        
+        mock_window.close.assert_called_once()
+        assert plugin._dictionary_window is None
+    
+    def test_cleanup_ui_resources_closes_settings_window(self, plugin):
+        """Test that cleanup closes settings window."""
+        mock_window = Mock()
+        plugin._settings_window = mock_window
+        
+        plugin._cleanup_ui_resources()
+        
+        mock_window.close.assert_called_once()
+        assert plugin._settings_window is None
+    
+    def test_cleanup_ui_resources_closes_dictionary_manager(self, plugin):
+        """Test that cleanup closes dictionary manager."""
+        mock_manager = Mock()
+        plugin._dictionary_manager = mock_manager
+        
+        plugin._cleanup_ui_resources()
+        
+        mock_manager.close.assert_called_once()
+        assert plugin._dictionary_manager is None
+    
+    def test_cleanup_ui_resources_handles_errors(self, plugin):
+        """Test that UI cleanup handles errors gracefully."""
+        mock_window = Mock()
+        mock_window.close.side_effect = Exception("Close error")
+        plugin._dictionary_window = mock_window
+        
+        # Should not raise exception
+        plugin._cleanup_ui_resources()
+        
+        # Window reference should still be cleared
+        assert plugin._dictionary_window is None
+    
+    def test_cleanup_calls_cleanup_ui_resources(self, plugin):
+        """Test that cleanup calls _cleanup_ui_resources."""
+        with patch.object(plugin, '_cleanup_ui_resources') as mock_ui_cleanup:
+            with patch.object(plugin.media_service, 'cleanup_temp_media'):
+                with patch.object(plugin.db_connection, 'close'):
+                    plugin.cleanup()
+                    
+                    mock_ui_cleanup.assert_called_once()
+
+
+class TestBackwardCompatibilityProperties:
+    """Test backward compatibility properties."""
+    
+    def test_dictionary_window_property_getter(self, plugin):
+        """Test dictionary_window property getter."""
+        mock_window = Mock()
+        plugin._dictionary_window = mock_window
+        
+        assert plugin.dictionary_window == mock_window
+    
+    def test_dictionary_window_property_setter(self, plugin):
+        """Test dictionary_window property setter."""
+        mock_window = Mock()
+        plugin.dictionary_window = mock_window
+        
+        assert plugin._dictionary_window == mock_window
+    
+    def test_settings_window_property_getter(self, plugin):
+        """Test settings_window property getter."""
+        mock_window = Mock()
+        plugin._settings_window = mock_window
+        
+        assert plugin.settings_window == mock_window
+    
+    def test_settings_window_property_setter(self, plugin):
+        """Test settings_window property setter."""
+        mock_window = Mock()
+        plugin.settings_window = mock_window
+        
+        assert plugin._settings_window == mock_window
+    
+    def test_editor_integration_property_getter(self, plugin):
+        """Test editor_integration property getter."""
+        mock_editor = Mock()
+        plugin._editor_integration = mock_editor
+        
+        assert plugin.editor_integration == mock_editor
+    
+    def test_editor_integration_property_setter(self, plugin):
+        """Test editor_integration property setter."""
+        mock_editor = Mock()
+        plugin.editor_integration = mock_editor
+        
+        assert plugin._editor_integration == mock_editor
 
 
 class TestErrorHandling:
