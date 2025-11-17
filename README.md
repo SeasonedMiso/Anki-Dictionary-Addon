@@ -10,7 +10,8 @@
 ### Table of Contents
 
 - [Installation](#installation)
-- [Documentation](#documentation)
+- [Features](#features)
+- [Development](#development)
 - [Contributing](#contributing)
 - [License and Credits](#license-and-credits)
 
@@ -18,6 +19,33 @@
 
 1. Install the latest supported version of Anki.
 2. Download the latest version of the addon from this repository, and unzip it to your anki2 addons folder.
+
+### Features
+
+- Real-time dictionary lookup with multiple dictionary support
+- Audio pronunciation from Forvo
+- Image search via Google Images
+- Bulk definition export
+- Customizable card templates
+- Theme support
+- Frequency information
+- Sentence mining
+
+### Development
+
+This project is undergoing active refactoring to improve code quality and maintainability.
+
+**Current Status:**
+- ✅ Phase 1: Foundation (100%)
+- ✅ Phase 2: Database Integration (100%)
+- ✅ Phase 3: Main Entry Point (100%)
+- ⏳ Phase 4: UI Refactoring (In Progress)
+
+**For Developers:**
+- See [DEVELOPMENT.md](DEVELOPMENT.md) for development guide
+- See [.kiro/specs/](./kiro/specs/) for detailed specifications
+- Run tests: `python3 -m pytest tests/ -v`
+- 124 tests, 100% pass rate
 
 ### Contributing
 
