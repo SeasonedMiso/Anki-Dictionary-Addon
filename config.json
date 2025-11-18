@@ -1,6 +1,18 @@
 {   
     "DictionaryGroups": {
-                    },
+        "jp": {
+            "customFont": false,
+            "font": false,
+            "dictionaries": [
+                {"dict": "l161nameMonolingual_旺文社国語辞典_第十一版_Recommended", "lang": "jp"},
+                {"dict": "l161nameMonolingual_三省堂国語辞典_第八版_Recommended", "lang": "jp"},
+                {"dict": "l161nameMonolingual_実用日本語表現辞典_Recommended", "lang": "jp"},
+                {"dict": "l161nameMonolingual_実用日本語表現辞典_Extended_Recommended", "lang": "jp"},
+                {"dict": "l161nameMonolingual_新明解国語辞典_第八版", "lang": "jp"},
+                {"dict": "l161nameMonolingual_明鏡国語辞典_第二版_Recommended_Improved", "lang": "jp"}
+            ]
+        }
+    },
     "ExportTemplates" : {},
     "GoogleImageFields" : [],
     "ForvoFields" : [],
@@ -21,7 +33,7 @@
     "backBracket" : "】",
     "showTarget" : false,
     "day" : true,
-    "currentGroup" : "All",
+    "currentGroup" : "jp",
     "searchMode" : "Forward",
     "currentTemplate" : false,
     "currentDeck" : false,

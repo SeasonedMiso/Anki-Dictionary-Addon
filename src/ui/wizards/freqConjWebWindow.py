@@ -3,7 +3,7 @@ from enum import Enum
 from aqt.qt import *
 from anki.httpclient import HttpClient
 
-from . import webConfig
+from ...config import webConfig
 
 addon_path = os.path.dirname(__file__)
 

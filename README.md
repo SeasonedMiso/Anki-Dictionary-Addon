@@ -31,21 +31,9 @@
 - Frequency information
 - Sentence mining
 
-### Development
-
-This project is undergoing active refactoring to improve code quality and maintainability.
-
-**Current Status:**
-- ✅ Phase 1: Foundation (100%)
-- ✅ Phase 2: Database Integration (100%)
-- ✅ Phase 3: Main Entry Point (100%)
-- ⏳ Phase 4: UI Refactoring (In Progress)
 
 **For Developers:**
-- See [DEVELOPMENT.md](DEVELOPMENT.md) for development guide
-- See [.kiro/specs/](./kiro/specs/) for detailed specifications
 - Run tests: `python3 -m pytest tests/ -v`
-- 124 tests, 100% pass rate
 
 ### Contributing
 

@@ -131,13 +131,16 @@ class MenuManager:
         
         try:
             # Ctrl+W / ⌘W: Toggle dictionary window
+            shortcut_str = self._get_platform_shortcut("Ctrl+W")
+            logger.info(f"Setting up dictionary hotkey: {shortcut_str}")
             hotkey_w = QShortcut(
-                QKeySequence(self._get_platform_shortcut("Ctrl+W")),
+                QKeySequence(shortcut_str),
                 self.mw
             )
-            hotkey_w.activated.connect(self.open_dictionary)
+            hotkey_w.activated.connect(lambda: (logger.info("Hotkey W activated!"), self.open_dictionary()))
             self.mw.hotkeyW = hotkey_w  # Backward compatibility
             self._global_hotkeys.append(hotkey_w)
+            logger.info(f"Dictionary hotkey registered: {hotkey_w.key().toString()}")
             
             # Ctrl+S / ⌘S: Search selected text
             hotkey_s = QShortcut(
@@ -169,11 +172,14 @@ class MenuManager:
         This method handles opening the dictionary window, toggling its visibility,
         and updating the menu text accordingly.
         """
+        logger.info("open_dictionary called")
         try:
             from anki.utils import is_mac
             
+            logger.info("Getting dictionary window...")
             # Get dictionary window
             dict_window = self.plugin.get_dictionary_window()
+            logger.info(f"Dictionary window obtained: {dict_window}")
             
             # Determine shortcut text for menu
             shortcut_text = "⌘W" if is_mac else "Ctrl+W"
@@ -181,12 +187,14 @@ class MenuManager:
             # Toggle visibility
             if dict_window.isVisible():
                 # Hide window
+                logger.info("Hiding dictionary window")
                 dict_window.hide()
                 if hasattr(self.mw, 'openMiDict'):
                     self.mw.openMiDict.setText(f"Open Dictionary ({shortcut_text})")
                 logger.debug("Dictionary window hidden")
             else:
                 # Show window
+                logger.info("Showing dictionary window")
                 dict_window.show_window()
                 if hasattr(self.mw, 'openMiDict'):
                     self.mw.openMiDict.setText(f"Close Dictionary ({shortcut_text})")

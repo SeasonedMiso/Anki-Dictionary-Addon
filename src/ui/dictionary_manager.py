@@ -314,7 +314,7 @@ class DictionaryManagerWidget(QWidget):
     def web_installer(self) -> None:
         """Open web installer wizard."""
         try:
-            from ..dictionaryWebInstallWizard import DictionaryWebInstallWizard
+            from .wizards.dictionaryWebInstallWizard import DictionaryWebInstallWizard
             DictionaryWebInstallWizard.execute_modal()
             self.reload_tree_widget()
         except Exception as e:
@@ -477,7 +477,7 @@ class DictionaryManagerWidget(QWidget):
         lang_name = lang_item.data(0, Qt.ItemDataRole.UserRole+0)
 
         try:
-            from ..freqConjWebWindow import FreqConjWebWindow
+            from .wizards.freqConjWebWindow import FreqConjWebWindow
             FreqConjWebWindow.execute_modal(lang_name, FreqConjWebWindow.Mode.Freq)
         except Exception as e:
             logger.error(f"Failed to open frequency wizard: {e}")
@@ -531,7 +531,7 @@ class DictionaryManagerWidget(QWidget):
         lang_name = lang_item.data(0, Qt.ItemDataRole.UserRole+0)
 
         try:
-            from ..freqConjWebWindow import FreqConjWebWindow
+            from .wizards.freqConjWebWindow import FreqConjWebWindow
             FreqConjWebWindow.execute_modal(lang_name, FreqConjWebWindow.Mode.Conj)
         except Exception as e:
             logger.error(f"Failed to open conjugation wizard: {e}")
@@ -619,7 +619,7 @@ class DictionaryManagerWidget(QWidget):
         lang_name = lang_item.data(0, Qt.ItemDataRole.UserRole+0)
 
         try:
-            from ..dictionaryWebInstallWizard import DictionaryWebInstallWizard
+            from .wizards.dictionaryWebInstallWizard import DictionaryWebInstallWizard
             DictionaryWebInstallWizard.execute_modal(lang_name)
             self.reload_tree_widget()
         except Exception as e:

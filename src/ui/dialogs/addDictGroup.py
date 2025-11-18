@@ -16,7 +16,7 @@ from os.path import dirname, join, exists
 from aqt import mw
 
 from aqt.qt import Qt
-from src.utils.dialogs import show_info as show_info_dialog, ask_user as ask_user_dialog
+from ...utils.dialogs import show_info as show_info_dialog, ask_user as ask_user_dialog
 from shutil import copyfile
 from operator import itemgetter
 import ntpath

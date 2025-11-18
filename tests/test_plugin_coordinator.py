@@ -13,6 +13,7 @@ from src.core.plugin import AnkiDictionaryPlugin
 from src.config.manager import ConfigManager
 from src.database.connection import DatabaseConnection
 from src.database.repository import DictionaryRepository
+from src.database.dictdb import DictDB
 from src.services.search_service import SearchService
 from src.services.export_service import ExportService
 from src.services.media_service import MediaService
@@ -108,6 +109,11 @@ def plugin(mock_mw, temp_addon_path, monkeypatch):
         plugin.db_connection = DatabaseConnection(str(db_path))
         plugin.dictionary_repo = DictionaryRepository(plugin.db_connection)
         
+        # Mock DictDB for testing
+        plugin.dictdb = Mock(spec=DictDB)
+        plugin.dictdb.repository = plugin.dictionary_repo
+        plugin.dictdb.getAllDictsWithLang = Mock(return_value=[])
+        
         plugin.search_service = SearchService(
             plugin.dictionary_repo,
             temp_addon_path
@@ -165,7 +171,7 @@ class TestPluginInitialization:
         assert mock_mw.dictSettings is False
         assert mock_mw.misoEditorLoadedAfterDictionary is False
         assert mock_mw.DictBulkMediaExportWasCancelled is False
-        assert mock_mw.miDictDB == plugin.dictionary_repo
+        assert mock_mw.miDictDB == plugin.dictdb
     
     def test_services_initialized(self, plugin):
         """Test that all services are properly initialized."""
@@ -371,8 +377,8 @@ class TestBackwardCompatibility:
         mock_mw.refreshAnkiDictConfig()  # Should not raise
     
     def test_dictionary_repo_accessible_via_mw(self, plugin, mock_mw):
-        """Test that dictionary repo is accessible via mw for backward compatibility."""
-        assert mock_mw.miDictDB == plugin.dictionary_repo
+        """Test that DictDB is accessible via mw for backward compatibility."""
+        assert mock_mw.miDictDB == plugin.dictdb
 
 
 class TestDatabaseIntegration:

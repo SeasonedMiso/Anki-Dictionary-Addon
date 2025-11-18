@@ -306,20 +306,25 @@ class BrowserIntegration:
                         continue
                     
                     # Search for definition
-                    results = search_service.search(clean_text)
-                    
-                    if results and len(results) > 0:
-                        # Get first result
-                        first_result = results[0]
-                        
-                        # Format definition
-                        definition = first_result.get('definition', '')
-                        
-                        if definition:
-                            # Update destination field
-                            note[dest_field] = definition
-                            self.mw.col.update_note(note)
-                            exported_count += 1
+                    # TODO: Need to get dictionary_group from config
+                    # For now, skip this functionality until properly implemented
+                    # results = search_service.search(clean_text, dictionary_group)
+                    # 
+                    # if not results.is_empty():
+                    #     # Get first result from first dictionary
+                    #     for dict_name, entries in results.results.items():
+                    #         if entries:
+                    #             first_entry = entries[0]
+                    #             entry_dict = first_entry.to_dict() if hasattr(first_entry, 'to_dict') else first_entry
+                    #             definition = entry_dict.get('definition', '')
+                    #             
+                    #             if definition:
+                    #                 # Update destination field
+                    #                 note[dest_field] = definition
+                    #                 self.mw.col.update_note(note)
+                    #                 exported_count += 1
+                    #             break
+                    pass  # Temporarily disabled until dictionary_group is properly passed
                     
                 except Exception as e:
                     logger.warning(f"Error exporting note {note_id}: {e}")

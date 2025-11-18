@@ -13,10 +13,10 @@ import json
 from aqt.utils import showInfo
 from aqt import mw
 
-from src.utils.dialogs import show_info as show_info_dialog
+from ..utils.dialogs import show_info as show_info_dialog
 from .init_db import initialize_sqlite_file
-from src.database import DatabaseConnection, DictionaryRepository
-from src.constants import DICT_GOOGLE_IMAGES, DICT_FORVO
+from ..database import DatabaseConnection, DictionaryRepository
+from ..constants import DICT_GOOGLE_IMAGES, DICT_FORVO
 
 addon_path = os.path.dirname(__file__)
 
@@ -28,21 +28,37 @@ class DictDB:
     Refactored to use new database layer while maintaining backward compatibility.
     """
     
-    def __init__(self):
-        """Initialize database connection."""
-        db_dir = os.path.join(addon_path, "user_files", "db")
-        os.makedirs(db_dir, exist_ok=True)
-        db_file = os.path.join(db_dir, "dictionaries.sqlite")
+    def __init__(self, db_connection: Optional[DatabaseConnection] = None, repository: Optional[DictionaryRepository] = None):
+        """
+        Initialize database connection.
         
-        # Create dictionary file if it doesn't exist
-        if not os.path.exists(db_file):
-            with open(db_file, 'x') as f:
-                pass
-            initialize_sqlite_file(db_file)
-        
-        # Use new database connection
-        self.db_connection = DatabaseConnection(db_file)
-        self.repository = DictionaryRepository(self.db_connection)
+        Args:
+            db_connection: Optional existing database connection
+            repository: Optional existing repository instance
+        """
+        if repository:
+            # Use provided repository
+            self.repository = repository
+            self.db_connection = repository.db
+        elif db_connection:
+            # Use provided connection
+            self.db_connection = db_connection
+            self.repository = DictionaryRepository(db_connection)
+        else:
+            # Create new connection (legacy behavior)
+            db_dir = os.path.join(addon_path, "user_files", "db")
+            os.makedirs(db_dir, exist_ok=True)
+            db_file = os.path.join(db_dir, "dictionaries.sqlite")
+            
+            # Create dictionary file if it doesn't exist
+            if not os.path.exists(db_file):
+                with open(db_file, 'x') as f:
+                    pass
+                initialize_sqlite_file(db_file)
+            
+            # Use new database connection
+            self.db_connection = DatabaseConnection(db_file)
+            self.repository = DictionaryRepository(self.db_connection)
         
         # Maintain backward compatibility with old interface
         self.conn = self.db_connection.conn

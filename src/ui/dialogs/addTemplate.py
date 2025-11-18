@@ -12,7 +12,7 @@ from anki.lang import _
 import re
 import os
 from os.path import dirname, join
-from src.utils.dialogs import show_info as show_info_dialog, ask_user as ask_user_dialog
+from ...utils.dialogs import show_info as show_info_dialog, ask_user as ask_user_dialog
 
 class TemplateEditor(QDialog):
     def __init__(self, mw, parent = None, dictionaries = [], toEdit = False, tName = False):

@@ -667,7 +667,7 @@ class TestDictionaryDatabaseBackwardCompatibility:
             
             # Verify mw.miDictDB is set
             assert hasattr(mock_mw, 'miDictDB')
-            assert mock_mw.miDictDB == plugin.dictionary_repo
+            assert mock_mw.miDictDB == plugin.dictdb
 
 
 class TestLegacyFunctionWrappersBackwardCompatibility:

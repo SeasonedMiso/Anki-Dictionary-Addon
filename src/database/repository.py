@@ -193,7 +193,46 @@ class DictionaryRepository:
         conjugated_terms = {}
         
         for dict_info in dictionaries:
-            dict_name = dict_info['dict']
+            # Handle both dict and string formats for backward compatibility
+            if isinstance(dict_info, str):
+                # Legacy format: just a dictionary name string
+                dict_name = dict_info
+                lang = ''
+            elif isinstance(dict_info, dict):
+                # New format: dict with 'dict' and 'lang' keys
+                dict_name = dict_info.get('dict', '')
+                lang = dict_info.get('lang', '')
+            else:
+                # Skip invalid entries
+                continue
+            
+            if not dict_name:
+                continue
+            
+            # If dict_name doesn't have the language prefix, try to find the correct table name
+            if not dict_name.startswith('l') or 'name' not in dict_name[:10]:
+                # This might be a clean name without prefix, try to find the full table name
+                cursor = self.db.execute(
+                    "SELECT dictname, lid FROM dictnames WHERE dictname = ?;",
+                    (dict_name,)
+                )
+                result = cursor.fetchone()
+                if result:
+                    # Found it! Use the formatted name
+                    dict_name = self._format_dict_name(result[1], result[0])
+                    if not lang:
+                        # Also get the language
+                        lang_cursor = self.db.execute(
+                            "SELECT langname FROM langnames WHERE id = ?;",
+                            (result[1],)
+                        )
+                        lang_result = lang_cursor.fetchone()
+                        if lang_result:
+                            lang = lang_result[0]
+                else:
+                    # Not found in database, skip
+                    print(f"Dictionary '{dict_name}' not found in database")
+                    continue
             
             # Handle special dictionaries
             if dict_name == DICT_GOOGLE_IMAGES:
@@ -204,8 +243,7 @@ class DictionaryRepository:
                 continue
             
             # Get search terms with conjugations if needed
-            lang = dict_info['lang']
-            if deinflect and lang in conjugations:
+            if deinflect and lang and lang in conjugations:
                 if lang not in conjugated_terms:
                     conjugated_terms[lang] = self._deconjugate(
                         terms, conjugations[lang]

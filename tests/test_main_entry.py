@@ -219,7 +219,7 @@ class TestBackwardCompatibilityVariables:
             # Verify dictionary DB is attached
             assert hasattr(mock_mw, 'miDictDB')
             assert mock_mw.miDictDB is not None
-            assert mock_mw.miDictDB == plugin.dictionary_repo
+            assert mock_mw.miDictDB == plugin.dictdb
     
     def test_state_variables_initialized(self, mock_mw, temp_addon_path):
         """Test that state variables are initialized."""

@@ -11,7 +11,7 @@ import logging
 from ..config import ConfigManager
 from ..database import DatabaseConnection, DictionaryRepository
 from ..services import SearchService, ExportService, MediaService
-from ..constants import VERSION
+from ..constants import VERSION, DB_FILENAME
 
 if TYPE_CHECKING:
     from ..ui import (
@@ -51,9 +51,11 @@ class AnkiDictionaryPlugin:
         self.config_manager = ConfigManager(mw.addonManager)
         
         # Database
-        db_path = self.addon_path / 'user_files' / 'db' / 'dictionaries.db'
+        from ..database.dictdb import DictDB
+        db_path = self.addon_path / 'user_files' / 'db' / DB_FILENAME
         self.db_connection = DatabaseConnection(str(db_path))
         self.dictionary_repo = DictionaryRepository(self.db_connection)
+        self.dictdb = DictDB(repository=self.dictionary_repo)  # Legacy DictDB wrapper with shared repository
         
         # Services
         self.search_service = SearchService(
@@ -94,8 +96,8 @@ class AnkiDictionaryPlugin:
         # Set up refresh callback
         self.mw.refreshAnkiDictConfig = self.refresh_config
         
-        # Attach repository for backward compatibility
-        self.mw.miDictDB = self.dictionary_repo
+        # Attach DictDB for backward compatibility
+        self.mw.miDictDB = self.dictdb
     
     def refresh_config(self, config: Optional[dict] = None) -> None:
         """

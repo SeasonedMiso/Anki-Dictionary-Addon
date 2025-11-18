@@ -731,31 +731,82 @@ class SettingsWindow(QTabWidget):
     
     def _edit_group(self, row: int) -> None:
         """Edit a dictionary group."""
-        # This would open the DictGroupEditor dialog
-        # For now, just log it
-        group_name = self.dict_groups.item(row, 0).text()
-        logger.info(f"Edit group requested: {group_name}")
-        # TODO: Implement DictGroupEditor integration
+        try:
+            from .dialogs import DictGroupEditor
+            
+            group_name = self.dict_groups.item(row, 0).text()
+            dict_groups = self.config_manager.get_config()['DictionaryGroups']
+            
+            if group_name in dict_groups:
+                dict_names = self._get_dictionary_names()
+                editor = DictGroupEditor(
+                    self.mw, 
+                    self, 
+                    dict_names, 
+                    dict_groups[group_name], 
+                    group_name
+                )
+                editor.exec()
+        except Exception as e:
+            logger.error(f"Error editing group: {e}", exc_info=True)
+            show_info(f"Error editing group: {str(e)}", parent=self, title="Error")
     
     def _edit_template(self, row: int) -> None:
         """Edit an export template."""
-        # This would open the TemplateEditor dialog
-        # For now, just log it
-        template_name = self.export_templates.item(row, 0).text()
-        logger.info(f"Edit template requested: {template_name}")
-        # TODO: Implement TemplateEditor integration
+        try:
+            from .dialogs import TemplateEditor
+            
+            template_name = self.export_templates.item(row, 0).text()
+            export_templates = self.config_manager.get_config()['ExportTemplates']
+            
+            if template_name in export_templates:
+                dict_names = self._get_dictionary_names()
+                editor = TemplateEditor(
+                    self.mw,
+                    self,
+                    dict_names,
+                    export_templates[template_name],
+                    template_name
+                )
+                editor.exec()
+        except Exception as e:
+            logger.error(f"Error editing template: {e}", exc_info=True)
+            show_info(f"Error editing template: {str(e)}", parent=self, title="Error")
     
     def _add_group(self) -> None:
         """Add a new dictionary group."""
-        # This would open the DictGroupEditor dialog
-        logger.info("Add group requested")
-        # TODO: Implement DictGroupEditor integration
+        try:
+            from .dialogs import DictGroupEditor
+            
+            dict_names = self._get_dictionary_names()
+            editor = DictGroupEditor(self.mw, self, dict_names)
+            editor.clearGroupEditor(True)
+            editor.exec()
+        except Exception as e:
+            logger.error(f"Error adding group: {e}", exc_info=True)
+            show_info(f"Error adding group: {str(e)}", parent=self, title="Error")
     
     def _add_template(self) -> None:
         """Add a new export template."""
-        # This would open the TemplateEditor dialog
-        logger.info("Add template requested")
-        # TODO: Implement TemplateEditor integration
+        try:
+            from .dialogs import TemplateEditor
+            
+            dict_names = self._get_dictionary_names()
+            editor = TemplateEditor(self.mw, self, dict_names)
+            editor.exec()
+        except Exception as e:
+            logger.error(f"Error adding template: {e}", exc_info=True)
+            show_info(f"Error adding template: {str(e)}", parent=self, title="Error")
+    
+    def _get_dictionary_names(self) -> list:
+        """Get list of dictionary names for dialogs."""
+        try:
+            if hasattr(self.mw, 'miDictDB'):
+                return self.mw.miDictDB.getDictionaryNames()
+            return []
+        except Exception as e:
+            logger.error(f"Error getting dictionary names: {e}", exc_info=True)
+            return []
     
     def _update_audio_directory(self) -> None:
         """Update condensed audio directory."""
@@ -1051,3 +1102,13 @@ class SettingsWindow(QTabWidget):
             "Spanish", "Swedish", "Tagalog", "Tatar", "Thai", "Turkish", "Ukrainian", "Urdu", "Uyghur",
             "Venetian", "Vietnamese", "Welsh", "Wu Chinese", "Yiddish"
         ]
+
+    # Backward compatibility methods for legacy dialogs
+    
+    def loadTemplateTable(self) -> None:
+        """Backward compatibility wrapper for _load_template_table."""
+        self._load_template_table()
+    
+    def loadGroupTable(self) -> None:
+        """Backward compatibility wrapper for _load_group_table."""
+        self._load_group_table()

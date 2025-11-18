@@ -6,7 +6,7 @@
 # This file now acts as a compatibility shim, forwarding calls to the new location.
 
 from typing import Optional, Tuple
-from src.utils.dialogs import show_info, show_warning, show_error, show_notice, ask_user
+from .src.utils.dialogs import show_info, show_warning, show_error, show_notice, ask_user
 
 
 def show_info_dialog(

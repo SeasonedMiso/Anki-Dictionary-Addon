@@ -1,7 +1,7 @@
 import sys
 import json 
 import re
-from src.utils.dialogs import show_info as show_info_dialog
+from .src.utils.dialogs import show_info as show_info_dialog
 from os.path import join, exists, dirname
 sys.path.insert(0, join(dirname(__file__)))
 from aqt.qt import QThread, pyqtSignal

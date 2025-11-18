@@ -1,5 +1,5 @@
 from aqt.qt import *
-from src.utils.dialogs import ask_user as ask_user_dialog
+from .src.utils.dialogs import ask_user as ask_user_dialog
 from anki.utils import is_win, is_mac
 from anki.hooks import addHook
 from aqt.utils import openLink

@@ -6,7 +6,7 @@ import os
 import aqt
 
 from .dict_wizard import *
-from . import webConfig
+from ...config import webConfig
 
 
 addon_path = os.path.dirname(__file__)
@@ -359,8 +359,8 @@ class DictionaryInstallPage(MiWizardPage):
         def run(self):
             # Import dictionary functionality is now in DictionaryManagerWidget
             # We'll use the repository directly for importing
-            from .src.database.repository import DictionaryRepository
-            from .src.ui.dictionary_manager import DictionaryManagerWidget
+            from ...database.repository import DictionaryRepository
+            from ..dictionary_manager import DictionaryManagerWidget
             import tempfile
 
             client = HttpClient()
@@ -464,9 +464,10 @@ class DictionaryInstallPage(MiWizardPage):
                                 # Create a temporary DictionaryManagerWidget instance to use _import_dict
                                 from pathlib import Path
                                 addon_path_obj = Path(addon_path)
-                                from .src.config.manager import ConfigManager
+                                from ...config.manager import ConfigManager
                                 config_mgr = ConfigManager(addon_path_obj)
                                 
+                                from ..dictionary_manager import DictionaryManagerWidget
                                 dict_mgr = DictionaryManagerWidget(
                                     aqt.mw, dict_repo, config_mgr, addon_path_obj
                                 )

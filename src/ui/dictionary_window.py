@@ -15,7 +15,7 @@ try:
         QWidget, QVBoxLayout, QHBoxLayout, QComboBox, QLineEdit,
         QPushButton, QShortcut, QKeySequence, QUrl, QCloseEvent, QHideEvent
     )
-    from aqt.webview import AnkiWebView
+    from aqt.webview import AnkiWebView, AnkiWebViewKind
     from aqt.utils import showInfo, tooltip
     from anki.utils import is_mac, is_win
     # Check if we're in a test environment
@@ -35,6 +35,10 @@ except ImportError:
     QCloseEvent = type('QCloseEvent', (object,), {})
     QHideEvent = type('QHideEvent', (object,), {})
     AnkiWebView = type('AnkiWebView', (object,), {})
+    # Mock AnkiWebViewKind for testing
+    class AnkiWebViewKind:
+        EDITOR = 'editor'
+        DEFAULT = 'default'
     showInfo = lambda *args, **kwargs: None
     tooltip = lambda *args, **kwargs: None
     is_mac = False
@@ -177,13 +181,64 @@ class DictionaryWindow(QWidget):
     
     def _create_web_view(self) -> AnkiWebView:
         """
-        Create the web view for displaying dictionary content.
+        Create the web view with modern Anki 25.x API.
+        
+        CRITICAL: Must use kind=ADDON to enable pycmd bridge.
+        Without kind parameter, Anki uses legacy mode with no bridge.
         
         Returns:
-            AnkiWebView instance
+            AnkiWebView instance with working pycmd bridge
         """
-        web_view = AnkiWebView()
-        web_view.onBridgeCmd = self._handle_bridge_command
+        import inspect
+        
+        # Debug: log Anki version
+        try:
+            anki_version = getattr(self.mw, 'version', 'unknown')
+            logger.info(f"Anki version: {anki_version}")
+        except Exception:
+            logger.info("Could not determine Anki version")
+        
+        # Debug: inspect constructor signature
+        try:
+            sig = inspect.signature(AnkiWebView.__init__)
+            logger.info(f"AnkiWebView.__init__ signature: {sig}")
+        except Exception:
+            logger.info("Could not inspect AnkiWebView.__init__")
+        
+        # Log available kinds for debugging
+        try:
+            available_kinds = [k.name for k in AnkiWebViewKind]
+            logger.info(f"Available AnkiWebViewKind values: {available_kinds}")
+        except Exception:
+            logger.info("Could not enumerate AnkiWebViewKind values")
+        
+        # Use EDITOR kind (enables pycmd bridge and is available in all versions)
+        # EDITOR is the most appropriate for add-on UIs that need bridge access
+        try:
+            web_view = AnkiWebView(
+                parent=self,
+                title="dictionary",
+                kind=AnkiWebViewKind.EDITOR
+            )
+            logger.info("✓ Created AnkiWebView with kind=EDITOR")
+            
+            # Set bridge command handler using the correct API
+            web_view.set_bridge_command(self._handle_bridge_command, self)
+            logger.info("✓ Set bridge command handler")
+            
+        except Exception as e:
+            logger.error(f"Failed to create modern WebView: {e}", exc_info=True)
+            raise RuntimeError(
+                f"Failed to create AnkiWebView: {e}\n"
+                "This add-on requires Anki 23.10 or later."
+            )
+        
+        # Verify bridge is set up
+        has_onBridgeCmd = callable(getattr(web_view, 'onBridgeCmd', None))
+        logger.info(f"web_view has onBridgeCmd callable: {has_onBridgeCmd}")
+        
+        if not has_onBridgeCmd:
+            logger.warning("onBridgeCmd is not callable - bridge may not work!")
         
         # Load initial HTML
         self._load_initial_html(web_view)
@@ -197,23 +252,73 @@ class DictionaryWindow(QWidget):
         Args:
             web_view: Web view to load content into
         """
-        html_path = self.addon_path / 'dictionaryInit.html'
+        # Try multiple possible locations for the HTML file
+        possible_paths = [
+            self.addon_path / 'dictionaryInit.html',
+            self.addon_path / 'docs' / 'dictionaryInit.html',
+        ]
         
-        if html_path.exists():
+        html_path = None
+        for path in possible_paths:
+            if path.exists():
+                html_path = path
+                break
+        
+        if html_path:
             try:
                 with open(html_path, 'r', encoding='utf-8') as f:
-                    html = f.read()
+                    html_content = f.read()
                 
                 # Apply theme
-                html = self._apply_theme_to_html(html)
+                html_content = self._apply_theme_to_html(html_content)
                 
-                url = QUrl.fromLocalFile(str(html_path))
-                web_view.setHtml(html, url)
+                # Use setHtml with proper base_url (required for modern mode)
+                # The pycmd bridge is already set up via kind=ADDON in constructor
+                # CRITICAL: Must use setHtml, NOT stdHtml (which forces legacy mode)
+                base_url = QUrl.fromLocalFile(str(html_path.parent) + '/')
+                web_view.setHtml(html_content, base_url)
+                logger.info(f"✓ Loaded HTML from {html_path} with base URL: {base_url.toString()}")
             except Exception as e:
-                logger.error(f"Error loading initial HTML: {e}")
+                logger.error(f"Error loading initial HTML: {e}", exc_info=True)
+                # Fallback
                 web_view.setHtml("<h3>Dictionary Ready</h3>")
         else:
-            web_view.setHtml("<h3>Dictionary Ready</h3>")
+            logger.warning(f"dictionaryInit.html not found in {possible_paths}, using fallback")
+            # Use a more visible fallback with styling
+            fallback_html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body {{
+                        background-color: #2d2d2d;
+                        color: #ffffff;
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                    }}
+                    .message {{
+                        text-align: center;
+                        padding: 20px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="message">
+                    <h2>Dictionary Ready</h2>
+                    <p>HTML template not found. Please check installation.</p>
+                    <p style="font-size: 12px; color: #888;">Searched: {}</p>
+                </div>
+            </body>
+            </html>
+            """.format(', '.join(str(p) for p in possible_paths))
+            
+            # Use setHtml (pycmd bridge already set up via kind=EDITOR)
+            web_view.setHtml(fallback_html)
     
     def _apply_theme_to_html(self, html: str) -> str:
         """
@@ -350,6 +455,13 @@ class DictionaryWindow(QWidget):
             self._show_error("No dictionary group selected")
             return
         
+        # Debug logging
+        logger.info(f"Dictionary group: {dict_group}")
+        logger.info(f"Dictionaries type: {type(dict_group.get('dictionaries', []))}")
+        if dict_group.get('dictionaries'):
+            logger.info(f"First dictionary: {dict_group['dictionaries'][0]}")
+            logger.info(f"First dictionary type: {type(dict_group['dictionaries'][0])}")
+        
         # Get search settings
         search_mode = self.search_type_combo.currentText()
         deinflect = self.config_manager.get_bool('deinflect', True)
@@ -396,9 +508,105 @@ class DictionaryWindow(QWidget):
         # Format results as HTML
         html = self._format_results_as_html(term, result, dict_group)
         
-        # Inject into web view
-        escaped_html = html.replace("'", "\\'").replace('\n', '')
-        self.web_view.eval(f"addNewTab('{escaped_html}', '{term}', true);")
+        # Try to use JavaScript tab system if available
+        try:
+            escaped_html = html.replace("'", "\\'").replace('\n', '')
+            self.web_view.eval(f"addNewTab('{escaped_html}', '{term}', true);")
+        except Exception as e:
+            logger.warning(f"Failed to use tab system, falling back to direct HTML: {e}")
+            # Fallback: display results directly
+            full_html = self._create_standalone_results_html(term, html)
+            self.web_view.setHtml(full_html)
+    
+    def _create_standalone_results_html(self, term: str, results_html: str) -> str:
+        """
+        Create standalone HTML for displaying results without tab system.
+        
+        Args:
+            term: Search term
+            results_html: Formatted results HTML
+            
+        Returns:
+            Complete HTML document
+        """
+        theme = self._load_theme()
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body {{
+                    background-color: {theme.get('header_background', '#51576d')};
+                    color: {theme.get('definition_text', '#c6d0f5')};
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 10px;
+                }}
+                .search-term {{
+                    font-size: 18px;
+                    font-weight: bold;
+                    padding: 10px;
+                    background-color: {theme.get('selector', '#51576d')};
+                    margin-bottom: 10px;
+                }}
+                .definitionBlock {{
+                    background-color: {theme.get('definition_background', '#51576d')};
+                    color: {theme.get('definition_text', '#c6d0f5')};
+                    border: 1px solid {theme.get('border', '#babbf1')};
+                    border-radius: 5px;
+                    padding: 15px;
+                    margin: 10px 0;
+                }}
+                .dictionaryTitleBlock {{
+                    font-size: 18px;
+                    font-weight: bold;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                    color: {theme.get('header_text', '#c6d0f5')};
+                }}
+                .termPronunciation {{
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                }}
+                .term {{
+                    font-weight: bold;
+                    margin-right: 10px;
+                }}
+                .pronunciation {{
+                    color: {theme.get('search_term', '#c6d0f5')};
+                }}
+                .definition {{
+                    line-height: 1.6;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="search-term">Search: {term}</div>
+            {results_html}
+        </body>
+        </html>
+        """
+    
+    def _load_theme(self) -> Dict:
+        """Load theme configuration."""
+        theme_path = self.addon_path / "user_files" / "themes" / "active.json"
+        
+        try:
+            with open(theme_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.warning(f"Error loading theme: {e}")
+            return {
+                "header_background": "#51576d",
+                "definition_background": "#51576d",
+                "definition_text": "#c6d0f5",
+                "border": "#babbf1",
+                "header_text": "#c6d0f5",
+                "search_term": "#c6d0f5",
+                "selector": "#51576d"
+            }
     
     def _format_results_as_html(
         self,
@@ -438,13 +646,22 @@ class DictionaryWindow(QWidget):
             html_parts.append('</div>')
             
             for entry in entries:
+                # Convert DictionaryEntry to dict
+                if hasattr(entry, 'to_dict'):
+                    entry_dict = entry.to_dict()
+                elif isinstance(entry, dict):
+                    entry_dict = entry
+                else:
+                    # Skip invalid entries
+                    continue
+                    
                 html_parts.append('<div class="definitionBlock">')
                 html_parts.append(f'<div class="termPronunciation">')
-                html_parts.append(f'<span class="term">{entry.get("term", "")}</span>')
-                if entry.get('pronunciation'):
-                    html_parts.append(f'<span class="pronunciation">{entry["pronunciation"]}</span>')
+                html_parts.append(f'<span class="term">{entry_dict.get("term", "")}</span>')
+                if entry_dict.get('pronunciation'):
+                    html_parts.append(f'<span class="pronunciation">{entry_dict["pronunciation"]}</span>')
                 html_parts.append('</div>')
-                html_parts.append(f'<div class="definition">{entry.get("definition", "")}</div>')
+                html_parts.append(f'<div class="definition">{entry_dict.get("definition", "")}</div>')
                 html_parts.append('</div>')
         
         html_parts.append('</div>')
@@ -465,13 +682,20 @@ class DictionaryWindow(QWidget):
         
         # Check user groups
         groups = self.config_manager.get_dictionary_groups()
+        logger.info(f"All groups: {groups}")
         if group_name in groups:
-            return groups[group_name]
+            group = groups[group_name]
+            logger.info(f"Selected group '{group_name}': {group}")
+            return group
         
         # Handle special groups
         if group_name == 'All':
             # Return all dictionaries
             all_dicts = self.search_service.repository.get_all_dictionaries()
+            if not all_dicts:
+                logger.warning("No dictionaries found in database")
+                self._show_error("No dictionaries installed. Please add dictionaries through the Dictionary Manager first.")
+                return None
             return {
                 'dictionaries': [{'dict': d, 'lang': ''} for d in all_dicts],
                 'customFont': False,
@@ -530,7 +754,12 @@ class DictionaryWindow(QWidget):
         Args:
             cmd: Command string from JavaScript
         """
-        logger.debug(f"Bridge command: {cmd}")
+        logger.debug(f"Bridge command received: {cmd!r}")
+        
+        # Handle handshake to confirm bridge is working
+        if cmd == "bridgeReady" or cmd == "AnkiDictionaryLoaded":
+            logger.info("✓ JS bridge handshake complete: pycmd available in JavaScript")
+            return
         
         try:
             if cmd.startswith('addDef:'):
@@ -737,6 +966,16 @@ class DictionaryWindow(QWidget):
         self.hide()
         event.ignore()  # Don't actually close, just hide
     
+    def showEvent(self, event) -> None:
+        """
+        Handle window show event.
+        
+        Args:
+            event: Show event
+        """
+        super().showEvent(event)
+        self._update_menu_text()
+    
     def hideEvent(self, event: QHideEvent) -> None:
         """
         Handle window hide event.
@@ -745,4 +984,19 @@ class DictionaryWindow(QWidget):
             event: Hide event
         """
         self._save_window_position()
+        self._update_menu_text()
         event.accept()
+    
+    def _update_menu_text(self) -> None:
+        """Update the menu text based on window visibility."""
+        try:
+            from anki.utils import is_mac
+            shortcut = '⌘W' if is_mac else 'Ctrl+W'
+            
+            if hasattr(self.mw, 'openMiDict'):
+                if self.isVisible():
+                    self.mw.openMiDict.setText(f"Close Dictionary ({shortcut})")
+                else:
+                    self.mw.openMiDict.setText(f"Open Dictionary ({shortcut})")
+        except Exception as e:
+            logger.warning(f"Error updating menu text: {e}")
