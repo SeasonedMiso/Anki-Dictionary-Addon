@@ -153,3 +153,6 @@ ankiDict/pynput
 ankiDict/.idea
 
 .kiro/
+
+ankiSourceCode/
+user_files/

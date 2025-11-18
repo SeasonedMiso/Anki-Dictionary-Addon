@@ -51,7 +51,7 @@ def run_tests(verbose=False, coverage=False):
     if exit_code == 0:
         print("\n✅ All tests passed!")
     else:
-        print(f"\n❌ Tests failed with exit code {exit_code}")
+        print("\n❌ Tests failed with exit code {}".format(exit_code))
     
     return exit_code
 

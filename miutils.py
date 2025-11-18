@@ -2,17 +2,14 @@
 # 
 # DEPRECATED: This module is kept for backward compatibility.
 # New code should use src.utils.dialogs instead.
+#
+# This file now acts as a compatibility shim, forwarding calls to the new location.
 
-import aqt
-from aqt.qt import *
-from os.path import dirname, join
-from aqt.webview import AnkiWebView
 from typing import Optional, Tuple
+from src.utils.dialogs import show_info, show_warning, show_error, show_notice, ask_user
 
-addon_path = dirname(__file__)
 
-
-def miInfo(
+def show_info_dialog(
     text: str,
     parent: Optional[object] = False,
     level: str = 'msg',
@@ -32,36 +29,18 @@ def miInfo(
     Returns:
         Result of dialog execution
     """
+    # Map level to appropriate function
     if level == 'wrn':
-        title = "Anki Dictionary Warning"
+        return show_warning(text, parent if parent is not False else None)
     elif level == 'not':
-        title = "Anki Dictionary Notice"
+        return show_notice(text, parent if parent is not False else None)
     elif level == 'err':
-        title = "Anki Dictionary Error"
+        return show_error(text, parent if parent is not False else None)
     else:
-        title = "Anki Dictionary"
-    
-    if parent is False:
-        parent = aqt.mw.app.activeWindow() or aqt.mw
-    
-    icon = QIcon(join(addon_path, 'icons', 'miso.png'))
-    mb = QMessageBox(parent)
-    
-    if not day:
-        mb.setStyleSheet(" QMessageBox {background-color: #272828;}")
-    
-    mb.setText(text)
-    mb.setWindowIcon(icon)
-    mb.setWindowTitle(title)
-    
-    b = mb.addButton(QMessageBox.StandardButton.Ok)
-    b.setFixedSize(100, 30)
-    b.setDefault(True)
-
-    return mb.exec()
+        return show_info(text, parent if parent is not False else None)
 
 
-def miAsk(
+def ask_user_dialog(
     text: str,
     parent: Optional[object] = None,
     day: bool = True,
@@ -81,28 +60,5 @@ def miAsk(
     Returns:
         True if user clicked yes, False otherwise
     """
-    msg = QMessageBox(parent)
-    msg.setWindowTitle("Anki Dictionary")
-    msg.setText(text)
-    
-    icon = QIcon(join(addon_path, 'icons', 'miso.png'))
-    b = msg.addButton(QMessageBox.StandardButton.Yes)
-    
-    b.setFixedSize(100, 30)
-    b.setDefault(True)
-    c = msg.addButton(QMessageBox.StandardButton.No)
-    c.setFixedSize(100, 30)
-    
-    if customText:
-        b.setText(customText[0])
-        c.setText(customText[1])
-        b.setFixedSize(120, 40)
-        c.setFixedSize(120, 40)
-    
-    if not day:
-        msg.setStyleSheet(" QMessageBox {background-color: #272828;}")
-    
-    msg.setWindowIcon(icon)
-    msg.exec()
-    
-    return msg.clickedButton() == b
+    custom_buttons = customText if customText else None
+    return ask_user(text, parent, custom_buttons)

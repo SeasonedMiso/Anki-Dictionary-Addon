@@ -150,16 +150,30 @@ addon_root/
 7. ⏳ Create build system
 8. ⏳ Validate functionality and performance
 
+## Anki Source Code Reference
+
+**Location**: `ankiSourceCode/anki-main/`
+**Purpose**: Validate our implementation against actual Anki API
+
+The complete Anki source code has been added to the project for:
+- Verifying our mocks match the actual Anki API
+- Ensuring our imports and usage patterns are correct
+- Referencing actual implementations when needed
+- Validating our addon works with the real Anki environment
+
+See `.kiro/specs/anki-dict-phase5-cleanup/ANKI_SOURCE_REFERENCE.md` for details.
+
 ## Next Steps
 
 1. Create Phase 5 git branch
 2. Fix test suite syntax errors (run_tests.py)
-3. Fix failing tests
-4. Begin file reorganization
-5. Update imports
-6. Improve test coverage
-7. Update documentation
-8. Final validation
+3. Validate and update mocks against Anki source
+4. Fix failing tests
+5. Begin file reorganization
+6. Update imports
+7. Improve test coverage
+8. Update documentation
+9. Final validation
 
 ---
 

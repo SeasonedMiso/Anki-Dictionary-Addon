@@ -12,7 +12,7 @@ from anki.lang import _
 import re
 import os
 from os.path import dirname, join
-from .miutils import miInfo, miAsk
+from src.utils.dialogs import show_info as show_info_dialog, ask_user as ask_user_dialog
 
 class TemplateEditor(QDialog):
     def __init__(self, mw, parent = None, dictionaries = [], toEdit = False, tName = False):
@@ -127,11 +127,11 @@ class TemplateEditor(QDialog):
         newConfig = self.getConfig()
         tn = self.templateName.text()
         if tn  == '':
-            miInfo('The export template must have a name.', level='wrn')
+            show_info_dialog('The export template must have a name.', level='wrn')
             return
         curGroups = newConfig['ExportTemplates']
         if self.new and tn in curGroups:
-            miInfo('A new export template must have a unique name.', level='wrn')
+            show_info_dialog('A new export template must have a unique name.', level='wrn')
             return
         exportTemplate = {
         'noteType' : self.noteType.currentText(),

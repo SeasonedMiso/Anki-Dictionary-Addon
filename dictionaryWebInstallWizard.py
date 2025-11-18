@@ -357,7 +357,11 @@ class DictionaryInstallPage(MiWizardPage):
             return url
 
         def run(self):
-            from .dictionaryManager import importDict
+            # Import dictionary functionality is now in DictionaryManagerWidget
+            # We'll use the repository directly for importing
+            from .src.database.repository import DictionaryRepository
+            from .src.ui.dictionary_manager import DictionaryManagerWidget
+            import tempfile
 
             client = HttpClient()
 
@@ -448,7 +452,31 @@ class DictionaryInstallPage(MiWizardPage):
                         self.log_update.emit(' Importing...')
                         ddata = client.streamContent(dl_resp)
                         try:
-                            importDict(lname, io.BytesIO(ddata), dname)
+                            # Save to temporary file for import
+                            with tempfile.NamedTemporaryFile(mode='wb', suffix='.zip', delete=False) as tmp_file:
+                                tmp_file.write(ddata)
+                                tmp_path = tmp_file.name
+                            
+                            try:
+                                # Get the dictionary repository from Anki main window
+                                dict_repo = aqt.mw.miDictDB
+                                
+                                # Create a temporary DictionaryManagerWidget instance to use _import_dict
+                                from pathlib import Path
+                                addon_path_obj = Path(addon_path)
+                                from .src.config.manager import ConfigManager
+                                config_mgr = ConfigManager(addon_path_obj)
+                                
+                                dict_mgr = DictionaryManagerWidget(
+                                    aqt.mw, dict_repo, config_mgr, addon_path_obj
+                                )
+                                dict_mgr._import_dict(lname, tmp_path, dname)
+                            finally:
+                                # Clean up temporary file
+                                try:
+                                    os.unlink(tmp_path)
+                                except:
+                                    pass
                         except ValueError as e:
                             self.log_update.emit(' ERROR: %s' % str(e))
                     else:

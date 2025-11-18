@@ -214,9 +214,10 @@ def setup_aqt_mocks():
     # Create fake anki module
     fake_anki = MagicMock()
     fake_anki.utils = MagicMock()
-    fake_anki.utils.is_mac = Mock(return_value=False)
-    fake_anki.utils.is_win = Mock(return_value=False)
-    fake_anki.utils.is_lin = Mock(return_value=False)
+    # Platform detection: These are module-level booleans in actual Anki, not functions
+    fake_anki.utils.is_mac = sys.platform == "darwin"
+    fake_anki.utils.is_win = sys.platform == "win32"
+    fake_anki.utils.is_lin = not fake_anki.utils.is_mac and not fake_anki.utils.is_win
     fake_anki.hooks = MagicMock()
     fake_anki.hooks.addHook = Mock()
     fake_anki.hooks.wrap = Mock(side_effect=lambda func, wrapper: wrapper)

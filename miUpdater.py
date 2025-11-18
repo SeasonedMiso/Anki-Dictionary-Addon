@@ -1,8 +1,8 @@
 from aqt import mw
 from aqt import addons
-from . import dictdb
+from .legacy import dictdb
 from anki.hooks import  wrap, addHook
-from .miutils import miInfo
+from src.utils.dialogs import show_info as show_info_dialog
 import time
 from anki.httpclient import HttpClient
 
@@ -15,7 +15,7 @@ def shutdownDB( parent, mgr, ids, on_done, client):
     global dledIds 
     dledIds = ids
     if addonId in ids and hasattr(mw, 'miDictDB'):
-        miInfo('The Anki Dictionary database will be diconnected so that the update may proceed. The add-on will not function properly until Anki is restarted after the update.')
+        show_info_dialog('The Anki Dictionary database will be diconnected so that the update may proceed. The add-on will not function properly until Anki is restarted after the update.')
         mw.miDictDB.closeConnection()
         mw.miDictDB = False
         if hasattr(mw.ankiDictionary, 'db'):
@@ -30,7 +30,7 @@ def restartDB(*args):
         mw.miDictDB =  dictdb.DictDB()
         if hasattr(mw.ankiDictionary, 'db'):
             mw.ankiDictionary.db = dictdb.DictDB()
-        miInfo('The Anki Dictionary has been updated, please restart Anki to start using the new version now!')
+        show_info_dialog('The Anki Dictionary has been updated, please restart Anki to start using the new version now!')
 
 def wrapOnDone(self, log):
     self.mgr.mw.progress.timer(50, lambda: restartDB(), False)

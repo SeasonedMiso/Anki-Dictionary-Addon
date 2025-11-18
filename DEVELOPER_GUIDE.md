@@ -1,4 +1,4 @@
-dd to Plugin Coordinator
+Add to Plugin Coordinator
 
 Update `src/core/plugin.py`:
 
@@ -1302,3 +1302,236 @@ def _search_selected(self, editor: Any) -> None:
 
 **Last Updated**: January 2025
 **Version**: 4.0 (Phase 4 Complete)
+
+
+---
+
+## Anki API Compatibility
+
+### Supported Anki Versions
+
+**Minimum Version**: Anki 2.1.50+
+**Tested Version**: Anki 2.1.66
+**Target Version**: Anki 2.1.x (latest stable)
+
+The addon uses only stable, long-standing Anki APIs that have been present since Anki 2.1.50. All APIs are validated against the actual Anki source code.
+
+### Core APIs Used
+
+#### anki.hooks - Hook System
+
+The addon uses Anki's hook system for lifecycle management and integration:
+
+```python
+from anki.hooks import addHook
+
+# Profile lifecycle
+addHook('profileLoaded', on_profile_loaded)
+addHook('unloadProfile', on_unload_profile)
+```
+
+**API Reference**:
+- `addHook(hook: str, func: Callable) -> None` - Register a hook function
+- `runHook(hook: str, *args) -> None` - Execute all functions on a hook
+- `wrap(old, new, pos='after') -> Callable` - Monkey patch a function
+
+**Source**: `ankiSourceCode/anki-main/pylib/anki/hooks.py`
+
+**Stability**: ✅ Stable since Anki 2.1.0
+
+#### anki.utils - Platform Detection
+
+The addon uses platform detection for OS-specific behavior:
+
+```python
+from anki.utils import is_mac, is_win, is_lin
+
+# These are module-level boolean variables, NOT functions
+if is_mac:
+    shortcut = '⌘W'
+elif is_win:
+    shortcut = 'Ctrl+W'
+```
+
+**Important**: `is_mac`, `is_win`, and `is_lin` are **boolean variables**, not functions!
+
+```python
+# ✅ Correct usage
+if is_mac:
+    do_something()
+
+# ❌ Incorrect usage
+if is_mac():  # This will fail!
+    do_something()
+```
+
+**API Reference**:
+- `is_mac: bool` - True if running on macOS (sys.platform == "darwin")
+- `is_win: bool` - True if running on Windows (sys.platform == "win32")
+- `is_lin: bool` - True if running on Linux (not is_mac and not is_win)
+
+**Source**: `ankiSourceCode/anki-main/pylib/anki/utils.py:245-248`
+
+**Stability**: ✅ Stable since Anki 2.1.0
+
+#### aqt.utils - GUI Utilities
+
+The addon uses Anki's GUI utility functions for dialogs and notifications:
+
+```python
+from aqt.utils import showInfo, showWarning, tooltip, askUser
+
+# Show information dialog
+showInfo(
+    "Dictionary installed successfully",
+    parent=None,
+    help=None,
+    type="info",
+    title="Anki Dictionary"
+)
+
+# Show warning dialog
+showWarning("Please select a dictionary", parent=self)
+
+# Show tooltip
+tooltip("Search completed", period=2000)
+
+# Ask yes/no question
+if askUser("Delete this dictionary?", parent=self):
+    delete_dictionary()
+```
+
+**API Reference**:
+- `showInfo(text, parent=None, help=None, type="info", title="Anki", textFormat=None, customBtns=None) -> int`
+- `showWarning(text, parent=None, help=None, title="Anki", textFormat=None) -> int`
+- `tooltip(msg, period=3000, parent=None, x_offset=0, y_offset=100) -> None`
+- `askUser(text, parent=None, help=None, defaultno=False, msgfunc=None, title="Anki") -> bool`
+- `openLink(link: str | QUrl) -> None`
+
+**Source**: `ankiSourceCode/anki-main/qt/aqt/utils.py`
+
+**Stability**: ✅ Stable since Anki 2.1.0
+
+#### aqt.qt - Qt Widgets
+
+The addon uses standard PyQt6/PyQt5 widgets through Anki's Qt compatibility layer:
+
+```python
+from aqt.qt import (
+    QWidget, QDialog, QVBoxLayout, QHBoxLayout,
+    QPushButton, QLineEdit, QComboBox, QShortcut,
+    QKeySequence, Qt
+)
+
+class MyWindow(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._setup_ui()
+    
+    def _setup_ui(self):
+        layout = QVBoxLayout()
+        button = QPushButton("Click Me")
+        button.clicked.connect(self.on_click)
+        layout.addWidget(button)
+        self.setLayout(layout)
+```
+
+**Stability**: ✅ Stable - Standard Qt APIs
+
+#### aqt.mw - Main Window
+
+The addon accesses Anki's main window for integration:
+
+```python
+from aqt import mw
+
+# Access collection
+collection = mw.col
+
+# Access profile manager
+profile_manager = mw.pm
+
+# Add menu items
+mw.form.menuTools.addAction(action)
+```
+
+**Stability**: ✅ Stable since Anki 2.1.0
+
+### API Validation
+
+All Anki API usage has been validated against the actual Anki source code in `ankiSourceCode/anki-main/`. See the validation report for details:
+
+- **Validation Report**: `.kiro/specs/anki-dict-phase5-cleanup/TASK_18_VALIDATION_REPORT.md`
+- **Mock Validation**: `.kiro/specs/anki-dict-phase5-cleanup/MOCK_VALIDATION_FINDINGS.md`
+- **API Reference**: `.kiro/specs/anki-dict-phase5-cleanup/ANKI_SOURCE_REFERENCE.md`
+
+### Version-Specific Behavior
+
+**None identified** - The addon uses only stable APIs with no version-specific workarounds.
+
+### Breaking Changes Risk
+
+**Low** - All APIs used are core Anki functionality that has remained stable for years:
+
+- Hook system: Unchanged since Anki 2.1.0
+- Platform detection: Unchanged since Anki 2.1.0
+- GUI utilities: Unchanged since Anki 2.1.0
+- Qt widgets: Standard PyQt APIs
+
+### Testing Against Anki APIs
+
+Our test mocks accurately reflect the actual Anki APIs:
+
+```python
+# tests/mocks.py
+fake_anki.utils.is_mac = sys.platform == "darwin"  # Boolean, not function
+fake_anki.utils.is_win = sys.platform == "win32"   # Boolean, not function
+fake_anki.utils.is_lin = not fake_anki.utils.is_mac and not fake_anki.utils.is_win
+
+fake_anki.hooks.addHook = Mock()
+fake_anki.hooks.wrap = Mock(side_effect=lambda func, wrapper: wrapper)
+fake_anki.hooks.runHook = Mock()
+
+fake_aqt.utils.showInfo = Mock()
+fake_aqt.utils.showWarning = Mock()
+fake_aqt.utils.tooltip = Mock()
+```
+
+### Compatibility Checklist
+
+When updating the addon or testing with new Anki versions:
+
+- [ ] Verify hook names haven't changed
+- [ ] Verify dialog function signatures match
+- [ ] Verify platform detection still uses boolean variables
+- [ ] Test addon loads without errors
+- [ ] Test all UI components work correctly
+- [ ] Run full test suite
+- [ ] Check Anki changelog for API changes
+
+### Future Compatibility
+
+To maintain compatibility with future Anki versions:
+
+1. **Monitor Anki Releases**: Watch for API changes in release notes
+2. **Use Stable APIs**: Avoid undocumented or internal APIs
+3. **Test Early**: Test with Anki beta versions when available
+4. **Update Mocks**: Keep test mocks in sync with Anki changes
+5. **Document Changes**: Update this guide when APIs change
+
+### Getting Help
+
+If you encounter Anki API issues:
+
+1. Check the Anki source code: `ankiSourceCode/anki-main/`
+2. Review our validation reports in `.kiro/specs/anki-dict-phase5-cleanup/`
+3. Consult Anki's official documentation: https://addon-docs.ankiweb.net/
+4. Ask on Anki forums: https://forums.ankiweb.net/
+
+### References
+
+- **Anki Source Code**: `ankiSourceCode/anki-main/`
+- **Anki Add-on Docs**: https://addon-docs.ankiweb.net/
+- **PyQt6 Documentation**: https://www.riverbankcomputing.com/static/Docs/PyQt6/
+- **Our API Validation**: `.kiro/specs/anki-dict-phase5-cleanup/TASK_18_VALIDATION_REPORT.md`
+

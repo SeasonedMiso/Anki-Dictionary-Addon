@@ -13,7 +13,7 @@ import json
 from aqt.utils import showInfo
 from aqt import mw
 
-from .miutils import miInfo
+from src.utils.dialogs import show_info as show_info_dialog
 from .init_db import initialize_sqlite_file
 from src.database import DatabaseConnection, DictionaryRepository
 from src.constants import DICT_GOOGLE_IMAGES, DICT_FORVO

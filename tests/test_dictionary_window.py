@@ -355,6 +355,15 @@ def dictionary_window(
     window.pos = mock_pos
     window.size = mock_size
     
+    # Mock UI elements that would be created in _setup_ui
+    # These are needed because ANKI_AVAILABLE is False in tests
+    window.dict_group_combo = Mock()
+    window.dict_group_combo.currentText = Mock(return_value='All')
+    window.search_type_combo = Mock()
+    window.search_type_combo.currentText = Mock(return_value='Forward')
+    window.web_view = Mock()
+    window.web_view.setHtml = Mock()
+    
     return window
 
 

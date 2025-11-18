@@ -78,7 +78,7 @@ def ankiDict(text):
         text: Text to display in dialog
     """
     from aqt.utils import showInfo
-    showInfo(text, False, "", "info", "Anki Dictionary Add-on")
+    showInfo(text, parent=None, help=None, type="info", title="Anki Dictionary Add-on")
 
 
 def dictionary_init(terms=False):
@@ -101,7 +101,7 @@ def dictionary_init(terms=False):
     dict_window = plugin.get_dictionary_window()
     
     # Update menu text
-    shortcut = '⌘W' if is_mac() else 'Ctrl+W'
+    shortcut = '⌘W' if is_mac else 'Ctrl+W'
     
     # Toggle window visibility
     if not mw.ankiDictionary or not dict_window.isVisible():
@@ -136,7 +136,7 @@ def close_dictionary():
         dict_window.hide()
         
         from anki.utils import is_mac
-        shortcut = '⌘W' if is_mac() else 'Ctrl+W'
+        shortcut = '⌘W' if is_mac else 'Ctrl+W'
         if hasattr(mw, 'openMiDict'):
             mw.openMiDict.setText(f"Open Dictionary ({shortcut})")
 

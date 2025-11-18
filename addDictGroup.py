@@ -16,7 +16,7 @@ from os.path import dirname, join, exists
 from aqt import mw
 
 from aqt.qt import Qt
-from .miutils import miInfo, miAsk
+from src.utils.dialogs import show_info as show_info_dialog, ask_user as ask_user_dialog
 from shutil import copyfile
 from operator import itemgetter
 import ntpath
@@ -148,7 +148,7 @@ class DictGroupEditor(QDialog):
         fileName, _ = QFileDialog.getOpenFileName(self,"Select a Custom Font", "",'Font Files (*.ttf *.woff *.woff2 *.eot)', options=options)
         if fileName:
             if not fileName.endswith('.ttf') and not fileName.endswith('.woff') and not fileName.endswith('.woff2') and not fileName.endswith('.eot') :
-                miInfo('Please select a font file.', level='err')
+                show_info_dialog('Please select a font file.', level='err')
                 return
             self.fontFileName.setText(ntpath.basename(fileName))
             self.fontToMove = fileName
@@ -157,11 +157,11 @@ class DictGroupEditor(QDialog):
         newConfig = self.getConfig()
         gn = self.groupName.text()
         if gn  == '':
-            miInfo('The dictionary group must have a name.', level='wrn')
+            show_info_dialog('The dictionary group must have a name.', level='wrn')
             return
         curGroups = newConfig['DictionaryGroups']
         if self.new and gn in curGroups:
-            miInfo('A new dictionary group must have a unique name.', level='wrn')
+            show_info_dialog('A new dictionary group must have a unique name.', level='wrn')
             return
         if self.fontFromDropdown.isChecked():
             fontName = self.fontDropDown.currentText()
@@ -170,16 +170,16 @@ class DictGroupEditor(QDialog):
         else:
             fontName = self.fontFileName.text()
             if fontName == 'None Selected':
-                miInfo('You must select a file if you will be using a font from a file.', level='wrn')
+                show_info_dialog('You must select a file if you will be using a font from a file.', level='wrn')
                 return
             customFont = True
             if not exists(join(self.settings.addonPath,'user_files', 'fonts', fontName)):
                 if not self.moveFontToFolder(self.fontToMove):
-                    miInfo('The font file was unable to be loaded, please ensure your file exists in the target folder and try again.', level='err')
+                    show_info_dialog('The font file was unable to be loaded, please ensure your file exists in the target folder and try again.', level='err')
                     return
         selectedDicts = self.getSelectedDictionaries(True)
         if len(selectedDicts) < 1:
-            miInfo('You must select at least one dictionary.', level='wrn')
+            show_info_dialog('You must select at least one dictionary.', level='wrn')
             return
         dictGroup = {
         'dictionaries' : selectedDicts,
@@ -224,7 +224,7 @@ class DictGroupEditor(QDialog):
             if exists(filename): 
                 path = join(self.settings.addonPath, 'user_files', 'fonts', basename)
                 if exists(path): 
-                    if not miAsk('A font with the same name currently exists in your custom fonts folder. Would you like to overwrite it?', self):
+                    if not ask_user_dialog('A font with the same name currently exists in your custom fonts folder. Would you like to overwrite it?', self):
                         return
                 copyfile(filename, path)
                 return True

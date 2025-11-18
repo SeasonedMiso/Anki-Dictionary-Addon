@@ -23,7 +23,7 @@ except ImportError:
     QShortcut = type('QShortcut', (object,), {})
     QKeySequence = type('QKeySequence', (object,), {})
     QMenu = type('QMenu', (object,), {})
-    is_mac = lambda: False
+    is_mac = False  # Boolean, not function
 
 
 logger = logging.getLogger('anki_dictionary.ui.menu_manager')
@@ -176,7 +176,7 @@ class MenuManager:
             dict_window = self.plugin.get_dictionary_window()
             
             # Determine shortcut text for menu
-            shortcut_text = "⌘W" if is_mac() else "Ctrl+W"
+            shortcut_text = "⌘W" if is_mac else "Ctrl+W"
             
             # Toggle visibility
             if dict_window.isVisible():
@@ -281,7 +281,7 @@ class MenuManager:
             Platform-specific shortcut string
         """
         try:
-            if is_mac():
+            if is_mac:
                 # Replace Ctrl with Cmd for Mac
                 return shortcut.replace("Ctrl", "Cmd")
             else:
@@ -302,7 +302,7 @@ class MenuManager:
             Display text for menu (e.g., "⌘W" on Mac, "Ctrl+W" on Windows/Linux)
         """
         try:
-            if is_mac():
+            if is_mac:
                 # Use Mac symbols and remove + signs for cleaner display
                 return shortcut.replace("Ctrl+", "⌘").replace("Shift+", "⇧").replace("+", "")
             else:

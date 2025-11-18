@@ -4,7 +4,7 @@ import requests
 from anki.utils import is_mac, is_win, is_lin
 from anki.hooks import addHook
 from os.path import join, exists, dirname
-from .miutils import miInfo
+from src.utils.dialogs import show_info as show_info_dialog
 from aqt.qt import *
 from aqt import mw
 import zipfile
@@ -119,8 +119,8 @@ class FFMPEGInstaller:
     def couldNotInstall(self):
         self.toggleMP3Conversion(False)
         self.toggleFailedInstallation(True)
-        miInfo("FFMPEG could not be installed. MP3 Conversion has been disabled.")
-        # miInfo("FFMPEG could not be installed. MP3 Conversion has been disabled. You will not be able to convert audio files imported from the Immerse with Anki Browser Extension to MP3 format until it is installed. Anki Dictionary will attempt to install it again on the next profile load.")
+        show_info_dialog("FFMPEG could not be installed. MP3 Conversion has been disabled.")
+        # show_info_dialog("FFMPEG could not be installed. MP3 Conversion has been disabled. You will not be able to convert audio files imported from the Immerse with Anki Browser Extension to MP3 format until it is installed. Anki Dictionary will attempt to install it again on the next profile load.")
     
 
         

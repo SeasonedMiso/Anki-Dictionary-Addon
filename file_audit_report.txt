@@ -1,0 +1,115 @@
+================================================================================
+FILE AUDIT REPORT - Phase 5 Cleanup
+================================================================================
+
+SUMMARY
+--------------------------------------------------------------------------------
+  keep_root           :  20 items
+  move_libs           :  11 items
+  move_legacy         :   5 items
+  delete              :   4 items
+  refactored          :   9 items
+  evaluate            :  22 items
+  TOTAL               :  71 items
+
+
+KEEP ROOT
+--------------------------------------------------------------------------------
+  Files:
+    DEVELOPER_GUIDE.md                       - Asset file (.md)
+    DEVELOPMENT.md                           - Asset file (.md)
+    MIGRATION_NOTES.md                       - Asset file (.md)
+    PHASE5_BASELINE.md                       - Asset file (.md)
+    README.md                                - Essential addon file
+    REFACTORING_PROGRESS.md                  - Asset file (.md)
+    TEST_FAILURES_SUMMARY.md                 - Asset file (.md)
+    __init__.py                              - Essential addon file
+    _hiraganoMaruGothProW4.ttc               - Asset file (.ttc)
+    config.json                              - Essential addon file
+    dictionaryInit.html                      - Asset file (.html)
+    featuresPlan.md                          - Asset file (.md)
+    guide.css                                - Asset file (.css)
+    guide.html                               - Asset file (.html)
+    macwelcome.html                          - Asset file (.html)
+    main.py                                  - Essential addon file
+    manifest.json                            - Essential addon file
+    meta.json                                - Essential addon file
+    welcome.html                             - Asset file (.html)
+    zeroresults.html                         - Asset file (.html)
+
+REFACTORED
+--------------------------------------------------------------------------------
+  Directories:
+    docs                                     - Already organized directory
+    icons                                    - Already organized directory
+    js                                       - Already organized directory
+    legacy                                   - Already organized directory
+    libs                                     - Already organized directory
+    src                                      - Already organized directory
+    temp                                     - Already organized directory
+    tests                                    - Already organized directory
+    user_files                               - Already organized directory
+
+MOVE LIBS
+--------------------------------------------------------------------------------
+  Directories:
+    HIServices                               - Third-party library directory
+    bs4                                      - Third-party library directory
+    keyboardMac                              - Third-party library directory
+    linux                                    - Third-party library directory
+    pynput                                   - Third-party library directory
+    pyobjc-core                              - Third-party library directory
+    requests                                 - Third-party library directory
+    tornado                                  - Third-party library directory
+    urllib3                                  - Third-party library directory
+
+  Files:
+    Pyperclip.py                             - Third-party library file
+    six.py                                   - Third-party library file
+
+MOVE LEGACY
+--------------------------------------------------------------------------------
+  Files:
+    addonSettings.py                         - Legacy UI file (refactored)
+    cardExporter.py                          - Legacy UI file (refactored)
+    dictdb.py                                - Legacy UI file (refactored)
+    dictionaryManager.py                     - Legacy UI file (refactored)
+    midict.py                                - Legacy UI file (refactored)
+
+DELETE
+--------------------------------------------------------------------------------
+  Files:
+    dictdb_old_backup.py                     - Backup file - no longer needed
+    main_old_backup.py                       - Backup file - no longer needed
+    main_refactored.py                       - Backup file - no longer needed
+    test_phase2.py                           - Backup file - no longer needed
+
+EVALUATE
+--------------------------------------------------------------------------------
+  Files:
+    addDictGroup.py                          - Needs manual review to determine usage
+    addTemplate.py                           - Needs manual review to determine usage
+    checkForThirtyTwo.py                     - Needs manual review to determine usage
+    dict_wizard.py                           - Needs manual review to determine usage
+    dictionaryWebInstallWizard.py            - Needs manual review to determine usage
+    ffmpegInstaller.py                       - Needs manual review to determine usage
+    forvodl.py                               - Needs manual review to determine usage
+    freqConjWebWindow.py                     - Needs manual review to determine usage
+    googleimages.py                          - Needs manual review to determine usage
+    history.py                               - Needs manual review to determine usage
+    init_db.py                               - Needs manual review to determine usage
+    miJapaneseHandler.py                     - Needs manual review to determine usage
+    miUpdater.py                             - Needs manual review to determine usage
+    miflix.py                                - Needs manual review to determine usage
+    migakuMessage.py                         - Needs manual review to determine usage
+    migaku_wizard.py                         - Needs manual review to determine usage
+    misoMessage.py                           - Needs manual review to determine usage
+    miutils.py                               - Needs manual review to determine usage
+    run_tests.py                             - Unknown file - needs review
+    themeEditor.py                           - Needs manual review to determine usage
+    themes.py                                - Needs manual review to determine usage
+    webConfig.py                             - Needs manual review to determine usage
+
+================================================================================
+END OF REPORT
+================================================================================

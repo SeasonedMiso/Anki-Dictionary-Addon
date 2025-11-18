@@ -1,7 +1,7 @@
 import sys
 import json 
 import re
-from .miutils import miInfo
+from src.utils.dialogs import show_info as show_info_dialog
 from os.path import join, exists, dirname
 sys.path.insert(0, join(dirname(__file__)))
 from aqt.qt import QThread, pyqtSignal
@@ -423,6 +423,6 @@ def removeCondensedAudioInProgressMessage():
 
 
 serverThread = DictServerThread(mw)
-serverThread.alertUser.connect(miInfo)
+serverThread.alertUser.connect(show_info_dialog)
 serverThread.exportingCondensed.connect(addCondensedAudioInProgressMessage)
 serverThread.notExportingCondensed.connect(removeCondensedAudioInProgressMessage)

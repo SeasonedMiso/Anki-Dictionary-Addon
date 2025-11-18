@@ -10,10 +10,11 @@ from pathlib import Path
 import tempfile
 import sqlite3
 
-# Add project root and src to path
+# Add project root, src, and libs to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / 'src'))
+sys.path.insert(0, str(project_root / 'libs'))
 
 # Prevent importing the main __init__.py which requires Anki
 sys.modules['__init__'] = type(sys)('__init__')

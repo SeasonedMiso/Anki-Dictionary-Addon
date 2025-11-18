@@ -1,0 +1,5919 @@
+{
+  "summary": {
+    "total_files": 302,
+    "total_imports": 396,
+    "legacy_imports_count": 0,
+    "parse_errors": 0
+  },
+  "legacy_imports": {},
+  "top_imports": [
+    {
+      "module": "aqt",
+      "import_count": 155
+    },
+    {
+      "module": "__future__",
+      "import_count": 129
+    },
+    {
+      "module": "aqt.qt",
+      "import_count": 114
+    },
+    {
+      "module": "typing",
+      "import_count": 105
+    },
+    {
+      "module": "src.core.plugin",
+      "import_count": 97
+    },
+    {
+      "module": "anki.collection",
+      "import_count": 91
+    },
+    {
+      "module": "aqt.utils",
+      "import_count": 90
+    },
+    {
+      "module": "collections.abc",
+      "import_count": 74
+    },
+    {
+      "module": "os",
+      "import_count": 71
+    },
+    {
+      "module": "anki.utils",
+      "import_count": 69
+    },
+    {
+      "module": "sys",
+      "import_count": 63
+    },
+    {
+      "module": "re",
+      "import_count": 56
+    },
+    {
+      "module": "pathlib",
+      "import_count": 47
+    },
+    {
+      "module": "anki",
+      "import_count": 44
+    },
+    {
+      "module": "anki.lang",
+      "import_count": 41
+    },
+    {
+      "module": "aqt.operations",
+      "import_count": 41
+    },
+    {
+      "module": "json",
+      "import_count": 37
+    },
+    {
+      "module": "anki.decks",
+      "import_count": 34
+    },
+    {
+      "module": "anki.notes",
+      "import_count": 31
+    },
+    {
+      "module": "time",
+      "import_count": 30
+    }
+  ],
+  "circular_dependencies": [],
+  "errors": [],
+  "import_graph": {
+    "nodes": [
+      "PIL",
+      "PyChromeDevTools",
+      "PyQt6",
+      "__future__",
+      "__init__",
+      "_aqt",
+      "abc",
+      "addDictGroup",
+      "addTemplate",
+      "addcards",
+      "anki",
+      "ankiSourceCode.anki-main.pylib.anki._backend",
+      "ankiSourceCode.anki-main.pylib.anki._legacy",
+      "ankiSourceCode.anki-main.pylib.anki._vendor.stringcase",
+      "ankiSourceCode.anki-main.pylib.anki.browser",
+      "ankiSourceCode.anki-main.pylib.anki.cards",
+      "ankiSourceCode.anki-main.pylib.anki.collection",
+      "ankiSourceCode.anki-main.pylib.anki.config",
+      "ankiSourceCode.anki-main.pylib.anki.consts",
+      "ankiSourceCode.anki-main.pylib.anki.db",
+      "ankiSourceCode.anki-main.pylib.anki.dbproxy",
+      "ankiSourceCode.anki-main.pylib.anki.decks",
+      "ankiSourceCode.anki-main.pylib.anki.errors",
+      "ankiSourceCode.anki-main.pylib.anki.exporting",
+      "ankiSourceCode.anki-main.pylib.anki.find",
+      "ankiSourceCode.anki-main.pylib.anki.foreign_data.__init__",
+      "ankiSourceCode.anki-main.pylib.anki.foreign_data.mnemosyne",
+      "ankiSourceCode.anki-main.pylib.anki.hooks",
+      "ankiSourceCode.anki-main.pylib.anki.httpclient",
+      "ankiSourceCode.anki-main.pylib.anki.importing.__init__",
+      "ankiSourceCode.anki-main.pylib.anki.importing.anki2",
+      "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+      "ankiSourceCode.anki-main.pylib.anki.importing.base",
+      "ankiSourceCode.anki-main.pylib.anki.importing.csvfile",
+      "ankiSourceCode.anki-main.pylib.anki.importing.mnemo",
+      "ankiSourceCode.anki-main.pylib.anki.importing.noteimp",
+      "ankiSourceCode.anki-main.pylib.anki.lang",
+      "ankiSourceCode.anki-main.pylib.anki.latex",
+      "ankiSourceCode.anki-main.pylib.anki.media",
+      "ankiSourceCode.anki-main.pylib.anki.models",
+      "ankiSourceCode.anki-main.pylib.anki.notes",
+      "ankiSourceCode.anki-main.pylib.anki.rsbackend",
+      "ankiSourceCode.anki-main.pylib.anki.scheduler.__init__",
+      "ankiSourceCode.anki-main.pylib.anki.scheduler.base",
+      "ankiSourceCode.anki-main.pylib.anki.scheduler.dummy",
+      "ankiSourceCode.anki-main.pylib.anki.scheduler.legacy",
+      "ankiSourceCode.anki-main.pylib.anki.scheduler.v3",
+      "ankiSourceCode.anki-main.pylib.anki.sound",
+      "ankiSourceCode.anki-main.pylib.anki.stats",
+      "ankiSourceCode.anki-main.pylib.anki.statsbg",
+      "ankiSourceCode.anki-main.pylib.anki.stdmodels",
+      "ankiSourceCode.anki-main.pylib.anki.storage",
+      "ankiSourceCode.anki-main.pylib.anki.sync",
+      "ankiSourceCode.anki-main.pylib.anki.syncserver",
+      "ankiSourceCode.anki-main.pylib.anki.tags",
+      "ankiSourceCode.anki-main.pylib.anki.template",
+      "ankiSourceCode.anki-main.pylib.anki.types",
+      "ankiSourceCode.anki-main.pylib.anki.utils",
+      "ankiSourceCode.anki-main.pylib.hatch_build",
+      "ankiSourceCode.anki-main.pylib.tests.__init__",
+      "ankiSourceCode.anki-main.pylib.tests.shared",
+      "ankiSourceCode.anki-main.pylib.tests.test_cards",
+      "ankiSourceCode.anki-main.pylib.tests.test_collection",
+      "ankiSourceCode.anki-main.pylib.tests.test_decks",
+      "ankiSourceCode.anki-main.pylib.tests.test_exporting",
+      "ankiSourceCode.anki-main.pylib.tests.test_find",
+      "ankiSourceCode.anki-main.pylib.tests.test_flags",
+      "ankiSourceCode.anki-main.pylib.tests.test_importing",
+      "ankiSourceCode.anki-main.pylib.tests.test_latex",
+      "ankiSourceCode.anki-main.pylib.tests.test_media",
+      "ankiSourceCode.anki-main.pylib.tests.test_models",
+      "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+      "ankiSourceCode.anki-main.pylib.tests.test_stats",
+      "ankiSourceCode.anki-main.pylib.tests.test_template",
+      "ankiSourceCode.anki-main.pylib.tests.test_utils",
+      "ankiSourceCode.anki-main.pylib.tools.genbuildinfo",
+      "ankiSourceCode.anki-main.pylib.tools.genhooks",
+      "ankiSourceCode.anki-main.pylib.tools.hookslib",
+      "ankiSourceCode.anki-main.python.mkempty",
+      "ankiSourceCode.anki-main.python.sphinx.build",
+      "ankiSourceCode.anki-main.python.sphinx.conf",
+      "ankiSourceCode.anki-main.python.version",
+      "ankiSourceCode.anki-main.qt.aqt.__init__",
+      "ankiSourceCode.anki-main.qt.aqt._macos_helper",
+      "ankiSourceCode.anki-main.qt.aqt.about",
+      "ankiSourceCode.anki-main.qt.aqt.addcards",
+      "ankiSourceCode.anki-main.qt.aqt.addons",
+      "ankiSourceCode.anki-main.qt.aqt.ankihub",
+      "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+      "ankiSourceCode.anki-main.qt.aqt.browser.card_info",
+      "ankiSourceCode.anki-main.qt.aqt.browser.find_and_replace",
+      "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+      "ankiSourceCode.anki-main.qt.aqt.browser.layout",
+      "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+      "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.item",
+      "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.model",
+      "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.searchbar",
+      "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.toolbar",
+      "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.tree",
+      "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+      "ankiSourceCode.anki-main.qt.aqt.browser.table.state",
+      "ankiSourceCode.anki-main.qt.aqt.browser.table.table",
+      "ankiSourceCode.anki-main.qt.aqt.changenotetype",
+      "ankiSourceCode.anki-main.qt.aqt.clayout",
+      "ankiSourceCode.anki-main.qt.aqt.colors",
+      "ankiSourceCode.anki-main.qt.aqt.customstudy",
+      "ankiSourceCode.anki-main.qt.aqt.dbcheck",
+      "ankiSourceCode.anki-main.qt.aqt.debug_console",
+      "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+      "ankiSourceCode.anki-main.qt.aqt.deckchooser",
+      "ankiSourceCode.anki-main.qt.aqt.deckconf",
+      "ankiSourceCode.anki-main.qt.aqt.deckdescription",
+      "ankiSourceCode.anki-main.qt.aqt.deckoptions",
+      "ankiSourceCode.anki-main.qt.aqt.editcurrent",
+      "ankiSourceCode.anki-main.qt.aqt.editor",
+      "ankiSourceCode.anki-main.qt.aqt.emptycards",
+      "ankiSourceCode.anki-main.qt.aqt.errors",
+      "ankiSourceCode.anki-main.qt.aqt.exporting",
+      "ankiSourceCode.anki-main.qt.aqt.fields",
+      "ankiSourceCode.anki-main.qt.aqt.filtered_deck",
+      "ankiSourceCode.anki-main.qt.aqt.flags",
+      "ankiSourceCode.anki-main.qt.aqt.forms.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.forms.about",
+      "ankiSourceCode.anki-main.qt.aqt.forms.addcards",
+      "ankiSourceCode.anki-main.qt.aqt.forms.addfield",
+      "ankiSourceCode.anki-main.qt.aqt.forms.addmodel",
+      "ankiSourceCode.anki-main.qt.aqt.forms.addonconf",
+      "ankiSourceCode.anki-main.qt.aqt.forms.addons",
+      "ankiSourceCode.anki-main.qt.aqt.forms.browser",
+      "ankiSourceCode.anki-main.qt.aqt.forms.browserdisp",
+      "ankiSourceCode.anki-main.qt.aqt.forms.browseropts",
+      "ankiSourceCode.anki-main.qt.aqt.forms.changemap",
+      "ankiSourceCode.anki-main.qt.aqt.forms.changemodel",
+      "ankiSourceCode.anki-main.qt.aqt.forms.clayout_top",
+      "ankiSourceCode.anki-main.qt.aqt.forms.customstudy",
+      "ankiSourceCode.anki-main.qt.aqt.forms.dconf",
+      "ankiSourceCode.anki-main.qt.aqt.forms.debug",
+      "ankiSourceCode.anki-main.qt.aqt.forms.editcurrent",
+      "ankiSourceCode.anki-main.qt.aqt.forms.edithtml",
+      "ankiSourceCode.anki-main.qt.aqt.forms.emptycards",
+      "ankiSourceCode.anki-main.qt.aqt.forms.exporting",
+      "ankiSourceCode.anki-main.qt.aqt.forms.fields",
+      "ankiSourceCode.anki-main.qt.aqt.forms.filtered_deck",
+      "ankiSourceCode.anki-main.qt.aqt.forms.finddupes",
+      "ankiSourceCode.anki-main.qt.aqt.forms.findreplace",
+      "ankiSourceCode.anki-main.qt.aqt.forms.forget",
+      "ankiSourceCode.anki-main.qt.aqt.forms.getaddons",
+      "ankiSourceCode.anki-main.qt.aqt.forms.importing",
+      "ankiSourceCode.anki-main.qt.aqt.forms.main",
+      "ankiSourceCode.anki-main.qt.aqt.forms.modelopts",
+      "ankiSourceCode.anki-main.qt.aqt.forms.models",
+      "ankiSourceCode.anki-main.qt.aqt.forms.preferences",
+      "ankiSourceCode.anki-main.qt.aqt.forms.preview",
+      "ankiSourceCode.anki-main.qt.aqt.forms.profiles",
+      "ankiSourceCode.anki-main.qt.aqt.forms.progress",
+      "ankiSourceCode.anki-main.qt.aqt.forms.reposition",
+      "ankiSourceCode.anki-main.qt.aqt.forms.setgroup",
+      "ankiSourceCode.anki-main.qt.aqt.forms.setlang",
+      "ankiSourceCode.anki-main.qt.aqt.forms.stats",
+      "ankiSourceCode.anki-main.qt.aqt.forms.studydeck",
+      "ankiSourceCode.anki-main.qt.aqt.forms.synclog",
+      "ankiSourceCode.anki-main.qt.aqt.forms.taglimit",
+      "ankiSourceCode.anki-main.qt.aqt.forms.template",
+      "ankiSourceCode.anki-main.qt.aqt.forms.widgets",
+      "ankiSourceCode.anki-main.qt.aqt.gui_hooks",
+      "ankiSourceCode.anki-main.qt.aqt.import_export.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+      "ankiSourceCode.anki-main.qt.aqt.import_export.import_dialog",
+      "ankiSourceCode.anki-main.qt.aqt.import_export.importing",
+      "ankiSourceCode.anki-main.qt.aqt.importing",
+      "ankiSourceCode.anki-main.qt.aqt.legacy",
+      "ankiSourceCode.anki-main.qt.aqt.log",
+      "ankiSourceCode.anki-main.qt.aqt.main",
+      "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+      "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+      "ankiSourceCode.anki-main.qt.aqt.mediasync",
+      "ankiSourceCode.anki-main.qt.aqt.modelchooser",
+      "ankiSourceCode.anki-main.qt.aqt.models",
+      "ankiSourceCode.anki-main.qt.aqt.mpv",
+      "ankiSourceCode.anki-main.qt.aqt.notetypechooser",
+      "ankiSourceCode.anki-main.qt.aqt.operations.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.operations.card",
+      "ankiSourceCode.anki-main.qt.aqt.operations.collection",
+      "ankiSourceCode.anki-main.qt.aqt.operations.deck",
+      "ankiSourceCode.anki-main.qt.aqt.operations.note",
+      "ankiSourceCode.anki-main.qt.aqt.operations.notetype",
+      "ankiSourceCode.anki-main.qt.aqt.operations.scheduling",
+      "ankiSourceCode.anki-main.qt.aqt.operations.tag",
+      "ankiSourceCode.anki-main.qt.aqt.overview",
+      "ankiSourceCode.anki-main.qt.aqt.package",
+      "ankiSourceCode.anki-main.qt.aqt.preferences",
+      "ankiSourceCode.anki-main.qt.aqt.profiles",
+      "ankiSourceCode.anki-main.qt.aqt.progress",
+      "ankiSourceCode.anki-main.qt.aqt.props",
+      "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+      "ankiSourceCode.anki-main.qt.aqt.qt.qt6",
+      "ankiSourceCode.anki-main.qt.aqt.reviewer",
+      "ankiSourceCode.anki-main.qt.aqt.schema_change_tracker",
+      "ankiSourceCode.anki-main.qt.aqt.sound",
+      "ankiSourceCode.anki-main.qt.aqt.stats",
+      "ankiSourceCode.anki-main.qt.aqt.studydeck",
+      "ankiSourceCode.anki-main.qt.aqt.stylesheets",
+      "ankiSourceCode.anki-main.qt.aqt.switch",
+      "ankiSourceCode.anki-main.qt.aqt.sync",
+      "ankiSourceCode.anki-main.qt.aqt.tagedit",
+      "ankiSourceCode.anki-main.qt.aqt.taglimit",
+      "ankiSourceCode.anki-main.qt.aqt.taskman",
+      "ankiSourceCode.anki-main.qt.aqt.theme",
+      "ankiSourceCode.anki-main.qt.aqt.toolbar",
+      "ankiSourceCode.anki-main.qt.aqt.tts",
+      "ankiSourceCode.anki-main.qt.aqt.undo",
+      "ankiSourceCode.anki-main.qt.aqt.update",
+      "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+      "ankiSourceCode.anki-main.qt.aqt.utils",
+      "ankiSourceCode.anki-main.qt.aqt.webview",
+      "ankiSourceCode.anki-main.qt.aqt.widgetgallery",
+      "ankiSourceCode.anki-main.qt.aqt.winpaths",
+      "ankiSourceCode.anki-main.qt.hatch_build",
+      "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+      "ankiSourceCode.anki-main.qt.launcher.versions",
+      "ankiSourceCode.anki-main.qt.mac.anki_mac_helper.__init__",
+      "ankiSourceCode.anki-main.qt.mac.helper_build",
+      "ankiSourceCode.anki-main.qt.runanki",
+      "ankiSourceCode.anki-main.qt.tests.__init__",
+      "ankiSourceCode.anki-main.qt.tests.test_addons",
+      "ankiSourceCode.anki-main.qt.tests.test_i18n",
+      "ankiSourceCode.anki-main.qt.tools.build_qrc",
+      "ankiSourceCode.anki-main.qt.tools.build_ui",
+      "ankiSourceCode.anki-main.qt.tools.color_svg",
+      "ankiSourceCode.anki-main.qt.tools.extract_sass_vars",
+      "ankiSourceCode.anki-main.qt.tools.genhooks_gui",
+      "ankiSourceCode.anki-main.tools.reload_webviews",
+      "ankiSourceCode.anki-main.tools.run",
+      "anki_audio",
+      "anki_mac_helper",
+      "aqt",
+      "argparse",
+      "ast",
+      "asyncio",
+      "atexit",
+      "base64",
+      "bazelfixes",
+      "browser",
+      "browser_integration",
+      "bs4",
+      "builtins",
+      "cProfile",
+      "card_info",
+      "changenotetype",
+      "checkForThirtyTwo",
+      "collections",
+      "config",
+      "connection",
+      "constants",
+      "contextlib",
+      "copy",
+      "csv",
+      "ctypes",
+      "database",
+      "dataclasses",
+      "datetime",
+      "decorator",
+      "dialogs",
+      "dict_wizard",
+      "dictdb",
+      "dictionaryWebInstallWizard",
+      "dictionary_manager",
+      "dictionary_window",
+      "distro",
+      "editor_integration",
+      "enum",
+      "errno",
+      "errors",
+      "export_service",
+      "ffmpegInstaller",
+      "file_audit",
+      "find_and_replace",
+      "flask",
+      "flask_cors",
+      "forvodl",
+      "freqConjWebWindow",
+      "functools",
+      "gc",
+      "getpass",
+      "googleimages",
+      "hashlib",
+      "hookslib",
+      "html",
+      "http",
+      "httpclient",
+      "import_analyzer",
+      "import_rewriter",
+      "init_db",
+      "inspect",
+      "io",
+      "item",
+      "itertools",
+      "json",
+      "jsonschema",
+      "layout",
+      "legacy",
+      "locale",
+      "logging",
+      "main",
+      "manager",
+      "markdown",
+      "math",
+      "media_service",
+      "menu_manager",
+      "miJapaneseHandler",
+      "miUpdater",
+      "miflix",
+      "migakuMessage",
+      "mimetypes",
+      "misoMessage",
+      "miutils",
+      "mock",
+      "model",
+      "models",
+      "ntpath",
+      "operations",
+      "operator",
+      "orjson",
+      "os",
+      "package",
+      "pathlib",
+      "pdb",
+      "pickle",
+      "platform",
+      "plugin",
+      "pprint",
+      "previewer",
+      "pytest",
+      "pywintypes",
+      "qt6",
+      "queue",
+      "random",
+      "re",
+      "repository",
+      "requests",
+      "run_tests",
+      "search_service",
+      "searchbar",
+      "secrets",
+      "select",
+      "send2trash",
+      "services",
+      "settings_window",
+      "shutil",
+      "sidebar",
+      "signal",
+      "socket",
+      "sqlite3",
+      "src.__init__",
+      "src.config.__init__",
+      "src.config.manager",
+      "src.config.models",
+      "src.constants",
+      "src.core.__init__",
+      "src.core.plugin",
+      "src.database",
+      "src.database.__init__",
+      "src.database.connection",
+      "src.database.models",
+      "src.database.repository",
+      "src.services.__init__",
+      "src.services.export_service",
+      "src.services.media_service",
+      "src.services.search_service",
+      "src.ui.__init__",
+      "src.ui.base",
+      "src.ui.browser_integration",
+      "src.ui.card_exporter",
+      "src.ui.dictionary_manager",
+      "src.ui.dictionary_window",
+      "src.ui.editor_integration",
+      "src.ui.menu_manager",
+      "src.ui.settings_window",
+      "src.ui.theme_editor",
+      "src.ui.themes",
+      "src.utils.__init__",
+      "src.utils.dialogs",
+      "src.utils.platform",
+      "src.utils.text",
+      "stat",
+      "state",
+      "statsbg",
+      "string",
+      "stringcase",
+      "struct",
+      "subprocess",
+      "sys",
+      "table",
+      "tempfile",
+      "tests.__init__",
+      "tests.conftest",
+      "tests.mocks",
+      "tests.shared",
+      "tests.test_backward_compatibility",
+      "tests.test_browser_integration",
+      "tests.test_card_exporter",
+      "tests.test_config_manager",
+      "tests.test_constants",
+      "tests.test_database_connection",
+      "tests.test_database_repository",
+      "tests.test_dictionary_manager",
+      "tests.test_dictionary_window",
+      "tests.test_editor_integration",
+      "tests.test_main_entry",
+      "tests.test_media_service",
+      "tests.test_menu_manager",
+      "tests.test_phase4_backward_compatibility",
+      "tests.test_plugin_coordinator",
+      "tests.test_settings_window",
+      "tests.test_ui_base",
+      "tests.test_utils_platform",
+      "tests.test_utils_text",
+      "text",
+      "themes",
+      "threading",
+      "time",
+      "toolbar",
+      "traceback",
+      "tree",
+      "typing",
+      "typing_extensions",
+      "ui",
+      "unicodedata",
+      "urllib",
+      "utils",
+      "uuid",
+      "validate_mocks",
+      "waitress",
+      "warnings",
+      "wave",
+      "weakref",
+      "webConfig",
+      "win32con",
+      "win32file",
+      "win32gui",
+      "win32job",
+      "win32pipe",
+      "winerror",
+      "winreg",
+      "zipfile"
+    ],
+    "edges": [
+      {
+        "from": "__init__",
+        "to": "sys"
+      },
+      {
+        "from": "__init__",
+        "to": "pathlib"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "json"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "sys"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "math"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "re"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "os"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "aqt"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "shutil"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "operator"
+      },
+      {
+        "from": "addDictGroup",
+        "to": "ntpath"
+      },
+      {
+        "from": "addTemplate",
+        "to": "json"
+      },
+      {
+        "from": "addTemplate",
+        "to": "sys"
+      },
+      {
+        "from": "addTemplate",
+        "to": "math"
+      },
+      {
+        "from": "addTemplate",
+        "to": "re"
+      },
+      {
+        "from": "addTemplate",
+        "to": "os"
+      },
+      {
+        "from": "addTemplate",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "threading"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "weakref"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._backend",
+        "to": "errors"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._legacy",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki._vendor.stringcase",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.cards",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.cards",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.cards",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.cards",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.cards",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.cards",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "weakref"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.collection",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "weakref"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "weakref"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.config",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.consts",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.consts",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.consts",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.consts",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "sqlite3"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "sqlite3"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.db",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.dbproxy",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.dbproxy",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.dbproxy",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.dbproxy",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.decks",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.decks",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.decks",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.decks",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.decks",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.errors",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.errors",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.errors",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "threading"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "unicodedata"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "io"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.exporting",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.find",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.find",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.__init__",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.__init__",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.mnemosyne",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.mnemosyne",
+        "to": "abc"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.foreign_data.mnemosyne",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.hooks",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.hooks",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.hooks",
+        "to": "decorator"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "io"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "requests"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "requests"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.httpclient",
+        "to": "warnings"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.__init__",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.anki2",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.anki2",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.anki2",
+        "to": "unicodedata"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.anki2",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+        "to": "unicodedata"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.apkg",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.base",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.base",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.csvfile",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.csvfile",
+        "to": "csv"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.csvfile",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.csvfile",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.mnemo",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.mnemo",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.mnemo",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.noteimp",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.noteimp",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.noteimp",
+        "to": "unicodedata"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.importing.noteimp",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "locale"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "warnings"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "weakref"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.lang",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.latex",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.latex",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.latex",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.latex",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.latex",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.latex",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.media",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.models",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.notes",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.notes",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.notes",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.notes",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.notes",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.base",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.base",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.base",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.base",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.base",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.dummy",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.legacy",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.v3",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.v3",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.scheduler.v3",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sound",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sound",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sound",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sound",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sound",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sound",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stats",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stats",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stats",
+        "to": "random"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stats",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stats",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stats",
+        "to": "statsbg"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stdmodels",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stdmodels",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.stdmodels",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sync",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.sync",
+        "to": "httpclient"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.syncserver",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.syncserver",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.tags",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.tags",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.tags",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.tags",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.tags",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.tags",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.template",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.template",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.template",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.template",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.template",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.types",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "platform"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "random"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "string"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "contextlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "hashlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "orjson"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "atexit"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.anki.utils",
+        "to": "distro"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.hatch_build",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.hatch_build",
+        "to": "platform"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.hatch_build",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.hatch_build",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.hatch_build",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.shared",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.shared",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.shared",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.shared",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.shared",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_cards",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_collection",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_collection",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_collection",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_collection",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_decks",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_exporting",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_exporting",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_exporting",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_exporting",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_exporting",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_find",
+        "to": "pytest"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_find",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_flags",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_importing",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_importing",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_importing",
+        "to": "pytest"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_importing",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_latex",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_latex",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_latex",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_media",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_media",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_media",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_models",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_models",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_models",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_models",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "pytest"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_schedv3",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_stats",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_stats",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_stats",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tests.test_template",
+        "to": "tests.shared"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.genbuildinfo",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.genhooks",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.genhooks",
+        "to": "hookslib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.hookslib",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.hookslib",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.hookslib",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.hookslib",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.hookslib",
+        "to": "operator"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.pylib.tools.hookslib",
+        "to": "stringcase"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.python.mkempty",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.python.sphinx.build",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.python.sphinx.build",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.python.sphinx.conf",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.python.version",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "atexit"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "logging"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "argparse"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "builtins"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "cProfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "getpass"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "locale"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "package"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.__init__",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt._macos_helper",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt._macos_helper",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt._macos_helper",
+        "to": "anki_mac_helper"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.about",
+        "to": "platform"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addcards",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addcards",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "io"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "logging"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "collections"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "datetime"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "jsonschema"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.addons",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.ankihub",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.ankihub",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.ankihub",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.ankihub",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+        "to": "browser"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+        "to": "sidebar"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.__init__",
+        "to": "table"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "math"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "addcards"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "changenotetype"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "card_info"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "find_and_replace"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "layout"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "previewer"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "previewer"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "sidebar"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.browser",
+        "to": "table"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.card_info",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.card_info",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.card_info",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_and_replace",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_and_replace",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_and_replace",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "operations"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.find_duplicates",
+        "to": "utils"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.layout",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.layout",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.previewer",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.__init__",
+        "to": "item"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.__init__",
+        "to": "model"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.__init__",
+        "to": "searchbar"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.__init__",
+        "to": "toolbar"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.__init__",
+        "to": "tree"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.item",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.item",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.model",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.model",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.searchbar",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.searchbar",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.toolbar",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.toolbar",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.toolbar",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.tree",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.tree",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.tree",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.tree",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.sidebar.tree",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "model"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "state"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.__init__",
+        "to": "table"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.model",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.state",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.state",
+        "to": "abc"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.state",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.table",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.table",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.table",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.browser.table.table",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.changenotetype",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.changenotetype",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.clayout",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.customstudy",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.customstudy",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.dbcheck",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.dbcheck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "pprint"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.debug_console",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "copy"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckbrowser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckchooser",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckchooser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckconf",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckconf",
+        "to": "operator"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckconf",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckconf",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckconf",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckdescription",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckdescription",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckoptions",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckoptions",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.deckoptions",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editcurrent",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editcurrent",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "base64"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "itertools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "mimetypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "warnings"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "random"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "bs4"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "requests"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "bs4"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.editor",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.emptycards",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.emptycards",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.emptycards",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.emptycards",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.emptycards",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.errors",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.exporting",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.fields",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.fields",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.fields",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.filtered_deck",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.filtered_deck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.filtered_deck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.flags",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.flags",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.flags",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.flags",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.flags",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.gui_hooks",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "abc"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.exporting",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.import_dialog",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.import_dialog",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.import_dialog",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.import_dialog",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.importing",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.importing",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.importing",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.importing",
+        "to": "abc"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.import_export.importing",
+        "to": "itertools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.importing",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.legacy",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.legacy",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.legacy",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.legacy",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.log",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.log",
+        "to": "logging"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.log",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.log",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.log",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "gc"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "signal"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "weakref"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "argparse"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.main",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+        "to": "itertools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediacheck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "logging"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "mimetypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "secrets"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "threading"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "errno"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "http"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "flask"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "flask_cors"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "stringcase"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "flask"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasrv",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasync",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasync",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasync",
+        "to": "datetime"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasync",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasync",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mediasync",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.modelchooser",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.modelchooser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.models",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.models",
+        "to": "operator"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.models",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.models",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.models",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "inspect"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "platform"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "select"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "socket"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "threading"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "queue"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "pywintypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "win32file"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "win32job"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "win32pipe"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.mpv",
+        "to": "winerror"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.notetypechooser",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.notetypechooser",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.card",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.collection",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.collection",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.deck",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.deck",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.note",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.notetype",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.scheduling",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.scheduling",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.scheduling",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.operations.tag",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.overview",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.overview",
+        "to": "html"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.overview",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.overview",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.overview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.overview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "contextlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "anki_audio"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "bs4"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "flask"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "flask_cors"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "requests"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "waitress"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.package",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.preferences",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.preferences",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.preferences",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.preferences",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.preferences",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.preferences",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "io"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "pickle"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "random"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.profiles",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.progress",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.progress",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.progress",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.props",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "qt6"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "pdb"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.__init__",
+        "to": "pdb"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.qt.qt6",
+        "to": "PyQt6"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "random"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.reviewer",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.schema_change_tracker",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.schema_change_tracker",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.schema_change_tracker",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "platform"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "wave"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "abc"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "operator"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "struct"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "anki_audio"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sound",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.stats",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.stats",
+        "to": "time"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.stats",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.stats",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.stats",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.studydeck",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.studydeck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.studydeck",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.stylesheets",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.switch",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.switch",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.switch",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sync",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sync",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sync",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sync",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.sync",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tagedit",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tagedit",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tagedit",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taglimit",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taglimit",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taskman",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taskman",
+        "to": "traceback"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taskman",
+        "to": "threading"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taskman",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.taskman",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.theme",
+        "to": "winreg"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.toolbar",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.toolbar",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.toolbar",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.toolbar",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.toolbar",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.toolbar",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "operator"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.tts",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.undo",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.undo",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.undo",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.update",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.update",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.update",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+        "to": "markdown"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.url_schemes",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "inspect"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "shutil"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "functools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "send2trash"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "win32con"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "win32gui"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "platform"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.utils",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "enum"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "typing_extensions"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "anki"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.webview",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.widgetgallery",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.winpaths",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.aqt.winpaths",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.hatch_build",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.hatch_build",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.hatch_build",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.hatch_build",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "contextlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "typing"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.addon.__init__",
+        "to": "anki_audio"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.versions",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.versions",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.launcher.versions",
+        "to": "requests"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.anki_mac_helper.__init__",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.anki_mac_helper.__init__",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.anki_mac_helper.__init__",
+        "to": "ctypes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.anki_mac_helper.__init__",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.helper_build",
+        "to": "subprocess"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.helper_build",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.mac.helper_build",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.runanki",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.runanki",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.runanki",
+        "to": "aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.runanki",
+        "to": "bazelfixes"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tests.test_addons",
+        "to": "tempfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tests.test_addons",
+        "to": "zipfile"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tests.test_addons",
+        "to": "mock"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_qrc",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_qrc",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_ui",
+        "to": "__future__"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_ui",
+        "to": "io"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_ui",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_ui",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_ui",
+        "to": "dataclasses"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.build_ui",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.color_svg",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.color_svg",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.color_svg",
+        "to": "pathlib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.color_svg",
+        "to": "_aqt"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.extract_sass_vars",
+        "to": "json"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.extract_sass_vars",
+        "to": "re"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.extract_sass_vars",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.genhooks_gui",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.qt.tools.genhooks_gui",
+        "to": "hookslib"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.tools.reload_webviews",
+        "to": "argparse"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.tools.reload_webviews",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.tools.reload_webviews",
+        "to": "PyChromeDevTools"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.tools.run",
+        "to": "os"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.tools.run",
+        "to": "sys"
+      },
+      {
+        "from": "ankiSourceCode.anki-main.tools.run",
+        "to": "aqt"
+      },
+      {
+        "from": "checkForThirtyTwo",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "dictdb",
+        "to": "sqlite3"
+      },
+      {
+        "from": "dictdb",
+        "to": "typing"
+      },
+      {
+        "from": "dictdb",
+        "to": "re"
+      },
+      {
+        "from": "dictdb",
+        "to": "json"
+      },
+      {
+        "from": "dictdb",
+        "to": "aqt"
+      },
+      {
+        "from": "dictdb",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "dictdb",
+        "to": "init_db"
+      },
+      {
+        "from": "dictdb",
+        "to": "src.database"
+      },
+      {
+        "from": "dictdb",
+        "to": "src.constants"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "json"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "io"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "os"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "aqt"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "dict_wizard"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "src.database.repository"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "src.ui.dictionary_manager"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "tempfile"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "pathlib"
+      },
+      {
+        "from": "dictionaryWebInstallWizard",
+        "to": "src.config.manager"
+      },
+      {
+        "from": "ffmpegInstaller",
+        "to": "os"
+      },
+      {
+        "from": "ffmpegInstaller",
+        "to": "stat"
+      },
+      {
+        "from": "ffmpegInstaller",
+        "to": "requests"
+      },
+      {
+        "from": "ffmpegInstaller",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "ffmpegInstaller",
+        "to": "aqt"
+      },
+      {
+        "from": "ffmpegInstaller",
+        "to": "zipfile"
+      },
+      {
+        "from": "file_audit",
+        "to": "os"
+      },
+      {
+        "from": "file_audit",
+        "to": "pathlib"
+      },
+      {
+        "from": "file_audit",
+        "to": "enum"
+      },
+      {
+        "from": "file_audit",
+        "to": "typing"
+      },
+      {
+        "from": "file_audit",
+        "to": "dataclasses"
+      },
+      {
+        "from": "file_audit",
+        "to": "json"
+      },
+      {
+        "from": "forvodl",
+        "to": "argparse"
+      },
+      {
+        "from": "forvodl",
+        "to": "json"
+      },
+      {
+        "from": "forvodl",
+        "to": "os"
+      },
+      {
+        "from": "forvodl",
+        "to": "urllib"
+      },
+      {
+        "from": "forvodl",
+        "to": "bs4"
+      },
+      {
+        "from": "forvodl",
+        "to": "requests"
+      },
+      {
+        "from": "forvodl",
+        "to": "re"
+      },
+      {
+        "from": "forvodl",
+        "to": "base64"
+      },
+      {
+        "from": "freqConjWebWindow",
+        "to": "os"
+      },
+      {
+        "from": "freqConjWebWindow",
+        "to": "enum"
+      },
+      {
+        "from": "googleimages",
+        "to": "argparse"
+      },
+      {
+        "from": "googleimages",
+        "to": "json"
+      },
+      {
+        "from": "googleimages",
+        "to": "os"
+      },
+      {
+        "from": "googleimages",
+        "to": "urllib"
+      },
+      {
+        "from": "googleimages",
+        "to": "bs4"
+      },
+      {
+        "from": "googleimages",
+        "to": "requests"
+      },
+      {
+        "from": "googleimages",
+        "to": "time"
+      },
+      {
+        "from": "googleimages",
+        "to": "re"
+      },
+      {
+        "from": "import_analyzer",
+        "to": "ast"
+      },
+      {
+        "from": "import_analyzer",
+        "to": "os"
+      },
+      {
+        "from": "import_analyzer",
+        "to": "pathlib"
+      },
+      {
+        "from": "import_analyzer",
+        "to": "typing"
+      },
+      {
+        "from": "import_analyzer",
+        "to": "collections"
+      },
+      {
+        "from": "import_analyzer",
+        "to": "json"
+      },
+      {
+        "from": "import_rewriter",
+        "to": "ast"
+      },
+      {
+        "from": "import_rewriter",
+        "to": "re"
+      },
+      {
+        "from": "import_rewriter",
+        "to": "pathlib"
+      },
+      {
+        "from": "import_rewriter",
+        "to": "typing"
+      },
+      {
+        "from": "import_rewriter",
+        "to": "logging"
+      },
+      {
+        "from": "import_rewriter",
+        "to": "argparse"
+      },
+      {
+        "from": "init_db",
+        "to": "sqlite3"
+      },
+      {
+        "from": "init_db",
+        "to": "os"
+      },
+      {
+        "from": "main",
+        "to": "pathlib"
+      },
+      {
+        "from": "main",
+        "to": "aqt"
+      },
+      {
+        "from": "main",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "main",
+        "to": "src.constants"
+      },
+      {
+        "from": "miJapaneseHandler",
+        "to": "aqt"
+      },
+      {
+        "from": "miUpdater",
+        "to": "aqt"
+      },
+      {
+        "from": "miUpdater",
+        "to": "aqt"
+      },
+      {
+        "from": "miUpdater",
+        "to": "legacy"
+      },
+      {
+        "from": "miUpdater",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "miUpdater",
+        "to": "time"
+      },
+      {
+        "from": "miflix",
+        "to": "sys"
+      },
+      {
+        "from": "miflix",
+        "to": "json"
+      },
+      {
+        "from": "miflix",
+        "to": "re"
+      },
+      {
+        "from": "miflix",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "miflix",
+        "to": "asyncio"
+      },
+      {
+        "from": "miflix",
+        "to": "threading"
+      },
+      {
+        "from": "miflix",
+        "to": "os"
+      },
+      {
+        "from": "miflix",
+        "to": "uuid"
+      },
+      {
+        "from": "miflix",
+        "to": "aqt"
+      },
+      {
+        "from": "miflix",
+        "to": "threading"
+      },
+      {
+        "from": "miflix",
+        "to": "subprocess"
+      },
+      {
+        "from": "migakuMessage",
+        "to": "aqt"
+      },
+      {
+        "from": "migakuMessage",
+        "to": "os"
+      },
+      {
+        "from": "migakuMessage",
+        "to": "aqt"
+      },
+      {
+        "from": "migakuMessage",
+        "to": "requests"
+      },
+      {
+        "from": "migakuMessage",
+        "to": "re"
+      },
+      {
+        "from": "misoMessage",
+        "to": "aqt"
+      },
+      {
+        "from": "misoMessage",
+        "to": "os"
+      },
+      {
+        "from": "misoMessage",
+        "to": "aqt"
+      },
+      {
+        "from": "misoMessage",
+        "to": "requests"
+      },
+      {
+        "from": "misoMessage",
+        "to": "re"
+      },
+      {
+        "from": "miutils",
+        "to": "typing"
+      },
+      {
+        "from": "miutils",
+        "to": "src.utils.dialogs"
+      },
+      {
+        "from": "run_tests",
+        "to": "sys"
+      },
+      {
+        "from": "run_tests",
+        "to": "os"
+      },
+      {
+        "from": "run_tests",
+        "to": "pathlib"
+      },
+      {
+        "from": "run_tests",
+        "to": "argparse"
+      },
+      {
+        "from": "run_tests",
+        "to": "pytest"
+      },
+      {
+        "from": "run_tests",
+        "to": "pytest"
+      },
+      {
+        "from": "src.config.__init__",
+        "to": "manager"
+      },
+      {
+        "from": "src.config.__init__",
+        "to": "models"
+      },
+      {
+        "from": "src.config.manager",
+        "to": "typing"
+      },
+      {
+        "from": "src.config.manager",
+        "to": "json"
+      },
+      {
+        "from": "src.config.manager",
+        "to": "logging"
+      },
+      {
+        "from": "src.config.manager",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.config.models",
+        "to": "dataclasses"
+      },
+      {
+        "from": "src.config.models",
+        "to": "typing"
+      },
+      {
+        "from": "src.constants",
+        "to": "typing"
+      },
+      {
+        "from": "src.core.__init__",
+        "to": "plugin"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "typing"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "os"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "logging"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "config"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "database"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "services"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "constants"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.core.plugin",
+        "to": "ui"
+      },
+      {
+        "from": "src.database.__init__",
+        "to": "connection"
+      },
+      {
+        "from": "src.database.__init__",
+        "to": "repository"
+      },
+      {
+        "from": "src.database.__init__",
+        "to": "models"
+      },
+      {
+        "from": "src.database.connection",
+        "to": "sqlite3"
+      },
+      {
+        "from": "src.database.connection",
+        "to": "os"
+      },
+      {
+        "from": "src.database.connection",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.database.connection",
+        "to": "typing"
+      },
+      {
+        "from": "src.database.connection",
+        "to": "contextlib"
+      },
+      {
+        "from": "src.database.models",
+        "to": "dataclasses"
+      },
+      {
+        "from": "src.database.models",
+        "to": "typing"
+      },
+      {
+        "from": "src.database.repository",
+        "to": "typing"
+      },
+      {
+        "from": "src.database.repository",
+        "to": "re"
+      },
+      {
+        "from": "src.database.repository",
+        "to": "json"
+      },
+      {
+        "from": "src.database.repository",
+        "to": "connection"
+      },
+      {
+        "from": "src.database.repository",
+        "to": "models"
+      },
+      {
+        "from": "src.database.repository",
+        "to": "constants"
+      },
+      {
+        "from": "src.services.__init__",
+        "to": "search_service"
+      },
+      {
+        "from": "src.services.__init__",
+        "to": "export_service"
+      },
+      {
+        "from": "src.services.__init__",
+        "to": "media_service"
+      },
+      {
+        "from": "src.services.export_service",
+        "to": "typing"
+      },
+      {
+        "from": "src.services.export_service",
+        "to": "re"
+      },
+      {
+        "from": "src.services.export_service",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.services.export_service",
+        "to": "constants"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "typing"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "logging"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "shutil"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "tempfile"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "time"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "json"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "re"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "forvodl"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "requests"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "googleimages"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "requests"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "PIL"
+      },
+      {
+        "from": "src.services.media_service",
+        "to": "io"
+      },
+      {
+        "from": "src.services.search_service",
+        "to": "typing"
+      },
+      {
+        "from": "src.services.search_service",
+        "to": "json"
+      },
+      {
+        "from": "src.services.search_service",
+        "to": "os"
+      },
+      {
+        "from": "src.services.search_service",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.services.search_service",
+        "to": "database"
+      },
+      {
+        "from": "src.services.search_service",
+        "to": "constants"
+      },
+      {
+        "from": "src.ui.__init__",
+        "to": "dictionary_window"
+      },
+      {
+        "from": "src.ui.__init__",
+        "to": "settings_window"
+      },
+      {
+        "from": "src.ui.__init__",
+        "to": "dictionary_manager"
+      },
+      {
+        "from": "src.ui.__init__",
+        "to": "editor_integration"
+      },
+      {
+        "from": "src.ui.__init__",
+        "to": "browser_integration"
+      },
+      {
+        "from": "src.ui.__init__",
+        "to": "menu_manager"
+      },
+      {
+        "from": "src.ui.base",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.base",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.ui.browser_integration",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.browser_integration",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.browser_integration",
+        "to": "re"
+      },
+      {
+        "from": "src.ui.card_exporter",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.card_exporter",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.ui.card_exporter",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.card_exporter",
+        "to": "services"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "os"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "json"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "zipfile"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "re"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "shutil"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "aqt"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "dictionaryWebInstallWizard"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "freqConjWebWindow"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "freqConjWebWindow"
+      },
+      {
+        "from": "src.ui.dictionary_manager",
+        "to": "dictionaryWebInstallWizard"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "json"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "os"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "services"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "config"
+      },
+      {
+        "from": "src.ui.dictionary_window",
+        "to": "re"
+      },
+      {
+        "from": "src.ui.editor_integration",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.editor_integration",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.editor_integration",
+        "to": "re"
+      },
+      {
+        "from": "src.ui.editor_integration",
+        "to": "aqt"
+      },
+      {
+        "from": "src.ui.editor_integration",
+        "to": "aqt"
+      },
+      {
+        "from": "src.ui.menu_manager",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.menu_manager",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.settings_window",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.settings_window",
+        "to": "pathlib"
+      },
+      {
+        "from": "src.ui.settings_window",
+        "to": "logging"
+      },
+      {
+        "from": "src.ui.settings_window",
+        "to": "re"
+      },
+      {
+        "from": "src.ui.settings_window",
+        "to": "config"
+      },
+      {
+        "from": "src.ui.theme_editor",
+        "to": "json"
+      },
+      {
+        "from": "src.ui.theme_editor",
+        "to": "os"
+      },
+      {
+        "from": "src.ui.theme_editor",
+        "to": "themes"
+      },
+      {
+        "from": "src.ui.themes",
+        "to": "dataclasses"
+      },
+      {
+        "from": "src.ui.themes",
+        "to": "typing"
+      },
+      {
+        "from": "src.ui.themes",
+        "to": "json"
+      },
+      {
+        "from": "src.ui.themes",
+        "to": "os"
+      },
+      {
+        "from": "src.ui.themes",
+        "to": "aqt"
+      },
+      {
+        "from": "src.utils.__init__",
+        "to": "text"
+      },
+      {
+        "from": "src.utils.__init__",
+        "to": "platform"
+      },
+      {
+        "from": "src.utils.__init__",
+        "to": "dialogs"
+      },
+      {
+        "from": "src.utils.dialogs",
+        "to": "typing"
+      },
+      {
+        "from": "src.utils.dialogs",
+        "to": "aqt"
+      },
+      {
+        "from": "src.utils.platform",
+        "to": "sys"
+      },
+      {
+        "from": "src.utils.platform",
+        "to": "platform"
+      },
+      {
+        "from": "src.utils.text",
+        "to": "re"
+      },
+      {
+        "from": "src.utils.text",
+        "to": "typing"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "sys"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "os"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "tempfile"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "sqlite3"
+      },
+      {
+        "from": "tests.conftest",
+        "to": "tests.mocks"
+      },
+      {
+        "from": "tests.mocks",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "sqlite3"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "time"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "time"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_browser_integration",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_browser_integration",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_browser_integration",
+        "to": "tests.mocks"
+      },
+      {
+        "from": "tests.test_browser_integration",
+        "to": "src.ui.browser_integration"
+      },
+      {
+        "from": "tests.test_card_exporter",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_card_exporter",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_card_exporter",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_card_exporter",
+        "to": "src.ui.card_exporter"
+      },
+      {
+        "from": "tests.test_config_manager",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_config_manager",
+        "to": "src.config.manager"
+      },
+      {
+        "from": "tests.test_constants",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_constants",
+        "to": "src.constants"
+      },
+      {
+        "from": "tests.test_database_connection",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_database_connection",
+        "to": "sqlite3"
+      },
+      {
+        "from": "tests.test_database_connection",
+        "to": "src.database.connection"
+      },
+      {
+        "from": "tests.test_database_repository",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_database_repository",
+        "to": "src.database.connection"
+      },
+      {
+        "from": "tests.test_database_repository",
+        "to": "src.database.repository"
+      },
+      {
+        "from": "tests.test_dictionary_manager",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_dictionary_manager",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_dictionary_manager",
+        "to": "json"
+      },
+      {
+        "from": "tests.test_dictionary_manager",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_dictionary_manager",
+        "to": "src.ui.dictionary_manager"
+      },
+      {
+        "from": "tests.test_dictionary_window",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_dictionary_window",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_dictionary_window",
+        "to": "json"
+      },
+      {
+        "from": "tests.test_dictionary_window",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_dictionary_window",
+        "to": "src.ui.dictionary_window"
+      },
+      {
+        "from": "tests.test_editor_integration",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_editor_integration",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_editor_integration",
+        "to": "tests.mocks"
+      },
+      {
+        "from": "tests.test_editor_integration",
+        "to": "src.ui.editor_integration"
+      },
+      {
+        "from": "tests.test_editor_integration",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "sqlite3"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_main_entry",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "tempfile"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "shutil"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "io"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "src.services.media_service"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "src.config.manager"
+      },
+      {
+        "from": "tests.test_media_service",
+        "to": "shutil"
+      },
+      {
+        "from": "tests.test_menu_manager",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_menu_manager",
+        "to": "tests.mocks"
+      },
+      {
+        "from": "tests.test_menu_manager",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "sqlite3"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.menu_manager"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.ui.editor_integration"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "main"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "main"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_phase4_backward_compatibility",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "tempfile"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "sqlite3"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.core.plugin"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.config.manager"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.database.connection"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.database.repository"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.services.search_service"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.services.export_service"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "src.services.media_service"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_plugin_coordinator",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_settings_window",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_settings_window",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_settings_window",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_settings_window",
+        "to": "src.ui.settings_window"
+      },
+      {
+        "from": "tests.test_settings_window",
+        "to": "src.config.manager"
+      },
+      {
+        "from": "tests.test_ui_base",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_ui_base",
+        "to": "pathlib"
+      },
+      {
+        "from": "tests.test_ui_base",
+        "to": "src.ui.base"
+      },
+      {
+        "from": "tests.test_utils_platform",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_utils_platform",
+        "to": "sys"
+      },
+      {
+        "from": "tests.test_utils_platform",
+        "to": "src.utils.platform"
+      },
+      {
+        "from": "tests.test_utils_text",
+        "to": "pytest"
+      },
+      {
+        "from": "tests.test_utils_text",
+        "to": "src.utils.text"
+      },
+      {
+        "from": "validate_mocks",
+        "to": "ast"
+      },
+      {
+        "from": "validate_mocks",
+        "to": "inspect"
+      },
+      {
+        "from": "validate_mocks",
+        "to": "pathlib"
+      },
+      {
+        "from": "validate_mocks",
+        "to": "typing"
+      },
+      {
+        "from": "webConfig",
+        "to": "json"
+      }
+    ]
+  }
+}

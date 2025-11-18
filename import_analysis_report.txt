@@ -1,0 +1,49 @@
+================================================================================
+IMPORT ANALYSIS REPORT - Phase 5 Cleanup
+================================================================================
+
+SUMMARY
+--------------------------------------------------------------------------------
+  Total Python files analyzed: 302
+  Total unique imports: 396
+  Legacy module imports found: 0
+  Parse errors: 0
+
+
+✅ NO LEGACY MODULE IMPORTS FOUND
+--------------------------------------------------------------------------------
+  All files are using refactored modules.
+
+TOP 20 MOST IMPORTED MODULES
+--------------------------------------------------------------------------------
+  aqt                                      - imported by 155 file(s)
+  __future__                               - imported by 129 file(s)
+  aqt.qt                                   - imported by 114 file(s)
+  typing                                   - imported by 105 file(s)
+  src.core.plugin                          - imported by  97 file(s)
+  anki.collection                          - imported by  91 file(s)
+  aqt.utils                                - imported by  90 file(s)
+  collections.abc                          - imported by  74 file(s)
+  os                                       - imported by  71 file(s)
+  anki.utils                               - imported by  69 file(s)
+  sys                                      - imported by  63 file(s)
+  re                                       - imported by  56 file(s)
+  pathlib                                  - imported by  47 file(s)
+  anki                                     - imported by  44 file(s)
+  anki.lang                                - imported by  41 file(s)
+  aqt.operations                           - imported by  41 file(s)
+  json                                     - imported by  37 file(s)
+  anki.decks                               - imported by  34 file(s)
+  anki.notes                               - imported by  31 file(s)
+  time                                     - imported by  30 file(s)
+
+✅ NO CIRCULAR DEPENDENCIES DETECTED
+--------------------------------------------------------------------------------
+
+MODULE REFERENCE LOOKUP
+--------------------------------------------------------------------------------
+  Use find_references(module_name) to find all files importing a module
+
+================================================================================
+END OF REPORT
+================================================================================
