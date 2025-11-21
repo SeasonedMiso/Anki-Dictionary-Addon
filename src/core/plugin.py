@@ -12,6 +12,7 @@ from ..config import ConfigManager
 from ..database import DatabaseConnection, DictionaryRepository
 from ..services import SearchService, ExportService, MediaService
 from ..constants import VERSION, DB_FILENAME
+from ..utils.logging_config import setup_logging, get_logger
 
 if TYPE_CHECKING:
     from ..ui import (
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
     )
 
 
-logger = logging.getLogger('anki_dictionary.plugin')
+logger = get_logger('plugin')
 
 
 class AnkiDictionaryPlugin:
@@ -46,6 +47,19 @@ class AnkiDictionaryPlugin:
         self.mw = mw
         self.addon_path = Path(__file__).parent.parent.parent
         self.version = VERSION
+        
+        # Migrate user files first (before logging setup)
+        self._migrate_user_files()
+        
+        # Set up logging
+        log_dir = self.addon_path / 'user_files' / 'logs'
+        setup_logging(
+            log_dir=log_dir,
+            log_level=logging.INFO,
+            console_output=True,
+            file_output=True
+        )
+        logger.info(f"Anki Dictionary Plugin v{VERSION} initializing...")
         
         # Configuration
         self.config_manager = ConfigManager(mw.addonManager)
@@ -79,6 +93,40 @@ class AnkiDictionaryPlugin:
         
         # Initialize state
         self._initialize_state()
+    
+    def _migrate_user_files(self) -> None:
+        """
+        Migrate user files to Anki's addon data directory if needed.
+        
+        This ensures user files are included in Anki's backup system.
+        Migration is only performed once - if files already exist in the
+        target location, migration is skipped.
+        """
+        import shutil
+        
+        # Current location (addon installation directory)
+        old_base = self.addon_path / 'user_files'
+        
+        # Target location (Anki addon data directory)
+        # Note: For now, we keep files in addon directory as Anki's backup
+        # system includes addon folders. This migration is prepared for
+        # future use if Anki changes its backup behavior.
+        
+        # Check if migration marker exists
+        migration_marker = old_base / '.migrated'
+        
+        if migration_marker.exists():
+            # Migration already completed
+            return
+        
+        # For now, just create the marker to indicate we've checked
+        # In the future, this is where we'd copy files to Anki's data directory
+        try:
+            old_base.mkdir(parents=True, exist_ok=True)
+            migration_marker.touch()
+            logger.info("User files migration check completed")
+        except Exception as e:
+            logger.warning(f"Could not create migration marker: {e}")
     
     def _initialize_state(self) -> None:
         """

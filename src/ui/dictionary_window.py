@@ -7,7 +7,7 @@ from typing import Any, Optional, List, Dict
 from pathlib import Path
 import json
 import logging
-
+import time
 import os
 
 try:
@@ -46,9 +46,16 @@ except ImportError:
 
 from ..services import SearchService, ExportService, MediaService
 from ..config import ConfigManager
+from ..utils.logging_config import (
+    get_logger,
+    log_html_content,
+    log_svg_load,
+    log_bridge_command,
+    log_window_state
+)
 
 
-logger = logging.getLogger('anki_dictionary.ui.dictionary_window')
+logger = get_logger('ui.dictionary_window')
 
 
 class DictionaryWindow(QWidget):
@@ -322,13 +329,13 @@ class DictionaryWindow(QWidget):
     
     def _apply_theme_to_html(self, html: str) -> str:
         """
-        Apply theme styling to HTML content.
+        Apply theme styling to HTML content and inject SVG icons.
         
         Args:
             html: Original HTML content
             
         Returns:
-            HTML with theme applied
+            HTML with theme applied and SVG icons injected
         """
         # Load active theme
         theme_path = self.addon_path / "user_files" / "themes" / "active.json"
@@ -345,6 +352,9 @@ class DictionaryWindow(QWidget):
                 "definition_text": "#c6d0f5",
                 "border": "#babbf1"
             }
+        
+        # Determine if night mode
+        theme_mode = 'night' if theme.get('name', '').lower().find('night') >= 0 else 'day'
         
         # Create CSS from theme
         theme_css = f"""
@@ -369,6 +379,9 @@ class DictionaryWindow(QWidget):
             html = html.replace('<style id="customThemeCss"></style>', theme_css)
         else:
             html = html.replace('</head>', f'{theme_css}</head>')
+        
+        # Inject SVG icons
+        html = self._inject_svg_icons_into_html(html, theme_mode)
         
         return html
     
@@ -508,15 +521,33 @@ class DictionaryWindow(QWidget):
         # Format results as HTML
         html = self._format_results_as_html(term, result, dict_group)
         
+        # Log HTML rendering
+        log_html_content(logger, html, term=term, max_length=1000)
+        
         # Try to use JavaScript tab system if available
         try:
-            escaped_html = html.replace("'", "\\'").replace('\n', '')
-            self.web_view.eval(f"addNewTab('{escaped_html}', '{term}', true);")
+            # Escape HTML for JavaScript
+            escaped_html = html.replace("\\", "\\\\").replace("'", "\\'").replace('\n', ' ').replace('\r', '')
+            escaped_term = term.replace("\\", "\\\\").replace("'", "\\'")
+            
+            # Use setTimeout to ensure DOM is ready
+            js_code = f"""
+            (function() {{
+                if (typeof addNewTab === 'function') {{
+                    addNewTab('{escaped_html}', '{escaped_term}', true);
+                }} else {{
+                    console.error('addNewTab function not available');
+                }}
+            }})();
+            """
+            self.web_view.eval(js_code)
+            logger.debug(f"Used JavaScript tab system for term: {term}")
         except Exception as e:
             logger.warning(f"Failed to use tab system, falling back to direct HTML: {e}")
             # Fallback: display results directly
             full_html = self._create_standalone_results_html(term, html)
             self.web_view.setHtml(full_html)
+            logger.debug(f"Used direct HTML rendering for term: {term}")
     
     def _create_standalone_results_html(self, term: str, results_html: str) -> str:
         """
@@ -608,6 +639,100 @@ class DictionaryWindow(QWidget):
                 "selector": "#51576d"
             }
     
+    def _load_svg_icon(self, icon_name: str, theme: str = 'day') -> Optional[str]:
+        """
+        Load SVG icon from file with comprehensive logging.
+        
+        Args:
+            icon_name: Name of the icon (without extension)
+            theme: Theme variant ('day' or 'night')
+            
+        Returns:
+            SVG content as string, or None if loading failed
+        """
+        # Construct icon path based on theme
+        if theme == 'night':
+            icon_filename = f"{icon_name}night.svg"
+        else:
+            icon_filename = f"{icon_name}.svg"
+        
+        icon_path = self.addon_path / 'icons' / 'dictsvgs' / icon_filename
+        
+        try:
+            if not icon_path.exists():
+                log_svg_load(logger, icon_name, icon_path, False, "File not found")
+                return None
+            
+            with open(icon_path, 'r', encoding='utf-8') as f:
+                svg_content = f.read()
+            
+            log_svg_load(logger, icon_name, icon_path, True)
+            return svg_content
+            
+        except Exception as e:
+            log_svg_load(logger, icon_name, icon_path, False, str(e))
+            return None
+    
+    def _inject_svg_icons_into_html(self, html: str, theme: str = 'day') -> str:
+        """
+        Inject SVG icons into HTML template.
+        
+        Args:
+            html: HTML content
+            theme: Theme variant ('day' or 'night')
+            
+        Returns:
+            HTML with SVG icons injected
+        """
+        # List of SVG icons to load
+        svg_icons = [
+            'search', 'settings', 'conjugation', 'history', 
+            'theme', 'tabs', 'plus', 'minus', 
+            'sidebaropen', 'sidebarclose', 'onetab', 'closedcube'
+        ]
+        
+        # Load all SVG icons
+        svg_data = {}
+        for icon_name in svg_icons:
+            svg_content = self._load_svg_icon(icon_name, theme)
+            if svg_content:
+                svg_data[icon_name] = svg_content
+        
+        # Inject SVG data as JavaScript variable
+        svg_js = '<script id="svgIcons">var svgIcons = ' + json.dumps(svg_data) + ';</script>'
+        
+        # Insert before closing head tag
+        if '</head>' in html:
+            html = html.replace('</head>', f'{svg_js}</head>')
+        else:
+            # Fallback: insert at beginning of body
+            html = svg_js + html
+        
+        return html
+    
+    def switch_theme(self, theme: str) -> None:
+        """
+        Switch dictionary window theme.
+        
+        Args:
+            theme: Theme name ('day' or 'night')
+        """
+        try:
+            # Update theme in config
+            self.config_manager.update_config('theme', theme)
+            
+            # Reload HTML with new theme
+            self._load_initial_html(self.web_view)
+            
+            # Notify JavaScript of theme change
+            is_night = theme == 'night'
+            self.web_view.eval(f"nightModeToggle({str(is_night).lower()})")
+            
+            logger.info(f"Theme switched to: {theme}")
+            
+        except Exception as e:
+            logger.error(f"Error switching theme: {e}", exc_info=True)
+    
     def _format_results_as_html(
         self,
         term: str,
@@ -615,7 +740,10 @@ class DictionaryWindow(QWidget):
         dict_group: Dict
     ) -> str:
         """
-        Format search results as HTML.
+        Format search results as HTML matching pre-refactor structure.
+        
+        This method replicates the exact HTML structure from the pre-refactor
+        prepareResults() method to ensure JavaScript compatibility.
         
         Args:
             term: Search term
@@ -623,28 +751,62 @@ class DictionaryWindow(QWidget):
             dict_group: Dictionary group configuration
             
         Returns:
-            HTML string
+            HTML string with exact pre-refactor structure
         """
         if not result or not result.results:
-            return f'''
-            <div class="vertical-center noresults">
-                <div align="center">
-                    <h3>No dictionary entries found for "{term}".</h3>
-                </div>
-            </div>
-            '''
+            return f'''<style>.noresults{{font-family: Arial;}}.vertical-center{{height: 400px; width: 60%; margin: 0 auto; display: flex; justify-content: center; align-items: center;}}</style> </head> <div class="vertical-center noresults"> <div align="center"> <img ankiDict="icons/searchzero.svg" width="50px" height="40px"> <h3 align="center">No dictionary entries were found for "{term}".</h3> </div></div>'''
+        
+        # Get configuration values
+        front_bracket = self.config_manager.get_value('frontBracket', '【')
+        back_bracket = self.config_manager.get_value('backBracket', '】')
+        font = self._get_font_style(dict_group)
+        tooltips_enabled = self.config_manager.get_bool('tooltips', True)
         
         # Build HTML from results
-        html_parts = ['<div class="mainDictDisplay">']
+        # Start with sidebar
+        html_parts = [self._get_sidebar_html(result.results, term, font, front_bracket, back_bracket)]
+        html_parts.append('<div class="mainDictDisplay">')
+        
+        # Tooltip texts
+        img_tooltip = ' title="Add this definition, or any selected text and this definition\'s header to the card exporter (opens the card exporter if it is not yet opened)." ' if tooltips_enabled else ''
+        clip_tooltip = ' title="Copy this definition, or any selected text to the clipboard." ' if tooltips_enabled else ''
+        send_tooltip = ' title="Send this definition, or any selected text and this definition\'s header to the card exporter to this dictionary\'s target fields. It will send it to the current target window, be it an Editor window, or the Review window." ' if tooltips_enabled else ''
+        
+        dict_index = 0
+        entry_index = 0
         
         for dict_name, entries in result.results.items():
             if not entries:
                 continue
             
-            html_parts.append(f'<div class="dictionaryTitleBlock">')
-            html_parts.append(f'<div class="dictionaryTitle">{dict_name}</div>')
-            html_parts.append('</div>')
+            # Handle special dictionaries (Google Images, Forvo)
+            if dict_name == 'Google Images':
+                html_parts.append(self._get_google_images_html(term, dict_index, front_bracket, back_bracket, entry_index, font))
+                dict_index += 1
+                entry_index += 1
+                continue
             
+            if dict_name == 'Forvo':
+                html_parts.append(self._get_forvo_html(term, dict_index, front_bracket, back_bracket, entry_index, font))
+                dict_index += 1
+                entry_index += 1
+                continue
+            
+            # Regular dictionary
+            # Dictionary title block with settings
+            duplicate_header_cb = self._get_duplicate_header_cb(dict_name)
+            overwrite_checks = self._get_overwrite_checks(dict_index, dict_name)
+            field_checks = self._get_field_checks(dict_name)
+            
+            html_parts.append(f'<div data-index="{dict_index}" class="dictionaryTitleBlock">')
+            html_parts.append(f'<div {font} class="dictionaryTitle">{dict_name.replace("_", " ")}</div>')
+            html_parts.append(f'<div class="dictionarySettings">{duplicate_header_cb}{overwrite_checks}{field_checks}')
+            html_parts.append('<div class="dictNav"><div onclick="navigateDict(event, false)" class="prevDict">▲</div><div onclick="navigateDict(event, true)" class="nextDict">▼</div></div>')
+            html_parts.append('</div></div>')
+            
+            dict_index += 1
+            
+            # Process entries
             for entry in entries:
                 # Convert DictionaryEntry to dict
                 if hasattr(entry, 'to_dict'):
@@ -652,21 +814,469 @@ class DictionaryWindow(QWidget):
                 elif isinstance(entry, dict):
                     entry_dict = entry
                 else:
-                    # Skip invalid entries
                     continue
+                
+                # Get entry data
+                entry_term = entry_dict.get('term', '')
+                entry_altterm = entry_dict.get('altterm', '')
+                entry_pronunciation = entry_dict.get('pronunciation', '')
+                entry_definition = entry_dict.get('definition', '')
+                star_count = entry_dict.get('starCount', '')
+                
+                # Format term header
+                term_header = self._get_prepared_term_header(
+                    dict_name, front_bracket, back_bracket, term,
+                    entry_term, entry_altterm, entry_pronunciation, sb=False
+                )
+                
+                # Highlight target term and examples in definition
+                highlighted_def = self._highlight_target(self._highlight_examples(entry_definition), term)
+                
+                # Build entry HTML
+                html_parts.append(f'<div data-index="{entry_index}" class="termPronunciation">')
+                html_parts.append(f'<span {font} class="tpCont">{term_header} <span class="starcount">{star_count}</span></span>')
+                html_parts.append('<div class="defTools">')
+                html_parts.append(f'<div onclick="ankiExport(event, \'{dict_name}\')" class="ankiExportButton"><img {img_tooltip} ankiDict="icons/anki.png"></div>')
+                html_parts.append(f'<div onclick="clipText(event)" {clip_tooltip} class="clipper">✂</div>')
+                html_parts.append(f'<div {send_tooltip} onclick="sendToField(event, \'{dict_name}\')" class="sendToField">➠</div>')
+                html_parts.append('<div class="defNav"><div onclick="navigateDef(event, false)" class="prevDef">▲</div><div onclick="navigateDef(event, true)" class="nextDef">▼</div></div>')
+                html_parts.append('</div></div>')
+                html_parts.append(f'<div{font} class="definitionBlock">{highlighted_def}</div>')
+                
+                entry_index += 1
+        
+        html_parts.append('</div>')  # Close mainDictDisplay
+        
+        # Escape single quotes for JavaScript
+        return ''.join(html_parts).replace("'", "\\'")
+    
+    def _get_font_style(self, dict_group: Dict) -> str:
+        """
+        Get font style attribute for HTML elements.
+        
+        Args:
+            dict_group: Dictionary group configuration
+            
+        Returns:
+            Font style string for HTML attribute
+        """
+        if not dict_group.get('font'):
+            return ' '
+        
+        font_name = dict_group['font']
+        if dict_group.get('customFont'):
+            # Remove file extension for custom fonts
+            import re
+            font_name = re.sub(r'\..*$', '', font_name)
+        
+        return f' style="font-family:{font_name};" '
+    
+    def _get_sidebar_html(self, results: Dict, term: str, font: str, front_bracket: str, back_bracket: str) -> str:
+        """
+        Generate sidebar HTML with dictionary and entry navigation.
+        
+        Args:
+            results: Dictionary results
+            term: Search term
+            font: Font style string
+            front_bracket: Front bracket character
+            back_bracket: Back bracket character
+            
+        Returns:
+            Sidebar HTML string
+        """
+        html = f'<div{font}class="definitionSideBar"><div class="innerSideBar">'
+        dict_count = 0
+        entry_count = 0
+        
+        for dict_name, dict_results in results.items():
+            if dict_name == 'Google Images' or dict_name == 'Forvo':
+                html += f'<div data-index="{dict_count}" class="listTitle">{dict_name}</div>'
+                html += f'<ol class="foundEntriesList"><li data-index="{entry_count}">'
+                html += self._get_prepared_term_header(dict_name, front_bracket, back_bracket, term, term, term, term, sb=True)
+                html += '</li></ol>'
+                entry_count += 1
+                dict_count += 1
+                continue
+            
+            html += f'<div data-index="{dict_count}" class="listTitle">{dict_name}</div>'
+            html += '<ol class="foundEntriesList">'
+            dict_count += 1
+            
+            for entry in dict_results:
+                entry_dict = entry.to_dict() if hasattr(entry, 'to_dict') else entry
+                html += f'<li data-index="{entry_count}">'
+                html += self._get_prepared_term_header(
+                    dict_name, front_bracket, back_bracket, term,
+                    entry_dict.get('term', ''),
+                    entry_dict.get('altterm', ''),
+                    entry_dict.get('pronunciation', ''),
+                    sb=True
+                )
+                html += '</li>'
+                entry_count += 1
+            
+            html += '</ol>'
+        
+        return html + '<br></div><div class="resizeBar" onmousedown="hresize(event)"></div></div>'
+    
+    def _get_prepared_term_header(self, dict_name: str, front_bracket: str, back_bracket: str,
+                                   target: str, term: str, altterm: str, pronunciation: str, sb: bool = False) -> str:
+        """
+        Format term header with pronunciation and highlighting.
+        
+        Args:
+            dict_name: Dictionary name
+            front_bracket: Front bracket character
+            back_bracket: Back bracket character
+            target: Target term for highlighting
+            term: Entry term
+            altterm: Alternative term
+            pronunciation: Pronunciation
+            sb: Whether this is for sidebar (True) or main display (False)
+            
+        Returns:
+            Formatted term header HTML
+        """
+        alt_fb = front_bracket
+        alt_bb = back_bracket
+        
+        # Clean up duplicates
+        if pronunciation == term:
+            pronunciation = ''
+        if altterm == term:
+            altterm = ''
+        if altterm == '':
+            alt_fb = ''
+            alt_bb = ''
+        
+        # Use default header format for special dictionaries
+        if dict_name == 'Google Images' or dict_name == 'Forvo':
+            if sb:
+                header = '◳f<span class="term mainword">◳t</span>◳b◳x<span class="altterm  mainword">◳a</span>◳y<span class="pronunciation">◳p</span>'
+            else:
+                header = '◳f<span class="listTerm">◳t</span>◳b◳x<span class="listAltTerm">◳a</span>◳y<span class="listPronunciation">◳p</span>'
+        else:
+            # Use configured term headers if available
+            # For now, use default format
+            if sb:
+                header = '◳f<span class="listTerm">◳t</span>◳b◳x<span class="listAltTerm">◳a</span>◳y<span class="listPronunciation">◳p</span>'
+            else:
+                header = '◳f<span class="term mainword">◳t</span>◳b◳x<span class="altterm  mainword">◳a</span>◳y<span class="pronunciation mainword">◳p</span>'
+        
+        # Replace placeholders with actual values
+        return (header
+                .replace('◳t', self._highlight_target(term, target))
+                .replace('◳a', self._highlight_target(altterm, target))
+                .replace('◳p', self._highlight_target(pronunciation, target))
+                .replace('◳f', front_bracket)
+                .replace('◳b', back_bracket)
+                .replace('◳x', alt_fb)
+                .replace('◳y', alt_bb))
+    
+    def _highlight_target(self, text: str, term: str) -> str:
+        """
+        Highlight target term in text.
+        
+        Args:
+            text: Text to highlight in
+            term: Term to highlight
+            
+        Returns:
+            Text with highlighted term
+        """
+        if not self.config_manager.get_bool('highlightTarget', True):
+            return text
+        
+        if not isinstance(text, str):
+            text = str(text) if text is not None else ""
+        
+        try:
+            import re
+            # Split text into HTML tags and content
+            parts = re.split(r'(<[^>]*>)', text)
+            
+            # Only apply highlighting to non-tag parts
+            for i in range(0, len(parts), 2):
+                if parts[i]:
+                    # For Japanese text, we don't need word boundaries
+                    if any('\u4e00' <= c <= '\u9fff' or '\u3040' <= c <= '\u309f' or '\u30a0' <= c <= '\u30ff' for c in term):
+                        pattern = '(' + self._escape_punctuation(term) + ')'
+                    else:
+                        # For non-Japanese text, keep word boundaries
+                        pattern = r'\b(' + self._escape_punctuation(term) + r')\b'
                     
-                html_parts.append('<div class="definitionBlock">')
-                html_parts.append(f'<div class="termPronunciation">')
-                html_parts.append(f'<span class="term">{entry_dict.get("term", "")}</span>')
-                if entry_dict.get('pronunciation'):
-                    html_parts.append(f'<span class="pronunciation">{entry_dict["pronunciation"]}</span>')
-                html_parts.append('</div>')
-                html_parts.append(f'<div class="definition">{entry_dict.get("definition", "")}</div>')
-                html_parts.append('</div>')
+                    parts[i] = re.sub(pattern, r'<span class="targetTerm">\1</span>', parts[i])
+            
+            return ''.join(parts)
+        except Exception as e:
+            logger.error(f"Error during highlightTarget: {e}")
+            return text
+    
+    def _escape_punctuation(self, term: str) -> str:
+        """Escape regex special characters in term."""
+        import re
+        return re.sub(r'([.*+(\[\]{}\\?)!])', r'\\\1', term)
+    
+    def _highlight_examples(self, text: str) -> str:
+        """
+        Highlight example sentences in text.
         
-        html_parts.append('</div>')
+        Args:
+            text: Text to highlight examples in
+            
+        Returns:
+            Text with highlighted examples
+        """
+        if not self.config_manager.get_bool('highlightSentences', True):
+            return text
         
-        return ''.join(html_parts)
+        import re
+        return re.sub(
+            r'「([^」]+)」(?![^<]*>)',
+            r'<span class="exampleSentence">「\1」</span>',
+            text
+        )
+    
+    def _get_duplicate_header_cb(self, dict_name: str) -> str:
+        """
+        Generate duplicate header checkbox HTML.
+        
+        Args:
+            dict_name: Dictionary name
+            
+        Returns:
+            Checkbox HTML string
+        """
+        tooltip = ''
+        if self.config_manager.get_bool('tooltips', True):
+            tooltip = ' title="Enable this option if this dictionary has the target word\'s header within the definition. Enabling this will prevent the addon from exporting duplicate header."'
+        
+        checked = ' '
+        class_name = 'checkDict' + dict_name.replace(' ', '')
+        
+        # Check if this dictionary has duplicate header setting
+        # For now, default to unchecked
+        # TODO: Load from database
+        
+        return f'<div class="dupHeadCB" data-dictname="{dict_name}">Duplicate Header:<input {checked}{tooltip} class="{class_name}" onclick="handleDupChange(this, \'{class_name}\')" type="checkbox"></div>'
+    
+    def _get_overwrite_checks(self, dict_count: int, dict_name: str) -> str:
+        """
+        Generate overwrite type selector HTML.
+        
+        Args:
+            dict_count: Dictionary index
+            dict_name: Dictionary name
+            
+        Returns:
+            Overwrite selector HTML string
+        """
+        # Get add type from config or database
+        if dict_name == 'Google Images':
+            add_type = self.config_manager.get_value('GoogleImageAddType', 'add')
+        elif dict_name == 'Forvo':
+            add_type = self.config_manager.get_value('ForvoAddType', 'add')
+        else:
+            # TODO: Load from database
+            add_type = 'add'
+        
+        tooltip = ''
+        if self.config_manager.get_bool('tooltips', True):
+            tooltip = ' title="This determines the conditions for sending a definition (or a Google Image) to a field. Overwrite the target field\'s content. Add to the target field\'s current contents. Only add definitions to the target field if it is empty."'
+        
+        if add_type == 'add':
+            type_name = '&nbsp;Add'
+        elif add_type == 'overwrite':
+            type_name = '&nbsp;Overwrite'
+        elif add_type == 'no':
+            type_name = '&nbsp;If Empty'
+        else:
+            type_name = '&nbsp;Add'
+        
+        select = (
+            f'<div class="overwriteSelectCont"><div {tooltip} class="overwriteSelect" onclick="showCheckboxes(event)">{type_name}</div>' +
+            self._get_selected_overwrite_type(dict_count, dict_name, add_type) + '</div>'
+        )
+        return select
+    
+    def _get_selected_overwrite_type(self, dict_count: int, dict_name: str, add_type: str) -> str:
+        """
+        Generate overwrite type radio buttons.
+        
+        Args:
+            dict_count: Dictionary index
+            dict_name: Dictionary name
+            add_type: Current add type
+            
+        Returns:
+            Radio buttons HTML string
+        """
+        count = str(dict_count)
+        
+        checked_add = ' checked' if add_type == 'add' else ''
+        checked_overwrite = ' checked' if add_type == 'overwrite' else ''
+        checked_no = ' checked' if add_type == 'no' else ''
+        
+        add = f'<label class="inCheckBox"><input{checked_add} onclick="handleAddTypeCheck(this)" class="inCheckBox radio{dict_name}" type="radio" name="{count}{dict_name}" value="add"/>Add</label>'
+        overwrite = f'<label class="inCheckBox"><input{checked_overwrite} onclick="handleAddTypeCheck(this)" class="inCheckBox radio{dict_name}" type="radio" name="{count}{dict_name}" value="overwrite"/>Overwrite</label>'
+        ifempty = f'<label class="inCheckBox"><input{checked_no} onclick="handleAddTypeCheck(this)" class="inCheckBox radio{dict_name}" type="radio" name="{count}{dict_name}" value="no"/>If Empty</label>'
+        
+        return f'<div class="overwriteCheckboxes" data-dictname="{dict_name}">{add}{overwrite}{ifempty}</div>'
+    
+    def _get_field_checks(self, dict_name: str) -> str:
+        """
+        Generate field selection checkboxes HTML.
+        
+        Args:
+            dict_name: Dictionary name
+            
+        Returns:
+            Field selector HTML string
+        """
+        # Get selected fields from config or database
+        if dict_name == 'Google Images':
+            sel_fields = self.config_manager.get_value('GoogleImageFields', [])
+        elif dict_name == 'Forvo':
+            sel_fields = self.config_manager.get_value('ForvoFields', [])
+        else:
+            # TODO: Load from database
+            sel_fields = []
+        
+        tooltip = ''
+        if self.config_manager.get_bool('tooltips', True):
+            tooltip = ' title="Select this dictionary\'s target fields for when sending a definition(or a Google Image) to a card. If a field does not exist in the target card, then it is ignored, otherwise the definition is added to all fields that exist within the target card."'
+        
+        title = '&nbsp;Select Fields ▾'
+        length = len(sel_fields)
+        if length > 0:
+            title = f'&nbsp;{length} Selected'
+        
+        select = (
+            f'<div class="fieldSelectCont"><div class="fieldSelect" {tooltip} onclick="showCheckboxes(event)">{title}</div>' +
+            self._get_checkboxes(dict_name, sel_fields) + '</div>'
+        )
+        return select
+    
+    def _get_checkboxes(self, dict_name: str, sel_fields: list) -> str:
+        """
+        Generate field checkboxes.
+        
+        Args:
+            dict_name: Dictionary name
+            sel_fields: List of selected field names
+            
+        Returns:
+            Checkboxes HTML string
+        """
+        fields = self._get_field_names()
+        options = f'<div class="fieldCheckboxes" data-dictname="{dict_name}">'
+        
+        for field in fields:
+            checked = ' checked' if field in sel_fields else ''
+            options += f'<label class="inCheckBox"><input{checked} onclick="handleFieldCheck(this)" class="inCheckBox" type="checkbox" value="{field}" />{field}</label>'
+        
+        return options + '</div>'
+    
+    def _get_field_names(self) -> list:
+        """
+        Get all field names from all note models.
+        
+        Returns:
+            Sorted list of unique field names
+        """
+        try:
+            models = self.mw.col.models.all()
+            fields = []
+            for model in models:
+                for fld in model['flds']:
+                    if fld['name'] not in fields:
+                        fields.append(fld['name'])
+            fields.sort()
+            return fields
+        except Exception as e:
+            logger.error(f"Error getting field names: {e}")
+            return []
+    
+    def _get_google_images_html(self, term: str, dict_count: int, front_bracket: str, back_bracket: str, entry_count: int, font: str) -> str:
+        """
+        Generate Google Images dictionary HTML.
+        
+        Args:
+            term: Search term
+            dict_count: Dictionary index
+            front_bracket: Front bracket character
+            back_bracket: Back bracket character
+            entry_count: Entry index
+            font: Font style string
+            
+        Returns:
+            Google Images HTML string
+        """
+        dict_name = 'Google Images'
+        overwrite = self._get_overwrite_checks(dict_count, dict_name)
+        select = self._get_field_checks(dict_name)
+        id_name = f'gcon{int(time.time() * 1000)}'
+        
+        html = f'<div data-index="{dict_count}" class="dictionaryTitleBlock">'
+        html += f'<div class="dictionaryTitle">Google Images</div>'
+        html += f'<div class="dictionarySettings">{overwrite}{select}'
+        html += '<div class="dictNav"><div onclick="navigateDict(event, false)" class="prevDict">▲</div><div onclick="navigateDict(event, true)" class="nextDict">▼</div></div>'
+        html += '</div></div>'
+        
+        html += f'<div data-index="{entry_count}" class="termPronunciation">'
+        html += f'<span class="tpCont">{front_bracket}<span {font} class="terms">'
+        html += self._highlight_target(term, term)
+        html += f'</span>{back_bracket} <span></span></span>'
+        html += '<div class="defTools">'
+        html += f'<div onclick="ankiExport(event, \'{dict_name}\')" class="ankiExportButton"><img ankiDict="icons/anki.png"></div>'
+        html += '<div onclick="clipText(event)" class="clipper">✂</div>'
+        html += f'<div onclick="sendToField(event, \'{dict_name}\')" class="sendToField">➠</div>'
+        html += '<div class="defNav"><div onclick="navigateDef(event, false)" class="prevDef">▲</div><div onclick="navigateDef(event, true)" class="nextDef">▼</div></div>'
+        html += '</div></div>'
+        html += f'<div class="definitionBlock"><div class="imageBlock" id="{id_name}">Loading...</div></div>'
+        
+        return html
+    
+    def _get_forvo_html(self, term: str, dict_count: int, front_bracket: str, back_bracket: str, entry_count: int, font: str) -> str:
+        """
+        Generate Forvo dictionary HTML.
+        
+        Args:
+            term: Search term
+            dict_count: Dictionary index
+            front_bracket: Front bracket character
+            back_bracket: Back bracket character
+            entry_count: Entry index
+            font: Font style string
+            
+        Returns:
+            Forvo HTML string
+        """
+        dict_name = 'Forvo'
+        overwrite = self._get_overwrite_checks(dict_count, dict_name)
+        select = self._get_field_checks(dict_name)
+        id_name = f'fcon{int(time.time() * 1000)}'
+        
+        html = f'<div data-index="{dict_count}" class="dictionaryTitleBlock">'
+        html += f'<div class="dictionaryTitle">{dict_name}</div>'
+        html += f'<div class="dictionarySettings">{overwrite}{select}'
+        html += '<div class="dictNav"><div onclick="navigateDict(event, false)" class="prevDict">▲</div><div onclick="navigateDict(event, true)" class="nextDict">▼</div></div>'
+        html += '</div></div>'
+        
+        html += f'<div data-index="{entry_count}" class="termPronunciation">'
+        html += f'<span class="tpCont">{front_bracket}<span {font} class="terms">'
+        html += self._highlight_target(term, term)
+        html += f'</span>{back_bracket} <span></span></span>'
+        html += '<div class="defTools">'
+        html += f'<div onclick="ankiExport(event, \'{dict_name}\')" class="ankiExportButton"><img ankiDict="icons/anki.png"></div>'
+        html += '<div onclick="clipText(event)" class="clipper">✂</div>'
+        html += f'<div onclick="sendToField(event, \'{dict_name}\')" class="sendToField">➠</div>'
+        html += '<div class="defNav"><div onclick="navigateDef(event, false)" class="prevDef">▲</div><div onclick="navigateDef(event, true)" class="nextDef">▼</div></div>'
+        html += '</div></div>'
+        html += f'<div id="{id_name}" class="definitionBlock">Loading...</div>'
+        
+        return html
     
     def _get_selected_dictionary_group(self) -> Optional[Dict]:
         """
@@ -754,7 +1364,8 @@ class DictionaryWindow(QWidget):
         Args:
             cmd: Command string from JavaScript
         """
-        logger.debug(f"Bridge command received: {cmd!r}")
+        # Log bridge command with detailed information
+        log_bridge_command(logger, cmd)
         
         # Handle handshake to confirm bridge is working
         if cmd == "bridgeReady" or cmd == "AnkiDictionaryLoaded":
@@ -918,6 +1529,16 @@ class DictionaryWindow(QWidget):
         Args:
             terms: Optional list of terms to search
         """
+        # Log window state change
+        log_window_state(
+            logger,
+            "DictionaryWindow",
+            "showing",
+            visible=self.isVisible(),
+            geometry=str(self.geometry()) if hasattr(self, 'geometry') else 'N/A',
+            search_terms=terms
+        )
+        
         self.show()
         self.raise_()
         self.activateWindow()
@@ -973,6 +1594,12 @@ class DictionaryWindow(QWidget):
         Args:
             event: Show event
         """
+        log_window_state(
+            logger,
+            "DictionaryWindow",
+            "shown",
+            geometry=str(self.geometry()) if hasattr(self, 'geometry') else 'N/A'
+        )
         super().showEvent(event)
         self._update_menu_text()
     
@@ -983,6 +1610,12 @@ class DictionaryWindow(QWidget):
         Args:
             event: Hide event
         """
+        log_window_state(
+            logger,
+            "DictionaryWindow",
+            "hidden",
+            geometry=str(self.geometry()) if hasattr(self, 'geometry') else 'N/A'
+        )
         self._save_window_position()
         self._update_menu_text()
         event.accept()
@@ -991,7 +1624,7 @@ class DictionaryWindow(QWidget):
         """Update the menu text based on window visibility."""
         try:
             from anki.utils import is_mac
-            shortcut = '⌘W' if is_mac else 'Ctrl+W'
+            shortcut = '⌘⇧W' if is_mac else 'Ctrl+Shift+W'
             
             if hasattr(self.mw, 'openMiDict'):
                 if self.isVisible():

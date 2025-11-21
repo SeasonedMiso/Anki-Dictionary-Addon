@@ -25,8 +25,10 @@ except ImportError:
     QMenu = type('QMenu', (object,), {})
     is_mac = False  # Boolean, not function
 
+from ..utils.logging_config import get_logger
 
-logger = logging.getLogger('anki_dictionary.ui.menu_manager')
+
+logger = get_logger('ui.menu_manager')
 
 
 class MenuManager:
@@ -90,7 +92,7 @@ class MenuManager:
             self._menu_settings.append(settings_action)
             
             # Create dictionary toggle action
-            shortcut_text = self._get_shortcut_display("Ctrl+W")
+            shortcut_text = self._get_shortcut_display("Ctrl+Shift+W")
             dict_action = QAction(f"Open Dictionary ({shortcut_text})", self.mw)
             dict_action.triggered.connect(self.open_dictionary)
             self.mw.openMiDict = dict_action  # Backward compatibility
@@ -124,46 +126,96 @@ class MenuManager:
             logger.error(f"Error setting up menu: {e}", exc_info=True)
     
     def setup_global_hotkeys(self) -> None:
-        """Register global keyboard shortcuts."""
+        """Register global keyboard shortcuts with platform-specific handling."""
         if not ANKI_AVAILABLE:
             logger.warning("Anki not available, skipping hotkey setup")
             return
         
+        logger.info("=" * 60)
+        logger.info("Setting up global hotkeys")
+        logger.info(f"Platform: {'macOS' if is_mac else 'Windows/Linux'}")
+        
+        # On macOS, delay hotkey registration to avoid IMKCFRu errors
+        if is_mac:
+            from aqt.qt import QTimer
+            logger.info("macOS detected: delaying hotkey registration by 1 second")
+            QTimer.singleShot(1000, self._register_hotkeys_delayed)
+        else:
+            self._register_hotkeys()
+    
+    def _register_hotkeys_delayed(self) -> None:
+        """Register hotkeys after delay (macOS workaround)."""
+        logger.info("Registering hotkeys after delay...")
+        self._register_hotkeys()
+    
+    def _register_hotkeys(self) -> None:
+        """Register all global hotkeys with comprehensive error handling."""
         try:
-            # Ctrl+W / ⌘W: Toggle dictionary window
-            shortcut_str = self._get_platform_shortcut("Ctrl+W")
-            logger.info(f"Setting up dictionary hotkey: {shortcut_str}")
-            hotkey_w = QShortcut(
-                QKeySequence(shortcut_str),
-                self.mw
-            )
-            hotkey_w.activated.connect(lambda: (logger.info("Hotkey W activated!"), self.open_dictionary()))
-            self.mw.hotkeyW = hotkey_w  # Backward compatibility
-            self._global_hotkeys.append(hotkey_w)
-            logger.info(f"Dictionary hotkey registered: {hotkey_w.key().toString()}")
+            # Use Ctrl+Shift+W / ⌘+Shift+W: Toggle dictionary window
+            # Note: Cmd-W is system-reserved on macOS for closing windows
+            shortcut_str = self._get_platform_shortcut("Ctrl+Shift+W")
+            logger.info(f"Registering dictionary hotkey: {shortcut_str}")
+            
+            try:
+                hotkey_w = QShortcut(
+                    QKeySequence(shortcut_str),
+                    self.mw
+                )
+                hotkey_w.activated.connect(lambda: (logger.info("Dictionary hotkey activated!"), self.open_dictionary()))
+                self.mw.hotkeyW = hotkey_w  # Backward compatibility
+                self._global_hotkeys.append(hotkey_w)
+                logger.info(f"✓ Dictionary hotkey registered: {hotkey_w.key().toString()}")
+            except Exception as e:
+                logger.error(f"✗ Failed to register dictionary hotkey: {e}", exc_info=True)
+                logger.warning("Dictionary will only be accessible via menu")
             
             # Ctrl+S / ⌘S: Search selected text
-            hotkey_s = QShortcut(
-                QKeySequence(self._get_platform_shortcut("Ctrl+S")),
-                self.mw
-            )
-            hotkey_s.activated.connect(self._search_selected_text)
-            self.mw.hotkeyS = hotkey_s  # Backward compatibility
-            self._global_hotkeys.append(hotkey_s)
+            shortcut_str_s = self._get_platform_shortcut("Ctrl+S")
+            logger.info(f"Registering search hotkey: {shortcut_str_s}")
+            
+            try:
+                hotkey_s = QShortcut(
+                    QKeySequence(shortcut_str_s),
+                    self.mw
+                )
+                hotkey_s.activated.connect(self._search_selected_text)
+                self.mw.hotkeyS = hotkey_s  # Backward compatibility
+                self._global_hotkeys.append(hotkey_s)
+                logger.info(f"✓ Search hotkey registered: {hotkey_s.key().toString()}")
+            except Exception as e:
+                logger.error(f"✗ Failed to register search hotkey: {e}", exc_info=True)
+                # Handle IMKCFRu errors gracefully
+                if "IMKCFRu" in str(e) or "mach port" in str(e).lower():
+                    logger.warning("IMKCFRu error detected - this is a known macOS issue")
+                    logger.warning("Search hotkey will not be available, but menu access still works")
             
             # Ctrl+Shift+B / ⌘+Shift+B: Search collection
-            hotkey_b = QShortcut(
-                QKeySequence(self._get_platform_shortcut("Ctrl+Shift+B")),
-                self.mw
-            )
-            hotkey_b.activated.connect(self._search_collection)
-            self.mw.hotkeyB = hotkey_b  # Backward compatibility
-            self._global_hotkeys.append(hotkey_b)
+            shortcut_str_b = self._get_platform_shortcut("Ctrl+Shift+B")
+            logger.info(f"Registering collection search hotkey: {shortcut_str_b}")
             
-            logger.info(f"Global hotkeys registered: {len(self._global_hotkeys)} shortcuts")
+            try:
+                hotkey_b = QShortcut(
+                    QKeySequence(shortcut_str_b),
+                    self.mw
+                )
+                hotkey_b.activated.connect(self._search_collection)
+                self.mw.hotkeyB = hotkey_b  # Backward compatibility
+                self._global_hotkeys.append(hotkey_b)
+                logger.info(f"✓ Collection search hotkey registered: {hotkey_b.key().toString()}")
+            except Exception as e:
+                logger.error(f"✗ Failed to register collection search hotkey: {e}", exc_info=True)
+                # Handle IMKCFRu errors gracefully
+                if "IMKCFRu" in str(e) or "mach port" in str(e).lower():
+                    logger.warning("IMKCFRu error detected - this is a known macOS issue")
+            
+            logger.info(f"Global hotkeys setup complete: {len(self._global_hotkeys)} shortcuts registered")
+            logger.info("=" * 60)
             
         except Exception as e:
-            logger.error(f"Error setting up global hotkeys: {e}", exc_info=True)
+            logger.error(f"Critical error setting up global hotkeys: {e}", exc_info=True)
+            logger.error("=" * 60)
+            # Ensure menu access still works even if hotkeys fail
+            logger.warning("Hotkey registration failed, but menu access should still work")
     
     def open_dictionary(self) -> None:
         """
@@ -172,17 +224,21 @@ class MenuManager:
         This method handles opening the dictionary window, toggling its visibility,
         and updating the menu text accordingly.
         """
+        logger.info("=" * 60)
         logger.info("open_dictionary called")
+        
         try:
             from anki.utils import is_mac
             
             logger.info("Getting dictionary window...")
             # Get dictionary window
             dict_window = self.plugin.get_dictionary_window()
-            logger.info(f"Dictionary window obtained: {dict_window}")
+            logger.info(f"Dictionary window obtained: {type(dict_window).__name__}")
+            logger.debug(f"  Window visible: {dict_window.isVisible()}")
+            logger.debug(f"  Window geometry: {dict_window.geometry() if hasattr(dict_window, 'geometry') else 'N/A'}")
             
             # Determine shortcut text for menu
-            shortcut_text = "⌘W" if is_mac else "Ctrl+W"
+            shortcut_text = "⌘⇧W" if is_mac else "Ctrl+Shift+W"
             
             # Toggle visibility
             if dict_window.isVisible():
@@ -191,17 +247,24 @@ class MenuManager:
                 dict_window.hide()
                 if hasattr(self.mw, 'openMiDict'):
                     self.mw.openMiDict.setText(f"Open Dictionary ({shortcut_text})")
-                logger.debug("Dictionary window hidden")
+                logger.info("✓ Dictionary window hidden")
             else:
                 # Show window
                 logger.info("Showing dictionary window")
                 dict_window.show_window()
                 if hasattr(self.mw, 'openMiDict'):
                     self.mw.openMiDict.setText(f"Close Dictionary ({shortcut_text})")
-                logger.debug("Dictionary window shown")
+                logger.info("✓ Dictionary window shown")
+            
+            logger.info("=" * 60)
             
         except Exception as e:
-            logger.error(f"Error opening dictionary: {e}", exc_info=True)
+            logger.error("=" * 60)
+            logger.error(f"✗ Error opening dictionary: {e}", exc_info=True)
+            logger.error(f"  Exception type: {type(e).__name__}")
+            logger.error(f"  Exception args: {e.args}")
+            logger.error("=" * 60)
+            
             from aqt.utils import showWarning
             showWarning(
                 f"Error opening dictionary: {str(e)}",
@@ -304,15 +367,18 @@ class MenuManager:
         Get display text for shortcut in menu.
         
         Args:
-            shortcut: Shortcut string (e.g., "Ctrl+W")
+            shortcut: Shortcut string (e.g., "Ctrl+Shift+W")
             
         Returns:
-            Display text for menu (e.g., "⌘W" on Mac, "Ctrl+W" on Windows/Linux)
+            Display text for menu (e.g., "⌘⇧W" on Mac, "Ctrl+Shift+W" on Windows/Linux)
         """
         try:
             if is_mac:
-                # Use Mac symbols and remove + signs for cleaner display
-                return shortcut.replace("Ctrl+", "⌘").replace("Shift+", "⇧").replace("+", "")
+                # Use Mac symbols
+                result = shortcut.replace("Ctrl", "⌘").replace("Shift", "⇧").replace("Alt", "⌥")
+                # Remove + signs for cleaner display
+                result = result.replace("+", "")
+                return result
             else:
                 # Keep as is for Windows/Linux
                 return shortcut
@@ -328,7 +394,7 @@ class MenuManager:
             is_visible: Whether dictionary window is visible
         """
         try:
-            shortcut_text = self._get_shortcut_display("Ctrl+W")
+            shortcut_text = self._get_shortcut_display("Ctrl+Shift+W")
             
             if hasattr(self.mw, 'openMiDict'):
                 if is_visible:
