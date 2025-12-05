@@ -17,6 +17,7 @@ from ..utils.logging_config import setup_logging, get_logger
 if TYPE_CHECKING:
     from ..ui import (
         DictionaryWindow,
+        ModernDictionaryWindow,
         SettingsWindow,
         DictionaryManagerWidget,
         EditorIntegration,
@@ -446,11 +447,11 @@ class AnkiDictionaryPlugin:
         Get or create dictionary window (lazy initialization).
         
         Returns:
-            DictionaryWindow instance
+            ModernDictionaryWindow instance (using modern UI)
         """
         if self._dictionary_window is None:
-            from ..ui import DictionaryWindow
-            self._dictionary_window = DictionaryWindow(
+            from ..ui import ModernDictionaryWindow
+            self._dictionary_window = ModernDictionaryWindow(
                 self.mw,
                 self.search_service,
                 self.export_service,
@@ -458,7 +459,7 @@ class AnkiDictionaryPlugin:
                 self.config_manager,
                 self.addon_path
             )
-            logger.debug("Dictionary window created")
+            logger.debug("Modern dictionary window created")
         return self._dictionary_window
     
     def get_settings_window(self) -> 'SettingsWindow':

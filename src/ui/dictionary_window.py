@@ -345,12 +345,16 @@ class DictionaryWindow(QWidget):
                 theme = json.load(f)
         except Exception as e:
             logger.warning(f"Error loading theme: {e}")
-            # Use default theme
+            # Use default dark theme matching CSS variables
             theme = {
-                "header_background": "#51576d",
-                "definition_background": "#51576d",
-                "definition_text": "#c6d0f5",
-                "border": "#babbf1"
+                "name": "Default Dark",
+                "header_background": "#1a1a1a",
+                "definition_background": "#2a2a2a",
+                "definition_text": "#ffffff",
+                "border": "#444444",
+                "selector": "#2a2a2a",
+                "header_text": "#ffffff",
+                "search_term": "#4a9eff"
             }
         
         # Determine if night mode
@@ -629,14 +633,16 @@ class DictionaryWindow(QWidget):
                 return json.load(f)
         except Exception as e:
             logger.warning(f"Error loading theme: {e}")
+            # Use default dark theme matching CSS variables
             return {
-                "header_background": "#51576d",
-                "definition_background": "#51576d",
-                "definition_text": "#c6d0f5",
-                "border": "#babbf1",
-                "header_text": "#c6d0f5",
-                "search_term": "#c6d0f5",
-                "selector": "#51576d"
+                "name": "Default Dark",
+                "header_background": "#1a1a1a",
+                "definition_background": "#2a2a2a",
+                "definition_text": "#ffffff",
+                "border": "#444444",
+                "header_text": "#ffffff",
+                "search_term": "#4a9eff",
+                "selector": "#2a2a2a"
             }
     
     def _load_svg_icon(self, icon_name: str, theme: str = 'day') -> Optional[str]:
