@@ -99,6 +99,12 @@ class MenuManager:
             self.mw.DictMenuActions.append(dict_action)
             self._menu_actions.append(dict_action)
             
+            # Create UI mock action (for design preview)
+            ui_mock_action = QAction("🎨 UI Design Preview (Mock)", self.mw)
+            ui_mock_action.triggered.connect(self.open_ui_mock)
+            self.mw.DictMenuActions.append(ui_mock_action)
+            self._menu_actions.append(ui_mock_action)
+            
             # Clear and rebuild menu
             self._main_menu.clear()
             
@@ -302,6 +308,31 @@ class MenuManager:
             from aqt.utils import showWarning
             showWarning(
                 f"Error opening settings: {str(e)}",
+                parent=self.mw,
+                title="Anki Dictionary"
+            )
+    
+    def open_ui_mock(self) -> None:
+        """
+        Open UI mock/demo window for design preview.
+        
+        This opens a standalone window showing the complete UI design
+        with sample data for validation before building real functionality.
+        """
+        try:
+            from aqt.qt import Qt
+            from ..ui.ui_mock import show_ui_mock
+            
+            # Create and show mock window
+            mock_window = show_ui_mock(self.mw)
+            
+            logger.info("UI mock window opened")
+            
+        except Exception as e:
+            logger.error(f"Error opening UI mock: {e}", exc_info=True)
+            from aqt.utils import showWarning
+            showWarning(
+                f"Error opening UI mock: {str(e)}",
                 parent=self.mw,
                 title="Anki Dictionary"
             )
