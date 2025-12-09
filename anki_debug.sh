@@ -1,23 +1,23 @@
 #!/bin/bash
-# Anki Debug Launcher
-# This script launches Anki with console output visible for debugging
+# Anki Debug Launcher - VERBOSE (full output)
+# Use anki_debug_dict.sh for filtered output instead
 
-echo "Starting Anki with debug output..."
-echo "Press Ctrl+C to stop Anki"
-echo "----------------------------------------"
+echo "🔍 Anki Debug Mode (VERBOSE - all output)"
+echo "Press Ctrl+C to stop"
+echo "=========================================="
 
-# Launch Anki using the launcher (updated for newer Anki versions)
+# Set environment variable to signal auto-open
+export ANKI_DICT_AUTO_OPEN=1
+
+# Launch Anki with full output
 if [ -f "/Applications/Anki.app/Contents/MacOS/launcher" ]; then
     /Applications/Anki.app/Contents/MacOS/launcher "$@" 2>&1
 elif [ -f "/Applications/Anki.app/Contents/MacOS/anki" ]; then
     /Applications/Anki.app/Contents/MacOS/anki "$@" 2>&1
 else
-    echo "ERROR: Could not find Anki executable"
-    echo "Checked:"
-    echo "  - /Applications/Anki.app/Contents/MacOS/launcher"
-    echo "  - /Applications/Anki.app/Contents/MacOS/anki"
+    echo "❌ ERROR: Could not find Anki executable"
     exit 1
 fi
 
-echo "----------------------------------------"
-echo "Anki closed"
+echo ""
+echo "✓ Anki closed"

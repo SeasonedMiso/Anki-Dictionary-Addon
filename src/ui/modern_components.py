@@ -280,40 +280,72 @@ class DefinitionCard(QFrame):
         
         layout.addStretch()
         
-        # Frequency badge (⭐ emoji)
-        frequency = self.word_data.get('frequency', 'N/A')
-        freq_label = QLabel(f"⭐ {frequency}")
-        freq_font = QFont()
-        freq_font.setPointSize(14)
-        freq_label.setFont(freq_font)
-        freq_label.setStyleSheet("color: #ffd700;")
-        layout.addWidget(freq_label)
+        # Frequency badge with human-readable label
+        frequency = self.word_data.get('frequency')
+        if frequency:
+            freq_text, freq_color = self._get_frequency_label(frequency)
+            freq_label = QLabel(freq_text)
+            freq_font = QFont()
+            freq_font.setPointSize(12)
+            freq_font.setBold(True)
+            freq_label.setFont(freq_font)
+            freq_label.setStyleSheet(f"""
+                QLabel {{
+                    color: {freq_color};
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 4px 10px;
+                    border-radius: 6px;
+                }}
+            """)
+            freq_label.setToolTip(f"Frequency rank: {frequency}\n(Lower = more common)")
+            layout.addWidget(freq_label)
         
         return layout
     
+    def _get_frequency_label(self, frequency: int) -> tuple[str, str]:
+        """
+        Convert frequency rank to human-readable label.
+        
+        Args:
+            frequency: Frequency ranking (lower = more common)
+            
+        Returns:
+            Tuple of (label_text, color_hex)
+        """
+        if frequency <= 500:
+            return ("Very Common", "#4ade80")  # Green
+        elif frequency <= 1500:
+            return ("Common", "#60a5fa")  # Blue
+        elif frequency <= 5000:
+            return ("Uncommon", "#fbbf24")  # Yellow
+        elif frequency <= 15000:
+            return ("Rare", "#fb923c")  # Orange
+        else:
+            return ("Very Rare", "#f87171")  # Red
+    
     def _create_action_buttons(self) -> QHBoxLayout:
         """
-        Create color-coded action buttons.
+        Create action buttons matching old UI functionality.
         
         Returns:
             Layout containing action buttons
         """
         layout = QHBoxLayout()
-        layout.setSpacing(10)
+        layout.setSpacing(8)
         
         word = self.word_data.get('word', '')
         
-        # Audio button (blue #4a9eff) - using clean Unicode
-        audio_btn = QPushButton("♪")  # Musical note
-        audio_btn.setMinimumSize(50, 50)
-        audio_btn.setMaximumSize(50, 50)
+        # Audio button (blue) - 🔊
+        audio_btn = QPushButton("🔊")
+        audio_btn.setMinimumSize(44, 44)
+        audio_btn.setMaximumSize(44, 44)
         audio_btn.setStyleSheet("""
             QPushButton {
                 background: #4a9eff;
                 color: white;
                 border: none;
                 border-radius: 8px;
-                font-size: 20px;
+                font-size: 18px;
             }
             QPushButton:hover {
                 background: #3a8edf;
@@ -322,20 +354,21 @@ class DefinitionCard(QFrame):
                 background: #2a7ecf;
             }
         """)
+        audio_btn.setToolTip("Play audio pronunciation")
         audio_btn.clicked.connect(lambda: self.audioRequested.emit(word))
         layout.addWidget(audio_btn)
         
-        # Image button (green #50c878) - using clean Unicode
-        image_btn = QPushButton("◈")  # Diamond with dot
-        image_btn.setMinimumSize(50, 50)
-        image_btn.setMaximumSize(50, 50)
+        # Image button (green) - 🖼️
+        image_btn = QPushButton("🖼️")
+        image_btn.setMinimumSize(44, 44)
+        image_btn.setMaximumSize(44, 44)
         image_btn.setStyleSheet("""
             QPushButton {
                 background: #50c878;
                 color: white;
                 border: none;
                 border-radius: 8px;
-                font-size: 20px;
+                font-size: 18px;
             }
             QPushButton:hover {
                 background: #40b868;
@@ -344,20 +377,44 @@ class DefinitionCard(QFrame):
                 background: #30a858;
             }
         """)
+        image_btn.setToolTip("Search images")
         image_btn.clicked.connect(lambda: self.imageRequested.emit(word))
         layout.addWidget(image_btn)
         
-        # Export button (purple #9b59b6) - using clean Unicode
-        export_btn = QPushButton("⊕")  # Circled plus
-        export_btn.setMinimumSize(50, 50)
-        export_btn.setMaximumSize(50, 50)
+        # Copy to clipboard button - ✂
+        copy_btn = QPushButton("✂")
+        copy_btn.setMinimumSize(44, 44)
+        copy_btn.setMaximumSize(44, 44)
+        copy_btn.setStyleSheet("""
+            QPushButton {
+                background: #64748b;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 18px;
+            }
+            QPushButton:hover {
+                background: #54647b;
+            }
+            QPushButton:pressed {
+                background: #44546b;
+            }
+        """)
+        copy_btn.setToolTip("Copy definition to clipboard")
+        copy_btn.clicked.connect(lambda: self._copy_to_clipboard())
+        layout.addWidget(copy_btn)
+        
+        # Export to Anki button (purple) - 💾
+        export_btn = QPushButton("💾")
+        export_btn.setMinimumSize(44, 44)
+        export_btn.setMaximumSize(44, 44)
         export_btn.setStyleSheet("""
             QPushButton {
                 background: #9b59b6;
                 color: white;
                 border: none;
                 border-radius: 8px;
-                font-size: 20px;
+                font-size: 18px;
             }
             QPushButton:hover {
                 background: #8b49a6;
@@ -366,10 +423,35 @@ class DefinitionCard(QFrame):
                 background: #7b3996;
             }
         """)
+        export_btn.setToolTip("Add to card exporter")
         export_btn.clicked.connect(lambda: self.exportRequested.emit(word))
         layout.addWidget(export_btn)
         
         layout.addStretch()
+        
+        return layout
+    
+    def _copy_to_clipboard(self) -> None:
+        """Copy definition text to clipboard."""
+        from aqt.qt import QApplication
+        
+        # Collect all definition text
+        definitions = self.word_data.get('definitions', [])
+        text_parts = [self.word_data.get('word', '')]
+        
+        phonetic = self.word_data.get('phonetic', '')
+        if phonetic:
+            text_parts.append(f"[{phonetic}]")
+        
+        for i, defn in enumerate(definitions, 1):
+            def_type = defn.get('type', '')
+            def_text = defn.get('text', '')
+            text_parts.append(f"{i}. ({def_type}) {def_text}")
+        
+        clipboard_text = '\n'.join(text_parts)
+        QApplication.clipboard().setText(clipboard_text)
+        
+        logger.debug(f"Copied to clipboard: {clipboard_text[:50]}...")
         
         return layout
     
