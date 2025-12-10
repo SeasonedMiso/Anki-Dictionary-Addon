@@ -255,26 +255,34 @@ class CollapsibleBox(ThemedWidget):
         if not ANKI_AVAILABLE:
             return
         
-        # Header button styling
-        header_style = self.style_generator.button_style(
-            bg_color=self.style_generator.theme.panel_color,
-            padding="12px 16px",
-            size_type="base"
-        )
-        # Override text alignment for header
-        header_style = header_style.replace(
-            "QPushButton {",
-            "QPushButton { text-align: left;"
-        )
+        theme = self.theme_manager.current_theme
+        
+        # Header button styling - no border, transparent background
+        header_style = f"""
+            QPushButton {{
+                background-color: transparent;
+                color: {theme.text_primary};
+                border: none;
+                padding: 12px 16px;
+                text-align: left;
+                font-size: {theme.get_font_size('base')}px;
+                font-weight: 600;
+            }}
+            QPushButton:hover {{
+                background-color: {self.style_generator.adjust_color_brightness(theme.background_color, 1.05)};
+            }}
+        """
         self.header.setStyleSheet(header_style)
         
-        # Content frame styling
-        content_style = """
-            QFrame {
-                background: transparent;
-                border: none;
+        # Content frame styling - border around content only, panel background
+        content_style = f"""
+            QFrame {{
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
+                border-radius: {theme.border_radius}px;
                 padding: 0px;
-            }
+                margin: 0px;
+            }}
         """
         self.content_frame.setStyleSheet(content_style)
     

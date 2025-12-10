@@ -22,6 +22,7 @@
 
 ### Features
 
+**Current (Legacy)**
 - Real-time dictionary lookup with multiple dictionary support
 - Audio pronunciation from Forvo
 - Image search via Google Images
@@ -31,23 +32,35 @@
 - Frequency information
 - Sentence mining
 
-### TODO
+**In Development (Modern UI)**
+- Modern, responsive dictionary interface with theming system
+- Improved export workflow with queue management and preview
+- Enhanced template editor with live preview
+- Better search and filtering capabilities
+- Streamlined settings management
 
-**Mock to Functional Interface**
-- [ ] Connect search bar to real dictionary lookup
-- [ ] Implement filter bar functionality (dictionary groups, search modes, conjugation)
-- [ ] Add real data loading and caching
-- [ ] Connect action buttons (audio, images, clipboard, export)
-- [ ] Implement collapsible state persistence
-- [ ] Add keyboard shortcuts and navigation
-- [ ] Error handling and loading states
+### Development Roadmap
 
-**Settings UI Development**
-- [ ] Create settings interface mockup
-- [ ] Implement real-time theme editing with live preview
-- [ ] Add theme customization (colors, fonts, spacing)
+**Current Phase: Export UI System (PR #1)**
+- [ ] Export queue management with drag-and-drop
+- [ ] Card template editor with live preview
+- [ ] Export preview and confirmation workflow
+- [ ] Export history tracking and management
+- [ ] Modern replacement for legacy cardExporter.py (1100+ lines)
+
+**Planned Features**
+- [ ] Enhanced search history & navigation with breadcrumbs and recent searches
+- [ ] Contextual frequency system with domain-specific rankings (fiction, non-fiction, TV, YouTube)
+- [ ] Keyboard shortcuts integration for power users
+- [ ] Settings UI with real-time theme editing and live preview
 - [ ] Dictionary source management interface
-- [ ] Settings export/import functionality
+- [ ] Performance optimizations and caching improvements
+
+**Pragmatic Architecture Strategy**
+- **OPTIMIZED**: New modern UI components built from scratch with clean patterns
+- **INTEGRATION**: Use existing services temporarily to avoid massive rewrites
+- **CLEAR BOUNDARIES**: Distinguish optimized code (new UI) from legacy integration
+- **INCREMENTAL**: Replace legacy services over time as optimization opportunities arise
 
 **Codebase Optimization**
 - [ ] Create new optimized src/ folder structure

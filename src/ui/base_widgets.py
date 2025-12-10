@@ -30,12 +30,21 @@ try:
     )
     ANKI_AVAILABLE = True
 except ImportError:
-    # Mock classes for testing
+    # Mock classes for testing - define minimal mocks
     ANKI_AVAILABLE = False
-    from .modern_components import (
-        QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-        QLineEdit, QFrame, pyqtSignal, Qt, QTimer, QApplication
-    )
+    
+    class QWidget: pass
+    class QVBoxLayout: pass
+    class QHBoxLayout: pass
+    class QLabel: pass
+    class QPushButton: pass
+    class QLineEdit: pass
+    class QFrame: pass
+    class QApplication: pass
+    class QTimer: pass
+    class pyqtSignal:
+        def __init__(self, *args): pass
+    class Qt: pass
 
 from .styling import ThemeColors, StyleGenerator, get_theme_manager
 

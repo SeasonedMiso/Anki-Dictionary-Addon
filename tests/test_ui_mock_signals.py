@@ -4,7 +4,7 @@ import pytest
 
 
 def test_ui_mock_uses_existing_signals():
-    modern_components = importlib.import_module("src.ui.modern_components")
+    modern_components = importlib.import_module("src.ui.dictionary_widgets")
 
     # Signals should exist on components
     assert hasattr(modern_components.ModernSearchBar, "searchChanged")

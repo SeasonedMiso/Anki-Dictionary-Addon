@@ -20,10 +20,10 @@ except ImportError:
     QWidget = None
 
 try:
-    from .styling import get_theme_manager
+    from ..ui.styling import get_theme_manager
 except ImportError:
     # For direct testing
-    from styling import get_theme_manager
+    from ..ui.styling import get_theme_manager
 
 logger = logging.getLogger(__name__)
 

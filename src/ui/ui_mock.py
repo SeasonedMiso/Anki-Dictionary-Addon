@@ -45,10 +45,9 @@ class UIMockWindow(QWidget):
         self.theme_manager = get_theme_manager()
         self.style_generator = StyleGenerator(self.theme_manager.current_theme)
         self.theme_manager.register_observer(self._on_theme_changed)
-        
-        self._apply_theme_styling()
 
         self._setup_ui()
+        self._apply_theme_styling()
         self._populate_sample_data()
     
     def _setup_ui(self):
@@ -231,16 +230,33 @@ class UIMockWindow(QWidget):
         """Apply current theme styling to all UI elements."""
         theme = self.theme_manager.current_theme
         
-        # Apply main window styling
+        # Apply main window styling with comprehensive stylesheet
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {theme.background_color};
                 color: {theme.text_primary};
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             }}
+            QMainWindow {{
+                background-color: {theme.background_color};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+                background-color: transparent;
+            }}
             QLabel#subtitle {{
                 color: {theme.text_muted};
                 font-size: {theme.get_font_size('small')}px;
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: {theme.border_radius}px;
+                padding: 8px 16px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.accent_color};
             }}
         """)
         
