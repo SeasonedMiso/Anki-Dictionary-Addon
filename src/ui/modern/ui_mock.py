@@ -86,7 +86,7 @@ class UIMockWindow(QWidget):
         outer.addWidget(container)  # Remove alignment to fill available space
 
         # Title label
-        title = QLabel("🎨 UI Design Preview (mock / sample data)")
+        title = QLabel("UI Design Preview (mock / sample data)")
         title.setStyleSheet(f"""
             QLabel {{
                 font-size: 15px;
@@ -276,7 +276,21 @@ class UIMockWindow(QWidget):
     
     def _on_options_clicked(self):
         """Handle options button click."""
-        self.status_label.setText("Options clicked (mock - would open settings dialog)")
+        try:
+            from .settings_window import show_modern_settings
+            
+            # Show modern settings dialog
+            settings = show_modern_settings(self)
+            
+            if settings:
+                self.status_label.setText("Settings applied successfully!")
+                # TODO: Apply theme changes to mock UI
+            else:
+                self.status_label.setText("Settings cancelled")
+                
+        except Exception as e:
+            logger.error(f"Error opening settings: {e}", exc_info=True)
+            self.status_label.setText(f"Error opening settings: {str(e)}")
 
 
 def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:
@@ -293,10 +307,5 @@ def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:
     
     window = UIMockWindow(parent)
     window.show()
-    
-    # If auto-close flag is set, close after 3 seconds
-    if os.environ.get('ANKI_DICT_AUTO_CLOSE') == '1':
-        from aqt.qt import QTimer
-        QTimer.singleShot(3000, window.close)
-    
+        
     return window

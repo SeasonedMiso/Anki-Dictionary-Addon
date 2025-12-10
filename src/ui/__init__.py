@@ -16,11 +16,14 @@ from .modern_components import (
     DictionaryFilterBar,
     ModernResultsArea
 )
+from .modern import ModernSettingsWindow, UIMockWindow
 
 __all__ = [
     'DictionaryWindow',
     'ModernDictionaryWindow',
     'SettingsWindow',
+    'ModernSettingsWindow',
+    'UIMockWindow',
     'DictionaryManagerWidget',
     'EditorIntegration',
     'BrowserIntegration',

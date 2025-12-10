@@ -31,56 +31,57 @@
 - Frequency information
 - Sentence mining
 
-### Current Status
+### TODO
 
-**Branch: `ui/mock-refresh` → `dev`**
-- ✅ Modern UI mock complete with responsive design
-- ✅ Independent resizable window
-- ✅ Dark theme with proper component styling
-- ✅ Word→Dictionary hierarchy structure
-- ✅ Collapsible sections and interactive elements
+**Mock to Functional Interface**
+- [ ] Connect search bar to real dictionary lookup
+- [ ] Implement filter bar functionality (dictionary groups, search modes, conjugation)
+- [ ] Add real data loading and caching
+- [ ] Connect action buttons (audio, images, clipboard, export)
+- [ ] Implement collapsible state persistence
+- [ ] Add keyboard shortcuts and navigation
+- [ ] Error handling and loading states
 
-**Ready for:** Mock-to-functional conversion and settings UI development
+**Settings UI Development**
+- [ ] Create settings interface mockup
+- [ ] Implement real-time theme editing with live preview
+- [ ] Add theme customization (colors, fonts, spacing)
+- [ ] Dictionary source management interface
+- [ ] Settings export/import functionality
 
-### Known Issues
+**Codebase Optimization**
+- [ ] Create new optimized src/ folder structure
+- [ ] Migrate working mock as foundation
+- [ ] Copy only essential code from current codebase
+- [ ] Eliminate technical debt and legacy code
+- [ ] Ensure modular, testable, maintainable architecture
 
-- **Dropdown Theme Issue**: QComboBox dropdown menus show white background instead of dark theme. The popup view styling is not being applied correctly despite multiple attempts with QAbstractItemView styling, palette changes, and showPopup overrides. This appears to be a Qt/PyQt theming limitation where the dropdown popup is a separate widget that inherits system styling.
+### To Fix
 
-### Development Roadmap
+- **Dropdown Theme Issue**: QComboBox dropdown menus show white background instead of dark theme. Qt/PyQt theming limitation where popup widgets inherit system styling.
 
-#### Current: UI Mock Complete ✅
-- Modern UI components with dark theme
-- Responsive layout and independent window
-- Search bar, filter controls, collapsible definitions
-- Word→Dictionary hierarchy structure
+### Planned Features
 
-#### Next: Mock to Functional Interface
-**Tasks to make mock fully functional:**
-- Connect search bar to real dictionary lookup
-- Implement filter bar functionality (dictionary groups, search modes, conjugation)
-- Add real data loading and caching
-- Connect action buttons (audio, images, clipboard, export)
-- Implement collapsible state persistence
-- Add keyboard shortcuts and navigation
-- Error handling and loading states
+**Modern Workflow Integration**
+- **Clipboard Monitor**: Auto-detect and process texthooker output
+- **Screenshot OCR**: Extract text from game screenshots (PS Vita, PC games)
+- **Yomitan Bridge**: API integration for enhanced card creation
+- **Batch Processing**: Handle multiple lookups efficiently
 
-#### Upcoming: Settings UI Mock
-- Dictionary settings interface mockup
-- Real-time theme editing with live preview
-- Theme customization (colors, fonts, spacing)
-- Dictionary source management
-- Export/import settings
+**Media-Rich Card Creation**
+- **Auto Audio Capture**: Record pronunciation during lookup
+- **Context Screenshots**: Attach source images to cards
+- **Smart Templates**: Context-aware card generation
+- **Netflix Integration**: Subtitle + audio extraction for streaming content
 
-#### Future: Clean Codebase Migration
-**New `src/` folder with optimized architecture:**
-- Start with working mock as foundation
-- Copy only essential code from current codebase
-- Eliminate technical debt and legacy code
-- Ensure high code quality and readability
-- Modular, testable, maintainable structure
+**Deep Customization & Theming**
+- **Card Template Sync**: Dictionary theme automatically mirrors to Anki card templates
+- **Global Anki Theming**: Optional integration with Anki's global theme system
+- **Texture Pack System**: Replace icons, images, and UI elements with custom assets
+- **Progressive Complexity**: Simple defaults with advanced customization for power users
+- **Theme Sharing**: Export/import complete visual themes and asset packs
 
-### Future Features
-
+**Advanced Features**
 - **Radical Search**: Search for kanji by radical components
 - **Draw Search**: Handwriting recognition for kanji lookup
 - **Voice Search**: Speech-to-text for audio-based dictionary queries

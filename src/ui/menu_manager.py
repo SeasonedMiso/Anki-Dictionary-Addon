@@ -321,7 +321,7 @@ class MenuManager:
         """
         try:
             from aqt.qt import Qt
-            from ..ui.ui_mock import show_ui_mock
+            from ..ui.modern import show_ui_mock
             
             # Create and show mock window
             mock_window = show_ui_mock(None)  # No parent = independent window
