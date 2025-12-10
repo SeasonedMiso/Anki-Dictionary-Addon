@@ -1,9 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-Modern UI Components for Dictionary Window.
+Dictionary Application Widgets.
 
-This module provides modern, beautiful UI components following the design
-specifications from the modern-ui-redesign spec.
+This module provides dictionary-specific UI components that compose together
+to create the dictionary lookup interface. These widgets are built using
+the base themed widgets and implement dictionary-specific functionality.
+
+WIDGETS PROVIDED:
+
+Layout Widgets:
+- CollapsibleBox: Expandable/collapsible container with arrow indicator
+- ModernResultsArea: Scrollable area for displaying search results
+
+Search Widgets:
+- ModernSearchBar: Search input with button and debounced text changes
+- DictionaryFilterBar: Dictionary selection and search mode controls
+
+Content Widgets:
+- DefinitionCard: Complete word definition with actions (audio, image, copy, export)
+- WordSection: Section for a single word with multiple dictionary sources
+- DictionarySubsection: Individual dictionary's definition within a word section
+
+All widgets use the centralized theming system and base widgets for consistency.
 """
 
 from typing import Optional, List, Dict, Any
@@ -51,11 +69,52 @@ except ImportError:
     class QFont:
         Bold = 0
 
+from .styling import ThemeColors, StyleGenerator, get_theme_manager
+from .base_widgets import (
+    ThemedWidget, ThemedButton, ThemedLabel, ThemedLineEdit, ThemedFrame,
+    ActionButton, CopyButton, FrequencyBadge, PitchAccentLabel
+)
 
 logger = logging.getLogger(__name__)
 
 
-class CollapsibleBox(QWidget):
+def _adjust_color_brightness(hex_color: str, factor: float) -> str:
+    """
+    Adjust the brightness of a hex color.
+    
+    Args:
+        hex_color: Hex color string (e.g., "#1c1c1c")
+        factor: Brightness factor (>1 = brighter, <1 = darker)
+        
+    Returns:
+        Adjusted hex color string
+    """
+    try:
+        # Remove # if present
+        hex_color = hex_color.lstrip('#')
+        
+        # Convert to RGB
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        
+        # Adjust brightness
+        r = min(255, max(0, int(r * factor)))
+        g = min(255, max(0, int(g * factor)))
+        b = min(255, max(0, int(b * factor)))
+        
+        # Convert back to hex
+        return f"#{r:02x}{g:02x}{b:02x}"
+    except (ValueError, IndexError):
+        # Return original color if parsing fails
+        return hex_color
+
+
+# =============================================================================
+# LAYOUT COMPONENTS
+# =============================================================================
+
+class CollapsibleBox(ThemedWidget):
     """
     Collapsible container with expand/collapse arrow.
     
@@ -78,6 +137,7 @@ class CollapsibleBox(QWidget):
         
         self.is_expanded = True
         self.content_widget = None
+        self.title = title
         
         # Main layout
         layout = QVBoxLayout(self)
@@ -93,24 +153,6 @@ class CollapsibleBox(QWidget):
         # Header title (clickable)
         self.header = QPushButton()
         self.header.setText(f"▼ {title}")
-        self.header.setStyleSheet("""
-            QPushButton {
-                background: #2a2a2a;
-                border: none;
-                border-radius: 8px;
-                padding: 12px 16px;
-                text-align: left;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton:hover {
-                background: #333;
-            }
-            QPushButton:pressed {
-                background: #222;
-            }
-        """)
         self.header.clicked.connect(self.toggle)
         self.header_layout.addWidget(self.header, 1)  # Stretch to fill space
         
@@ -118,14 +160,6 @@ class CollapsibleBox(QWidget):
         
         # Content container
         self.content_frame = QFrame()
-        self.content_frame.setStyleSheet("""
-            QFrame {
-                background: transparent;
-                border: none;
-                padding: 0px;
-            }
-        """)
-        
         self.content_layout = QVBoxLayout(self.content_frame)
         self.content_layout.setContentsMargins(16, 16, 16, 16)
         self.content_layout.setSpacing(12)
@@ -133,9 +167,13 @@ class CollapsibleBox(QWidget):
         layout.addWidget(self.content_frame)
         
         # Animation
-        self.animation = QPropertyAnimation(self.content_frame, b"maximumHeight")
-        self.animation.setDuration(200)
-        self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
+        if ANKI_AVAILABLE:
+            self.animation = QPropertyAnimation(self.content_frame, b"maximumHeight")
+            self.animation.setDuration(200)
+            self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
+        
+        # Apply initial styling
+        self._apply_styling()
     
     def add_content(self, widget: QWidget) -> None:
         """Add widget to collapsible content area."""
@@ -211,9 +249,45 @@ class CollapsibleBox(QWidget):
         
         self.animation.finished.connect(lambda: self.content_frame.setMaximumHeight(16777215))  # Remove height limit
         self.animation.start()
+    
+    def _apply_styling(self):
+        """Apply styling using centralized theme system."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        # Header button styling
+        header_style = self.style_generator.button_style(
+            bg_color=self.style_generator.theme.panel_color,
+            padding="12px 16px",
+            size_type="base"
+        )
+        # Override text alignment for header
+        header_style = header_style.replace(
+            "QPushButton {",
+            "QPushButton { text-align: left;"
+        )
+        self.header.setStyleSheet(header_style)
+        
+        # Content frame styling
+        content_style = """
+            QFrame {
+                background: transparent;
+                border: none;
+                padding: 0px;
+            }
+        """
+        self.content_frame.setStyleSheet(content_style)
+    
+    def update_theme(self, theme: ThemeColors) -> None:
+        """Update component styling with new theme."""
+        self._apply_styling()
 
 
-class ModernSearchBar(QWidget):
+# =============================================================================
+# SEARCH COMPONENTS  
+# =============================================================================
+
+class ModernSearchBar(ThemedWidget):
     """
     Modern search bar component with search button.
     
@@ -254,13 +328,11 @@ class ModernSearchBar(QWidget):
         self.search_button.setMinimumWidth(60)
         self.search_button.clicked.connect(self._on_search_requested)
         
-        # Apply styling
-        self._apply_styling()
-        
         # Set up debounce timer
-        self.search_timer = QTimer()
-        self.search_timer.setSingleShot(True)
-        self.search_timer.timeout.connect(self._emit_search)
+        if ANKI_AVAILABLE:
+            self.search_timer = QTimer()
+            self.search_timer.setSingleShot(True)
+            self.search_timer.timeout.connect(self._emit_search)
         
         # Layout - with spacing for separate appearance
         layout = QHBoxLayout(self)
@@ -269,48 +341,37 @@ class ModernSearchBar(QWidget):
         layout.addWidget(self.search_input, 1)  # Stretch to fill
         layout.addWidget(self.search_button)
         
+        # Apply initial styling
+        self._apply_styling()
+        
         logger.debug("ModernSearchBar initialized")
     
     def _apply_styling(self) -> None:
         """Apply modern styling to search components."""
-        self.search_input.setStyleSheet("""
-            QLineEdit {
-                padding: 12px 20px;
-                border: 1px solid #444;
-                border-radius: 12px;
-                background: #2a2a2a;
-                color: white;
-                font-size: 16px;
-            }
-            QLineEdit:focus {
-                border-color: #4a9eff;
-                background: #333;
-            }
-            QLineEdit::placeholder {
-                color: #888;
-            }
-        """)
+        if not ANKI_AVAILABLE:
+            return
         
-        self.search_button.setStyleSheet("""
-            QPushButton {
-                background: #4a9eff;
-                color: white;
-                border: 1px solid #4a9eff;
-                border-radius: 12px;
-                font-size: 20px;
-                font-weight: bold;
-                padding: 12px 16px;
-                min-width: 60px;
-            }
-            QPushButton:hover {
-                background: #3a8edf;
-                border-color: #3a8edf;
-            }
-            QPushButton:pressed {
-                background: #2a7ecf;
-                border-color: #2a7ecf;
-            }
-        """)
+        # Search input styling
+        input_style = self.style_generator.input_style(
+            padding="12px 20px",
+            size_type="medium"
+        )
+        # Override border radius for search bar
+        input_style = input_style.replace(
+            f"border-radius: {self.style_generator.theme.border_radius}px",
+            "border-radius: 12px"
+        )
+        self.search_input.setStyleSheet(input_style)
+        
+        # Search button styling
+        button_style = self.style_generator.button_style(
+            bg_color=self.style_generator.theme.accent_color,
+            text_color="white",
+            border_radius=12,
+            padding="12px 16px",
+            size_type="large"
+        )
+        self.search_button.setStyleSheet(button_style)
     
     def _on_text_changed(self, text: str) -> None:
         """
@@ -320,7 +381,8 @@ class ModernSearchBar(QWidget):
             text: New text value
         """
         # Restart timer on each text change
-        self.search_timer.start(300)  # 300ms debounce
+        if ANKI_AVAILABLE:
+            self.search_timer.start(300)  # 300ms debounce
     
     def _emit_search(self) -> None:
         """Emit search signal after debounce period."""
@@ -355,7 +417,21 @@ class ModernSearchBar(QWidget):
     def clear(self) -> None:
         """Clear search input."""
         self.search_input.clear()
+    
+    def update_theme(self, theme: ThemeColors) -> None:
+        """
+        Update component styling with new theme.
+        
+        Args:
+            theme: New theme colors
+        """
+        self._apply_styling()
+        logger.debug("Updated ModernSearchBar theme")
 
+
+# =============================================================================
+# CARD COMPONENTS
+# =============================================================================
 
 class DefinitionCard(QWidget):
     """
@@ -501,7 +577,7 @@ class DefinitionCard(QWidget):
     
     def _get_frequency_label(self, frequency: int) -> tuple[str, str]:
         """
-        Convert frequency rank to human-readable label.
+        Convert frequency rank to human-readable label using themed colors.
         
         Args:
             frequency: Frequency ranking (lower = more common)
@@ -509,43 +585,47 @@ class DefinitionCard(QWidget):
         Returns:
             Tuple of (label_text, color_hex)
         """
+        theme = get_theme_manager().current_theme
+        
         if frequency <= 500:
-            return ("Very Common", "#4ade80")  # Green
+            return ("Very Common", theme.freq_very_common)
         elif frequency <= 1500:
-            return ("Common", "#60a5fa")  # Blue
+            return ("Common", theme.freq_common)
         elif frequency <= 5000:
-            return ("Uncommon", "#fbbf24")  # Yellow
+            return ("Uncommon", theme.freq_uncommon)
         elif frequency <= 15000:
-            return ("Rare", "#fb923c")  # Orange
+            return ("Rare", theme.freq_rare)
         else:
-            return ("Very Rare", "#f87171")  # Red
+            return ("Very Rare", theme.freq_very_rare)
     
     def _get_pitch_color(self, pitch_accent: str) -> str:
         """
-        Get color for pitch accent pattern.
+        Get color for pitch accent pattern using themed colors.
         
         Args:
             pitch_accent: Pitch accent number (0, 1, 2, etc.)
             
         Returns:
-            Color hex code
+            Color hex code from theme
         """
+        theme = get_theme_manager().current_theme
+        
         try:
             accent_num = int(pitch_accent)
             if accent_num == 0:
-                return "#4a9eff"  # Blue - Heiban (flat)
+                return theme.heiban_color  # Blue - Heiban (flat)
             elif accent_num == 1:
-                return "#ef4444"  # Red - Atamadaka (head-high)
+                return theme.atamadaka_color  # Red - Atamadaka (head-high)
             else:
-                return "#f59e0b"  # Orange/Yellow - Nakadaka (mid-high)
+                return theme.nakadaka_color  # Orange/Yellow - Nakadaka (mid-high)
         except (ValueError, TypeError):
             # Handle special patterns
             if pitch_accent.lower() in ['odaka', 'tail-high']:
-                return "#22c55e"  # Green - Odaka (tail-high)
+                return theme.odaka_color  # Green - Odaka (tail-high)
             elif pitch_accent.lower() in ['kifuku', 'rising-falling']:
-                return "#a855f7"  # Purple - Kifuku (rising-falling)
+                return theme.kifuku_color  # Purple - Kifuku (rising-falling)
             else:
-                return "#64748b"  # Gray - Unknown
+                return theme.text_muted  # Gray - Unknown
     
     def _show_frequency_breakdown(self, frequencies: dict) -> None:
         """Show detailed frequency breakdown for all sources."""
@@ -591,155 +671,69 @@ class DefinitionCard(QWidget):
         word = self.word_data.get('word', '')
         
         # Audio button (blue) - 🔊
-        audio_btn = QPushButton("🔊 Audio")
-        audio_btn.setMinimumHeight(40)
-        audio_btn.setStyleSheet("""
-            QPushButton {
-                background: #4a9eff;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background: #3a8edf;
-            }
-            QPushButton:pressed {
-                background: #2a7ecf;
-            }
-        """)
+        audio_btn = ActionButton("Audio", "🔊", "audio", lambda: self.audioRequested.emit(word))
         audio_btn.setToolTip("Play audio pronunciation")
-        audio_btn.clicked.connect(lambda: self.audioRequested.emit(word))
         layout.addWidget(audio_btn, 1)  # Equal stretch
         
         # Image button (green) - 🖼️
-        image_btn = QPushButton("🖼️ Images")
-        image_btn.setMinimumHeight(40)
-        image_btn.setStyleSheet("""
-            QPushButton {
-                background: #50c878;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background: #40b868;
-            }
-            QPushButton:pressed {
-                background: #30a858;
-            }
-        """)
+        image_btn = ActionButton("Images", "🖼️", "image", lambda: self.imageRequested.emit(word))
         image_btn.setToolTip("Search images")
-        image_btn.clicked.connect(lambda: self.imageRequested.emit(word))
         layout.addWidget(image_btn, 1)  # Equal stretch
         
         # Copy to clipboard button - ✂
-        copy_btn = QPushButton("✂ Copy")
-        copy_btn.setMinimumHeight(40)
-        copy_btn.setStyleSheet("""
-            QPushButton {
-                background: #64748b;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background: #54647b;
-            }
-            QPushButton:pressed {
-                background: #44546b;
-            }
-        """)
+        copy_btn = ActionButton("Copy", "✂", "copy", lambda: self._copy_to_clipboard(copy_btn))
         copy_btn.setToolTip("Copy definition to clipboard")
-        copy_btn.clicked.connect(lambda: self._copy_to_clipboard(copy_btn))
         layout.addWidget(copy_btn, 1)  # Equal stretch
         
         # Export to Anki button (purple) - 💾
-        export_btn = QPushButton("💾 Export")
-        export_btn.setMinimumHeight(40)
-        export_btn.setStyleSheet("""
-            QPushButton {
-                background: #9b59b6;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 8px 16px;
-            }
-            QPushButton:hover {
-                background: #8b49a6;
-            }
-            QPushButton:pressed {
-                background: #7b3996;
-            }
-        """)
+        export_btn = ActionButton("Export", "💾", "export", lambda: self.exportRequested.emit(word))
         export_btn.setToolTip("Add to card exporter")
-        export_btn.clicked.connect(lambda: self.exportRequested.emit(word))
         layout.addWidget(export_btn, 1)  # Equal stretch
         
         return layout
     
     def _copy_to_clipboard(self, button) -> None:
         """Copy definition text to clipboard with visual feedback."""
-        from aqt.qt import QApplication, QTimer
+        from aqt.qt import QApplication
         
-        # Collect all definition text
-        definitions = self.word_data.get('definitions', [])
-        examples = self.word_data.get('examples', [])
-        
-        # Format: 勉強[べんきょう]
-        text_parts = [self.word_data.get('word', '')]
-        phonetic = self.word_data.get('phonetic', '')
-        if phonetic:
-            text_parts[0] += f"[{phonetic}]"
-        
-        # Add definitions
-        for i, defn in enumerate(definitions, 1):
-            def_type = defn.get('type', '')
-            def_text = defn.get('text', '')
-            text_parts.append(f"{i}. ({def_type}) {def_text}")
-        
-        # Add examples if present
-        if examples:
-            text_parts.append("")  # Empty line
-            text_parts.append("Examples:")
-            for example in examples:
-                text_parts.append(f"• {example}")
-        
-        clipboard_text = '\n'.join(text_parts)
-        QApplication.clipboard().setText(clipboard_text)
-        
-        # Visual feedback - change button briefly
-        original_text = button.text()
-        original_style = button.styleSheet()
-        
-        button.setText("✓")
-        button.setStyleSheet("""
-            QPushButton {
-                background: #22c55e;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 18px;
-            }
-        """)
-        
-        # Reset after 800ms
-        QTimer.singleShot(800, lambda: [
-            button.setText(original_text),
-            button.setStyleSheet(original_style)
-        ])
-        
-        logger.debug(f"Copied to clipboard: {clipboard_text[:50]}...")
+        try:
+            # Collect all definition text
+            definitions = self.word_data.get('definitions', [])
+            examples = self.word_data.get('examples', [])
+            
+            # Format: 勉強[べんきょう]
+            text_parts = [self.word_data.get('word', '')]
+            phonetic = self.word_data.get('phonetic', '')
+            if phonetic:
+                text_parts[0] += f"[{phonetic}]"
+            
+            # Add definitions
+            for i, defn in enumerate(definitions, 1):
+                def_type = defn.get('type', '')
+                def_text = defn.get('text', '')
+                text_parts.append(f"{i}. ({def_type}) {def_text}")
+            
+            # Add examples if present
+            if examples:
+                text_parts.append("")  # Empty line
+                text_parts.append("Examples:")
+                for example in examples:
+                    text_parts.append(f"• {example}")
+            
+            clipboard_text = '\n'.join(text_parts)
+            if ANKI_AVAILABLE:
+                QApplication.clipboard().setText(clipboard_text)
+            
+            # Use ActionButton's built-in feedback
+            if hasattr(button, 'show_feedback'):
+                button.show_feedback(success=True)
+            
+            logger.debug(f"Copied to clipboard: {clipboard_text[:50]}...")
+        except Exception as e:
+            # Show error feedback
+            if hasattr(button, 'show_feedback'):
+                button.show_feedback(success=False)
+            logger.error(f"Failed to copy to clipboard: {e}")
     
     def _create_definitions(self) -> QWidget:
         """
@@ -783,33 +777,44 @@ class DefinitionCard(QWidget):
         
         # Part of speech badge (inline, small)
         pos_type = definition.get('type', 'noun')
-        pos_label = QLabel(pos_type)
-        pos_label.setStyleSheet(f"""
+        pos_label = ThemedLabel(pos_type)
+        
+        # Apply themed styling for part-of-speech badge
+        theme = get_theme_manager().current_theme
+        style_gen = StyleGenerator(theme)
+        
+        badge_color = theme.accent_color if is_first else theme.text_muted
+        pos_style = f"""
             QLabel {{
-                background: {'#4a9eff' if is_first else '#64748b'};
+                background: {badge_color};
                 color: white;
                 padding: 3px 8px;
                 border-radius: 4px;
-                font-size: 10px;
+                font-size: {theme.get_font_size('small')}px;
                 font-weight: bold;
             }}
-        """)
+        """
+        pos_label.setStyleSheet(pos_style)
         pos_label.setFixedHeight(22)
         layout.addWidget(pos_label)
         
         # Definition text (inline, no box, selectable)
         def_text = definition.get('text', '')
-        def_label = QLabel(def_text)
+        def_label = ThemedLabel(def_text)
         def_label.setWordWrap(True)
         def_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        def_label.setStyleSheet(f"""
+        
+        # Apply themed styling for definition text
+        text_color = theme.text_primary if is_first else theme.text_muted
+        def_style = f"""
             QLabel {{
-                color: {'#ffffff' if is_first else '#e0e0e0'};
-                font-size: 14px;
+                color: {text_color};
+                font-size: {theme.get_font_size('base')}px;
                 line-height: 1.5;
                 font-weight: {'600' if is_first else 'normal'};
             }}
-        """)
+        """
+        def_label.setStyleSheet(def_style)
         layout.addWidget(def_label, 1)  # Stretch to fill space
         
         return container
@@ -827,23 +832,30 @@ class DefinitionCard(QWidget):
         layout.setSpacing(8)
         
         # Examples header
-        header = QLabel("Examples:")
-        header.setStyleSheet("color: #aaa; font-size: 12px; font-weight: bold;")
+        header = ThemedLabel("Examples:", "muted")
+        header.setStyleSheet(f"font-weight: bold; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
         layout.addWidget(header)
         
         # Example sentences
         examples = self.word_data.get('examples', [])
         for example in examples:
-            example_label = QLabel(f"• {example}")
+            example_label = ThemedLabel(f"• {example}")
             example_label.setWordWrap(True)
-            example_label.setStyleSheet("""
-                color: #ccc;
-                font-size: 13px;
-                font-style: italic;
-                background: #1a1a1a;
-                padding: 8px;
-                border-radius: 4px;
-            """)
+            example_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+            
+            # Apply themed styling for examples
+            theme = get_theme_manager().current_theme
+            example_style = f"""
+                QLabel {{
+                    color: {theme.text_muted};
+                    font-size: {theme.get_font_size('small')}px;
+                    font-style: italic;
+                    background: {theme.panel_color};
+                    padding: 8px;
+                    border-radius: 4px;
+                }}
+            """
+            example_label.setStyleSheet(example_style)
             layout.addWidget(example_label)
         
         return container
@@ -916,17 +928,19 @@ class WordSection(QWidget):
         main_layout.addWidget(self.collapsible_box)
     
     def _get_pitch_color(self, pitch_accent: str) -> str:
-        """Get color for pitch accent pattern."""
+        """Get color for pitch accent pattern using themed colors."""
+        theme = get_theme_manager().current_theme
+        
         try:
             accent_num = int(pitch_accent)
             if accent_num == 0:
-                return "#4a9eff"  # Blue - Heiban
+                return theme.heiban_color  # Blue - Heiban
             elif accent_num == 1:
-                return "#ef4444"  # Red - Atamadaka
+                return theme.atamadaka_color  # Red - Atamadaka
             else:
-                return "#f59e0b"  # Orange - Nakadaka
+                return theme.nakadaka_color  # Orange - Nakadaka
         except (ValueError, TypeError):
-            return "#64748b"  # Gray - Unknown
+            return theme.text_muted  # Gray - Unknown
     
     def _add_word_controls(self) -> None:
         """Add frequency badge and audio/image buttons to word header."""
@@ -954,53 +968,35 @@ class WordSection(QWidget):
             self.collapsible_box.add_header_widget(freq_button)
         
         # Audio button
-        audio_btn = QPushButton("🔊")
+        audio_btn = ThemedButton("🔊", "audio")
         audio_btn.setMinimumSize(32, 28)
         audio_btn.setMaximumSize(32, 28)
-        audio_btn.setStyleSheet("""
-            QPushButton {
-                background: #4a9eff;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background: #3a8edf; }
-        """)
         audio_btn.setToolTip("Play audio pronunciation")
         audio_btn.clicked.connect(lambda: self.audioRequested.emit(self.word_data.get('word', '')))
         self.collapsible_box.add_header_widget(audio_btn)
         
         # Image button
-        image_btn = QPushButton("🖼️")
+        image_btn = ThemedButton("🖼️", "image")
         image_btn.setMinimumSize(32, 28)
         image_btn.setMaximumSize(32, 28)
-        image_btn.setStyleSheet("""
-            QPushButton {
-                background: #50c878;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background: #40b868; }
-        """)
         image_btn.setToolTip("Search images")
         image_btn.clicked.connect(lambda: self.imageRequested.emit(self.word_data.get('word', '')))
         self.collapsible_box.add_header_widget(image_btn)
     
     def _get_frequency_label(self, frequency: int) -> tuple[str, str]:
-        """Convert frequency rank to human-readable label."""
+        """Convert frequency rank to human-readable label using themed colors."""
+        theme = get_theme_manager().current_theme
+        
         if frequency <= 500:
-            return ("Very Common", "#4ade80")
+            return ("Very Common", theme.freq_very_common)
         elif frequency <= 1500:
-            return ("Common", "#60a5fa")
+            return ("Common", theme.freq_common)
         elif frequency <= 5000:
-            return ("Uncommon", "#fbbf24")
+            return ("Uncommon", theme.freq_uncommon)
         elif frequency <= 15000:
-            return ("Rare", "#fb923c")
+            return ("Rare", theme.freq_rare)
         else:
-            return ("Very Rare", "#f87171")
+            return ("Very Rare", theme.freq_very_rare)
     
     def _show_frequency_breakdown(self, frequencies: dict) -> None:
         """Show detailed frequency breakdown."""
@@ -1022,6 +1018,17 @@ class WordSection(QWidget):
         dict_section = DictionarySubsection(dict_name, definitions, examples, is_primary)
         self.dictionary_sections.append(dict_section)
         self.content_layout.addWidget(dict_section)
+    
+    def update_theme(self, theme_settings: Dict[str, Any]) -> None:
+        """Update component styling with new theme."""
+        # Update dictionary subsections
+        for dict_section in self.dictionary_sections:
+            if hasattr(dict_section, 'update_theme'):
+                dict_section.update_theme(theme_settings)
+        
+        # Update collapsible box if it has theme support
+        if hasattr(self.collapsible_box, 'update_theme'):
+            self.collapsible_box.update_theme(theme_settings)
 
 
 class DictionarySubsection(QWidget):
@@ -1068,37 +1075,17 @@ class DictionarySubsection(QWidget):
     def _add_dict_controls(self) -> None:
         """Add copy/export buttons to dictionary header."""
         # Copy button
-        copy_btn = QPushButton("✂")
+        copy_btn = ThemedButton("✂", "copy")
         copy_btn.setMinimumSize(28, 24)
         copy_btn.setMaximumSize(28, 24)
-        copy_btn.setStyleSheet("""
-            QPushButton {
-                background: #64748b;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                font-size: 12px;
-            }
-            QPushButton:hover { background: #54647b; }
-        """)
         copy_btn.setToolTip("Copy this dictionary's definition")
         copy_btn.clicked.connect(self._copy_definition)
         self.collapsible_box.add_header_widget(copy_btn)
         
         # Export button
-        export_btn = QPushButton("💾")
+        export_btn = ThemedButton("💾", "export")
         export_btn.setMinimumSize(28, 24)
         export_btn.setMaximumSize(28, 24)
-        export_btn.setStyleSheet("""
-            QPushButton {
-                background: #9b59b6;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                font-size: 12px;
-            }
-            QPushButton:hover { background: #8b49a6; }
-        """)
         export_btn.setToolTip("Export this dictionary's definition")
         export_btn.clicked.connect(self._export_definition)
         self.collapsible_box.add_header_widget(export_btn)
@@ -1131,33 +1118,42 @@ class DictionarySubsection(QWidget):
         
         # Part of speech badge
         pos_type = definition.get('type', 'noun')
-        pos_label = QLabel(pos_type)
-        pos_label.setStyleSheet(f"""
+        pos_label = ThemedLabel(pos_type)
+        
+        # Apply themed styling for part-of-speech badge
+        theme = get_theme_manager().current_theme
+        badge_color = theme.accent_color if is_first else theme.text_muted
+        pos_style = f"""
             QLabel {{
-                background: {'#4a9eff' if is_first else '#64748b'};
+                background: {badge_color};
                 color: white;
                 padding: 3px 8px;
                 border-radius: 4px;
-                font-size: 10px;
+                font-size: {theme.get_font_size('small')}px;
                 font-weight: bold;
             }}
-        """)
+        """
+        pos_label.setStyleSheet(pos_style)
         pos_label.setFixedHeight(22)
         layout.addWidget(pos_label)
         
         # Definition text
         def_text = definition.get('text', '')
-        def_label = QLabel(def_text)
+        def_label = ThemedLabel(def_text)
         def_label.setWordWrap(True)
         def_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        def_label.setStyleSheet(f"""
+        
+        # Apply themed styling for definition text
+        text_color = theme.text_primary if is_first else theme.text_muted
+        def_style = f"""
             QLabel {{
-                color: {'#ffffff' if is_first else '#e0e0e0'};
-                font-size: 14px;
+                color: {text_color};
+                font-size: {theme.get_font_size('base')}px;
                 line-height: 1.5;
                 font-weight: {'600' if is_first else 'normal'};
             }}
-        """)
+        """
+        def_label.setStyleSheet(def_style)
         layout.addWidget(def_label, 1)
         
         return container
@@ -1170,16 +1166,16 @@ class DictionarySubsection(QWidget):
         layout.setSpacing(4)
         
         # Examples header
-        header = QLabel("Examples:")
-        header.setStyleSheet("color: #aaa; font-size: 12px; font-weight: bold;")
+        header = ThemedLabel("Examples:", "muted")
+        header.setStyleSheet(f"font-weight: bold; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
         layout.addWidget(header)
         
         # Example sentences
         for example in self.examples:
-            example_label = QLabel(f"• {example}")
+            example_label = ThemedLabel(f"• {example}", "muted")
             example_label.setWordWrap(True)
             example_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-            example_label.setStyleSheet("color: #ccc; font-size: 13px; font-style: italic;")
+            example_label.setStyleSheet(f"font-style: italic; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
             layout.addWidget(example_label)
         
         return container
@@ -1205,6 +1201,12 @@ class DictionarySubsection(QWidget):
     def _export_definition(self) -> None:
         """Export this dictionary's definition to Anki."""
         print(f"Exported {self.dict_name} definition to Anki")
+    
+    def update_theme(self, theme_settings: Dict[str, Any]) -> None:
+        """Update component styling with new theme."""
+        # Update collapsible box if it has theme support
+        if hasattr(self.collapsible_box, 'update_theme'):
+            self.collapsible_box.update_theme(theme_settings)
 
 
 class DictionaryFilterBar(QWidget):
@@ -1259,15 +1261,8 @@ class DictionaryFilterBar(QWidget):
         layout.setSpacing(8)  # Reduced spacing to fit better
         
         # Dictionary Group section
-        dict_label = QLabel("Dictionary Group:")
-        dict_label.setStyleSheet("""
-            QLabel {
-                color: #ccc;
-                font-size: 13px;
-                font-weight: 500;
-                min-width: 100px;
-            }
-        """)
+        dict_label = ThemedLabel("Dictionary Group:", "muted")
+        dict_label.setStyleSheet(f"font-weight: 500; min-width: 100px; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
         layout.addWidget(dict_label)
         
         # Dictionary group dropdown
@@ -1286,14 +1281,15 @@ class DictionaryFilterBar(QWidget):
         
         # Store arrow reference for positioning
         self.dict_arrow = QLabel("▼", self.dict_dropdown)
-        self.dict_arrow.setStyleSheet("""
-            QLabel {
-                color: #ccc;
-                font-size: 10px;
+        theme = get_theme_manager().current_theme
+        self.dict_arrow.setStyleSheet(f"""
+            QLabel {{
+                color: {theme.text_muted};
+                font-size: {theme.get_font_size('small')}px;
                 background: transparent;
                 padding: 0px;
                 margin: 0px;
-            }
+            }}
         """)
         self.dict_arrow.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.dict_arrow.setFixedSize(12, 12)
@@ -1319,15 +1315,8 @@ class DictionaryFilterBar(QWidget):
         layout.addSpacing(12)
         
         # Search Mode section
-        search_label = QLabel("Search Mode:")
-        search_label.setStyleSheet("""
-            QLabel {
-                color: #ccc;
-                font-size: 13px;
-                font-weight: 500;
-                min-width: 80px;
-            }
-        """)
+        search_label = ThemedLabel("Search Mode:", "muted")
+        search_label.setStyleSheet(f"font-weight: 500; min-width: 80px; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
         layout.addWidget(search_label)
         
         # Search mode dropdown
@@ -1356,14 +1345,15 @@ class DictionaryFilterBar(QWidget):
         
         # Store arrow reference for positioning
         self.search_arrow = QLabel("▼", self.search_dropdown)
-        self.search_arrow.setStyleSheet("""
-            QLabel {
-                color: #ccc;
-                font-size: 10px;
+        theme = get_theme_manager().current_theme
+        self.search_arrow.setStyleSheet(f"""
+            QLabel {{
+                color: {theme.text_muted};
+                font-size: {theme.get_font_size('small')}px;
                 background: transparent;
                 padding: 0px;
                 margin: 0px;
-            }
+            }}
         """)
         self.search_arrow.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self.search_arrow.setFixedSize(12, 12)
@@ -1400,99 +1390,13 @@ class DictionaryFilterBar(QWidget):
         # Add stretch to push everything to the left
         layout.addStretch()
         
-        # Style conjugation button
-        self.conjugation_button.setStyleSheet("""
-            QPushButton {
-                background: #4a9eff;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 13px;
-                font-weight: bold;
-                padding: 8px 12px;
-            }
-            QPushButton:hover {
-                background: #3a8edf;
-            }
-            QPushButton:checked {
-                background: #4a9eff;
-            }
-            QPushButton:!checked {
-                background: #64748b;
-                color: #ccc;
-            }
-            QPushButton:!checked:hover {
-                background: #54647b;
-            }
-        """)
+        # Apply themed styling to conjugation button
+        self._apply_conjugation_button_styling()
         
 
         
-        # Apply common dropdown styling
-        dropdown_style = """
-            QComboBox {
-                background: #2a2a2a;
-                border: 1px solid #444;
-                border-radius: 6px;
-                padding: 8px 12px;
-                padding-right: 30px;
-                color: white;
-                font-size: 14px;
-            }
-            QComboBox:hover {
-                border-color: #555;
-                background: #333;
-            }
-            QComboBox:focus {
-                border-color: #4a9eff;
-            }
-            QComboBox::drop-down {
-                subcontrol-origin: padding;
-                subcontrol-position: top right;
-                width: 20px;
-                border: none;
-                background: transparent;
-            }
-            QComboBox::down-arrow {
-                image: none;
-                border: none;
-                width: 12px;
-                height: 12px;
-                background: transparent;
-            }
-            QComboBox QAbstractItemView {
-                background-color: #2a2a2a;
-                border: 1px solid #444;
-                border-radius: 6px;
-                selection-background-color: #4a9eff;
-                selection-color: white;
-                color: white;
-                outline: none;
-                alternate-background-color: #2a2a2a;
-            }
-            QComboBox QAbstractItemView::item {
-                padding: 8px 12px;
-                border: none;
-                background-color: #2a2a2a;
-                color: white;
-                min-height: 20px;
-            }
-            QComboBox QAbstractItemView::item:hover {
-                background-color: #333;
-                color: white;
-            }
-            QComboBox QAbstractItemView::item:selected {
-                background-color: #4a9eff;
-                color: white;
-            }
-            QComboBox QAbstractItemView::item:selected:hover {
-                background-color: #3a8edf;
-                color: white;
-            }
-        """
-        
-        self.dict_dropdown.setStyleSheet(dropdown_style)
-        self.search_dropdown.setStyleSheet(dropdown_style)
+        # Apply themed dropdown styling
+        self._apply_dropdown_styling()
         
         # Override showPopup to apply dark theme to dropdown views
         def create_dark_dropdown(dropdown):
@@ -1501,34 +1405,38 @@ class DictionaryFilterBar(QWidget):
             def dark_show_popup():
                 original_show_popup()
                 try:
-                    # Apply dark theme to the popup view
+                    # Apply themed styling to the popup view
                     view = dropdown.view()
                     if view:
-                        view.setStyleSheet("""
-                            QListView {
-                                background-color: #2a2a2a !important;
-                                border: 1px solid #444 !important;
+                        theme = get_theme_manager().current_theme
+                        style_gen = StyleGenerator(theme)
+                        hover_bg = style_gen.adjust_color_brightness(theme.panel_color, 1.2)
+                        
+                        view.setStyleSheet(f"""
+                            QListView {{
+                                background-color: {theme.panel_color} !important;
+                                border: 1px solid {theme.border_color} !important;
                                 border-radius: 6px !important;
-                                color: white !important;
-                                selection-background-color: #4a9eff !important;
+                                color: {theme.text_primary} !important;
+                                selection-background-color: {theme.accent_color} !important;
                                 selection-color: white !important;
                                 outline: none !important;
-                            }
-                            QListView::item {
+                            }}
+                            QListView::item {{
                                 padding: 8px 12px !important;
                                 border: none !important;
-                                background-color: #2a2a2a !important;
-                                color: white !important;
+                                background-color: {theme.panel_color} !important;
+                                color: {theme.text_primary} !important;
                                 min-height: 20px !important;
-                            }
-                            QListView::item:hover {
-                                background-color: #333 !important;
+                            }}
+                            QListView::item:hover {{
+                                background-color: {hover_bg} !important;
+                                color: {theme.text_primary} !important;
+                            }}
+                            QListView::item:selected {{
+                                background-color: {theme.accent_color} !important;
                                 color: white !important;
-                            }
-                            QListView::item:selected {
-                                background-color: #4a9eff !important;
-                                color: white !important;
-                            }
+                            }}
                         """)
                 except Exception as e:
                     logger.debug(f"Failed to apply dropdown dark theme: {e}")
@@ -1539,6 +1447,49 @@ class DictionaryFilterBar(QWidget):
         create_dark_dropdown(self.search_dropdown)
         
         logger.debug(f"DictionaryFilterBar initialized with {len(dictionary_groups)} groups")
+    
+    def _apply_conjugation_button_styling(self):
+        """Apply themed styling to conjugation button."""
+        theme = get_theme_manager().current_theme
+        style_gen = StyleGenerator(theme)
+        
+        # Use themed button styling with toggle states
+        button_style = f"""
+            QPushButton {{
+                background: {theme.accent_color};
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: {theme.get_font_size('small')}px;
+                font-weight: bold;
+                padding: 8px 12px;
+            }}
+            QPushButton:hover {{
+                background: {style_gen.adjust_color_brightness(theme.accent_color, 0.9)};
+            }}
+            QPushButton:checked {{
+                background: {theme.accent_color};
+            }}
+            QPushButton:!checked {{
+                background: {theme.text_muted};
+                color: {theme.text_primary};
+            }}
+            QPushButton:!checked:hover {{
+                background: {style_gen.adjust_color_brightness(theme.text_muted, 0.9)};
+            }}
+        """
+        self.conjugation_button.setStyleSheet(button_style)
+    
+    def _apply_dropdown_styling(self):
+        """Apply themed styling to dropdown menus."""
+        theme = get_theme_manager().current_theme
+        style_gen = StyleGenerator(theme)
+        
+        # Use centralized dropdown styling
+        dropdown_style = style_gen.dropdown_style()
+        
+        self.dict_dropdown.setStyleSheet(dropdown_style)
+        self.search_dropdown.setStyleSheet(dropdown_style)
     
     def _on_dict_selection_changed(self, text: str) -> None:
         """Handle dictionary group selection change."""
@@ -1645,7 +1596,24 @@ class DictionaryFilterBar(QWidget):
         """
         self.conjugation_button.setChecked(enabled)
         self._on_conjugation_toggled(enabled)  # Update button text
+    
+    def update_theme(self, theme: ThemeColors) -> None:
+        """
+        Update component styling with new theme.
+        
+        Args:
+            theme: New theme colors
+        """
+        # Re-apply all themed styling
+        self._apply_conjugation_button_styling()
+        self._apply_dropdown_styling()
+        
+        logger.debug("Updated DictionaryFilterBar theme")
 
+
+# =============================================================================
+# LAYOUT COMPONENTS (continued)
+# =============================================================================
 
 class ModernResultsArea(QScrollArea):
     """
@@ -1672,29 +1640,8 @@ class ModernResultsArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         
-        # Apply styling
-        self.setStyleSheet("""
-            QScrollArea {
-                background: #1a1a1a;
-                border: none;
-            }
-            QScrollBar:vertical {
-                background: #2a2a2a;
-                width: 12px;
-                border-radius: 6px;
-            }
-            QScrollBar::handle:vertical {
-                background: #4a4a4a;
-                border-radius: 6px;
-                min-height: 20px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #5a5a5a;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-        """)
+        # Apply themed styling
+        self._apply_styling()
         
         # Create container widget
         self.container = QWidget()
@@ -1706,6 +1653,40 @@ class ModernResultsArea(QScrollArea):
         self.setWidget(self.container)
         
         logger.debug("ModernResultsArea initialized")
+    
+    def _apply_styling(self):
+        """Apply themed styling to scroll area."""
+        theme = get_theme_manager().current_theme
+        style_gen = StyleGenerator(theme)
+        
+        # Use darker background for results area
+        results_bg = style_gen.adjust_color_brightness(theme.background_color, 1.1)
+        handle_color = style_gen.adjust_color_brightness(theme.border_color, 1.5)
+        handle_hover = style_gen.adjust_color_brightness(handle_color, 1.3)
+        
+        scroll_style = f"""
+            QScrollArea {{
+                background: {results_bg};
+                border: none;
+            }}
+            QScrollBar:vertical {{
+                background: {theme.panel_color};
+                width: 12px;
+                border-radius: 6px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {handle_color};
+                border-radius: 6px;
+                min-height: 20px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {handle_hover};
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                height: 0px;
+            }}
+        """
+        self.setStyleSheet(scroll_style)
     
     def add_card(self, card: DefinitionCard) -> None:
         """
@@ -1734,3 +1715,13 @@ class ModernResultsArea(QScrollArea):
         """
         # Subtract 1 for the stretch item
         return max(0, self.layout.count() - 1)
+    
+    def update_theme(self, theme: ThemeColors) -> None:
+        """
+        Update component styling with new theme.
+        
+        Args:
+            theme: New theme colors
+        """
+        self._apply_styling()
+        logger.debug("Updated ModernResultsArea theme")

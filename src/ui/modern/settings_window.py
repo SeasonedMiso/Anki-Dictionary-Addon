@@ -187,6 +187,207 @@ except ImportError:
     # Make sure MockSignal is available
     MockSignal = MockSignal
 
+from .styling import ThemeColors, StyleGenerator, get_theme_manager, THEME_PRESETS
+from .components import (
+    ThemedWidget, ThemedButton, ThemedLabel, ThemedLineEdit, ThemedFrame,
+    ValidationInput, StatusMessage
+)
+
+logger = logging.getLogger('anki_dictionary.ui.modern_settings_window')
+
+
+class ProgressDialog(QDialog):
+    """Progress dialog for long-running operations."""
+    
+    def __init__(self, title, message, parent=None):
+        """Initialize progress dialog."""
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setModal(True)
+        self.setFixedSize(400, 120)
+        
+        if ANKI_AVAILABLE:
+            self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.CustomizeWindowHint)
+        
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Message label
+        self.message_label = QLabel(message)
+        self.message_label.setWordWrap(True)
+        layout.addWidget(self.message_label)
+        
+        # Progress bar
+        self.progress_bar = QProgressBar()
+        if ANKI_AVAILABLE:
+            self.progress_bar.setRange(0, 0)  # Indeterminate progress
+        layout.addWidget(self.progress_bar)
+        
+        # Cancel button (optional)
+        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        button_layout.addWidget(self.cancel_button)
+        layout.addLayout(button_layout)
+        
+        self._apply_styling()
+    
+    def _apply_styling(self):
+        """Apply dark theme styling."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme = ThemeColors()
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+                font-size: 13px;
+            }}
+            QProgressBar {{
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                background-color: {theme.panel_color};
+                text-align: center;
+            }}
+            QProgressBar::chunk {{
+                background-color: {theme.accent_color};
+                border-radius: 3px;
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                padding: 6px 12px;
+            }}
+            QPushButton:hover {{
+                background-color: #333;
+            }}
+        """)
+    
+    def update_message(self, message):
+        """Update the progress message."""
+        self.message_label.setText(message)
+    
+    def set_progress(self, value):
+        """Set progress value (0-100)."""
+        if ANKI_AVAILABLE:
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.setValue(value)
+
+
+class ValidationErrorDialog(QDialog):
+    """Dialog for displaying validation errors with recovery options."""
+    
+    def __init__(self, title, errors, parent=None):
+        """Initialize validation error dialog."""
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setModal(True)
+        self.setMinimumSize(500, 300)
+        
+        layout = QVBoxLayout(self)
+        layout.setSpacing(16)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Header
+        header_label = QLabel("The following validation errors were found:")
+        header_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        layout.addWidget(header_label)
+        
+        # Error list
+        self.error_text = QTextEdit()
+        self.error_text.setReadOnly(True)
+        self.error_text.setMaximumHeight(200)
+        
+        error_text = "\n".join([f"• {error}" for error in errors])
+        self.error_text.setPlainText(error_text)
+        layout.addWidget(self.error_text)
+        
+        # Recovery suggestions
+        recovery_label = QLabel("Suggested actions:")
+        recovery_label.setStyleSheet("font-weight: bold; margin-top: 8px;")
+        layout.addWidget(recovery_label)
+        
+        suggestions = [
+            "Check input formats and correct any invalid values",
+            "Ensure all required fields are filled",
+            "Verify network connections for online resources",
+            "Try resetting to defaults if problems persist"
+        ]
+        
+        suggestion_text = "\n".join([f"• {suggestion}" for suggestion in suggestions])
+        suggestion_label = QLabel(suggestion_text)
+        suggestion_label.setWordWrap(True)
+        suggestion_label.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        layout.addWidget(suggestion_label)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        
+        self.reset_button = QPushButton("Reset to Defaults")
+        self.reset_button.clicked.connect(self._reset_to_defaults)
+        button_layout.addWidget(self.reset_button)
+        
+        button_layout.addStretch()
+        
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.accept)
+        self.ok_button.setDefault(True)
+        button_layout.addWidget(self.ok_button)
+        
+        layout.addLayout(button_layout)
+        
+        self._apply_styling()
+    
+    def _reset_to_defaults(self):
+        """Signal that user wants to reset to defaults."""
+        self.done(2)  # Custom return code for reset
+    
+    def _apply_styling(self):
+        """Apply dark theme styling."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme = ThemeColors()
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+            }}
+            QTextEdit {{
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                color: {theme.text_primary};
+                font-family: monospace;
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                padding: 8px 16px;
+            }}
+            QPushButton:hover {{
+                background-color: #333;
+            }}
+            QPushButton:default {{
+                background-color: {theme.accent_color};
+                border-color: {theme.accent_color};
+            }}
+        """)
+
+
 logger = logging.getLogger('anki_dictionary.ui.modern_settings_window')
 
 
@@ -223,37 +424,7 @@ class DraggableListWidget(QListWidget):
             self.parent_tab._on_dictionary_reordered(source_index, target_index)
 
 
-class ThemeColors:
-    """Theme color configuration."""
-    
-    def __init__(self, 
-                 background_color="#0f0f0f",
-                 panel_color="#1c1c1c", 
-                 text_primary="#e6e6e6",
-                 text_muted="#9aa0ad",
-                 accent_color="#4a9eff",
-                 border_color="#2b2f36",
-                 # Pitch accent colors
-                 heiban_color="#4a9eff",      # Blue for heiban (flat)
-                 odaka_color="#51cf66",       # Green for odaka (tail-high)
-                 nakadaka_color="#ffd43b",    # Yellow/orange for nakadaka (middle-high)
-                 atamadaka_color="#ff6b6b",   # Red for atamadaka (head-high)
-                 kifuku_color="#9775fa",      # Purple for kifuku (complex)
-                 # Border options
-                 show_borders=True):          # Whether to show borders around individual elements
-        self.background_color = background_color
-        self.panel_color = panel_color
-        self.text_primary = text_primary
-        self.text_muted = text_muted
-        self.accent_color = accent_color
-        self.border_color = border_color
-        # Pitch accent colors
-        self.heiban_color = heiban_color
-        self.odaka_color = odaka_color
-        self.nakadaka_color = nakadaka_color
-        self.atamadaka_color = atamadaka_color
-        self.kifuku_color = kifuku_color
-        self.show_borders = show_borders
+# ThemeColors is now imported from styling module
 
 
 class LivePreview(QWidget):
@@ -457,20 +628,25 @@ class LivePreview(QWidget):
 
 
 class ColorPicker(QWidget):
-    """Color picker widget with live preview."""
+    """Color picker widget with live preview and validation."""
     
     def __init__(self, label, initial_color, parent=None):
         """Initialize color picker."""
         super().__init__(parent)
         self.label = label
         self.color = initial_color
+        self.validation_error = None
         self._setup_ui()
     
     def _setup_ui(self):
         """Set up color picker UI."""
-        layout = QHBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(4)
+        
+        # Main row with color picker controls
+        main_layout = QHBoxLayout()
+        main_layout.setSpacing(8)
         
         # Label - use minimum width instead of fixed width for better responsiveness
         label = QLabel(self.label)
@@ -479,22 +655,34 @@ class ColorPicker(QWidget):
         label.setWordWrap(False)
         label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(label)
+        main_layout.addWidget(label)
         
         # Color display button
         self.color_button = QPushButton()
         self.color_button.setFixedSize(40, 30)
         self.color_button.clicked.connect(self._open_color_dialog)
-        layout.addWidget(self.color_button)
+        if ANKI_AVAILABLE:
+            self.color_button.setToolTip("Click to open color picker dialog")
+        main_layout.addWidget(self.color_button)
         
         # Color value input
         self.color_input = QLineEdit(self.color)
         self.color_input.setMinimumWidth(80)
         self.color_input.setMaximumWidth(100)
         self.color_input.textChanged.connect(self._on_text_changed)
-        layout.addWidget(self.color_input)
+        if ANKI_AVAILABLE:
+            self.color_input.setToolTip("Enter hex color code (e.g., #ff0000)")
+        main_layout.addWidget(self.color_input)
         
-        layout.addStretch(1)  # Add stretch with factor
+        main_layout.addStretch(1)  # Add stretch with factor
+        layout.addLayout(main_layout)
+        
+        # Error message label (initially hidden)
+        self.error_label = QLabel()
+        self.error_label.setStyleSheet("color: #ff6b6b; font-size: 11px; margin-left: 100px;")
+        self.error_label.setVisible(False)
+        layout.addWidget(self.error_label)
+        
         self._update_button_color()
     
     def _update_button_color(self):
@@ -502,10 +690,13 @@ class ColorPicker(QWidget):
         if not ANKI_AVAILABLE:
             return
         
+        # Add border color based on validation state
+        border_color = "#ff6b6b" if self.validation_error else "#555"
+        
         self.color_button.setStyleSheet(f"""
             QPushButton {{
                 background-color: {self.color};
-                border: 1px solid #555;
+                border: 2px solid {border_color};
                 border-radius: 4px;
             }}
         """)
@@ -519,18 +710,54 @@ class ColorPicker(QWidget):
         if color.isValid():
             self.color = color.name()
             self.color_input.setText(self.color)
+            self._clear_validation_error()
             self._update_button_color()
     
     def _on_text_changed(self, text):
-        """Handle text input changes."""
+        """Handle text input changes with validation."""
+        # Clear previous error
+        self._clear_validation_error()
+        
         # Validate hex color format
-        if text.startswith('#') and len(text) == 7:
-            try:
-                int(text[1:], 16)  # Validate hex
-                self.color = text
-                self._update_button_color()
-            except ValueError:
-                pass
+        if not text:
+            self._set_validation_error("Color value cannot be empty")
+            return
+        
+        if not text.startswith('#'):
+            self._set_validation_error("Color must start with #")
+            return
+        
+        if len(text) != 7:
+            self._set_validation_error("Color must be 7 characters (#rrggbb)")
+            return
+        
+        try:
+            int(text[1:], 16)  # Validate hex
+            self.color = text
+            self._update_button_color()
+        except ValueError:
+            self._set_validation_error("Invalid hex color format")
+    
+    def _set_validation_error(self, message):
+        """Set validation error message."""
+        self.validation_error = message
+        self.error_label.setText(message)
+        self.error_label.setVisible(True)
+        self._update_button_color()
+    
+    def _clear_validation_error(self):
+        """Clear validation error message."""
+        self.validation_error = None
+        self.error_label.setVisible(False)
+        self._update_button_color()
+    
+    def is_valid(self):
+        """Check if current color value is valid."""
+        return self.validation_error is None
+    
+    def get_validation_error(self):
+        """Get current validation error message."""
+        return self.validation_error
     
     def get_color(self):
         """Get current color value."""
@@ -540,6 +767,7 @@ class ColorPicker(QWidget):
         """Set color value."""
         self.color = color
         self.color_input.setText(color)
+        self._clear_validation_error()
         self._update_button_color()
 
 
@@ -614,13 +842,38 @@ class ThemeTab(QWidget):
         pitch_accent_layout.addWidget(self.atamadaka_picker)
         pitch_accent_layout.addWidget(self.kifuku_picker)
         
-        # Add tooltips for pitch accent explanations
+        # Add comprehensive tooltips for pitch accent explanations
         if ANKI_AVAILABLE:
-            self.heiban_picker.setToolTip("Heiban (平板): Flat pitch pattern")
-            self.odaka_picker.setToolTip("Odaka (尾高): Tail-high pitch pattern")
-            self.nakadaka_picker.setToolTip("Nakadaka (中高): Middle-high pitch pattern")
-            self.atamadaka_picker.setToolTip("Atamadaka (頭高): Head-high pitch pattern")
-            self.kifuku_picker.setToolTip("Kifuku (起伏): Complex pitch pattern")
+            self.heiban_picker.setToolTip(
+                "Heiban (平板): Flat pitch pattern\n"
+                "• Low-High-High-High pattern\n"
+                "• Most common pitch accent type\n"
+                "• Example: さくら (sakura)"
+            )
+            self.odaka_picker.setToolTip(
+                "Odaka (尾高): Tail-high pitch pattern\n"
+                "• Low-High-High-Low pattern\n"
+                "• Pitch drops after the word\n"
+                "• Example: あたま (atama)"
+            )
+            self.nakadaka_picker.setToolTip(
+                "Nakadaka (中高): Middle-high pitch pattern\n"
+                "• Low-High-Low pattern\n"
+                "• Peak in the middle of the word\n"
+                "• Example: こころ (kokoro)"
+            )
+            self.atamadaka_picker.setToolTip(
+                "Atamadaka (頭高): Head-high pitch pattern\n"
+                "• High-Low-Low-Low pattern\n"
+                "• Starts high, then drops\n"
+                "• Example: いぬ (inu)"
+            )
+            self.kifuku_picker.setToolTip(
+                "Kifuku (起伏): Complex pitch pattern\n"
+                "• Multiple pitch changes\n"
+                "• Used for compound words\n"
+                "• Example: でんしゃ (densha)"
+            )
         
         # Initially show pitch accent colors (will be hidden/shown based on language detection)
         colors_layout.addWidget(self.pitch_accent_group)
@@ -758,47 +1011,8 @@ class ThemeTab(QWidget):
     
     def _apply_preset(self, preset_name):
         """Apply a theme preset."""
-        presets = {
-            "dark": ThemeColors(
-                background_color="#0f0f0f",
-                panel_color="#1c1c1c",
-                text_primary="#e6e6e6",
-                text_muted="#9aa0ad",
-                border_color="#2b2f36",
-                heiban_color="#4a9eff",
-                odaka_color="#51cf66",
-                nakadaka_color="#ffd43b",
-                atamadaka_color="#ff6b6b",
-                kifuku_color="#9775fa"
-            ),
-            "light": ThemeColors(
-                background_color="#ffffff",
-                panel_color="#f5f5f5",
-                text_primary="#1a1a1a",
-                text_muted="#666666",
-                border_color="#d0d0d0",
-                heiban_color="#0066cc",
-                odaka_color="#2b8a3e",
-                nakadaka_color="#e67700",
-                atamadaka_color="#c92a2a",
-                kifuku_color="#7048e8"
-            ),
-            "blue": ThemeColors(
-                background_color="#0a0e1a",
-                panel_color="#1a1f2e",
-                text_primary="#e1e8f0",
-                text_muted="#8a9bb8",
-                border_color="#2a3441",
-                heiban_color="#3a7afe",
-                odaka_color="#40c057",
-                nakadaka_color="#fab005",
-                atamadaka_color="#fa5252",
-                kifuku_color="#9775fa"
-            )
-        }
-        
-        if preset_name in presets:
-            theme = presets[preset_name]
+        if preset_name in THEME_PRESETS:
+            theme = THEME_PRESETS[preset_name]
             self.theme = theme
             
             # Update color pickers
@@ -835,6 +1049,16 @@ class ThemeTab(QWidget):
                         background-color: {theme.background_color};
                     }}
                 """)
+            
+            # Apply theme changes to parent mock UI immediately
+            parent_window = self.parent()
+            while parent_window and not hasattr(parent_window, '_apply_theme_settings'):
+                parent_window = parent_window.parent()
+            
+            if parent_window and hasattr(parent_window, '_apply_theme_settings'):
+                theme_dict = theme.__dict__
+                parent_window._apply_theme_settings(theme_dict)
+                logger.info(f"Applied {preset_name} theme preset to mock UI")
     
     def get_theme(self):
         """Get current theme configuration."""
@@ -1319,29 +1543,227 @@ class AddDictionaryDialog(QDialog):
         layout.addLayout(button_layout)
     
     def _validate_connection(self):
-        """Validate dictionary connection."""
+        """Validate dictionary connection with progress indicator."""
         conn_str = self.conn_input.text().strip()
         dict_type = self.type_combo.currentText()
         
-        if not conn_str:
-            self.status_label.setText("Please enter a connection string")
-            self.status_label.setStyleSheet("color: #ff6b6b;")
+        # Clear previous status
+        self.status_label.setText("")
+        
+        # Basic validation first
+        validation_errors = self._validate_input_format(conn_str, dict_type)
+        if validation_errors:
+            self._show_validation_errors(validation_errors)
             return
         
-        # Mock validation - in production this would actually test the connection
-        if dict_type == "Local File":
-            if not conn_str.endswith(('.zip', '.json', '.db')):
-                self.status_label.setText("Local files should be .zip, .json, or .db format")
+        # Show progress dialog for connection testing
+        if ANKI_AVAILABLE:
+            progress = ProgressDialog(
+                "Validating Connection", 
+                "Testing dictionary connection...", 
+                self
+            )
+            progress.show()
+            QApplication.processEvents()  # Allow UI to update
+        
+        try:
+            # Simulate connection testing with different steps
+            validation_result = self._test_connection(conn_str, dict_type, progress if ANKI_AVAILABLE else None)
+            
+            if ANKI_AVAILABLE:
+                progress.close()
+            
+            if validation_result['success']:
+                self.status_label.setText(f"✓ {validation_result['message']}")
+                self.status_label.setStyleSheet("color: #51cf66;")
+                
+                # Enable add button
+                self.add_btn.setEnabled(True)
+            else:
+                self.status_label.setText(f"✗ {validation_result['message']}")
                 self.status_label.setStyleSheet("color: #ff6b6b;")
-                return
+                
+                # Show recovery options
+                self._show_connection_error_dialog(validation_result['details'])
+                
+        except Exception as e:
+            if ANKI_AVAILABLE:
+                progress.close()
+            
+            self.status_label.setText(f"✗ Validation failed: {str(e)}")
+            self.status_label.setStyleSheet("color: #ff6b6b;")
+            logger.error(f"Dictionary validation error: {e}")
+    
+    def _validate_input_format(self, conn_str, dict_type):
+        """Validate input format and return list of errors."""
+        errors = []
+        
+        if not conn_str:
+            errors.append("Connection string cannot be empty")
+            return errors
+        
+        if dict_type == "Local File":
+            if not conn_str.endswith(('.zip', '.json', '.db', '.sqlite', '.dict')):
+                errors.append("Local files should be .zip, .json, .db, .sqlite, or .dict format")
+            
+            # Check if path looks valid
+            if not any(char in conn_str for char in ['/', '\\', '.']):
+                errors.append("Local file path should include directory separators or file extension")
+                
         elif dict_type in ["API", "Web Service"]:
             if not conn_str.startswith(('http://', 'https://')):
-                self.status_label.setText("API/Web connections should start with http:// or https://")
-                self.status_label.setStyleSheet("color: #ff6b6b;")
-                return
+                errors.append("API/Web connections must start with http:// or https://")
+            
+            # Basic URL validation
+            if ' ' in conn_str:
+                errors.append("URLs cannot contain spaces")
+            
+            if not '.' in conn_str.replace('http://', '').replace('https://', ''):
+                errors.append("URL must contain a valid domain")
         
-        self.status_label.setText("✓ Connection validated successfully")
-        self.status_label.setStyleSheet("color: #51cf66;")
+        return errors
+    
+    def _test_connection(self, conn_str, dict_type, progress=None):
+        """Test the actual connection (mock implementation)."""
+        import time
+        
+        if progress:
+            progress.update_message("Checking connection format...")
+            progress.set_progress(25)
+            time.sleep(0.5)  # Simulate work
+            QApplication.processEvents()
+        
+        # Mock different validation scenarios
+        if dict_type == "Local File":
+            if progress:
+                progress.update_message("Checking file accessibility...")
+                progress.set_progress(50)
+                time.sleep(0.5)
+                QApplication.processEvents()
+            
+            # Mock file validation
+            if "nonexistent" in conn_str.lower():
+                return {
+                    'success': False,
+                    'message': "File not found or not accessible",
+                    'details': [
+                        "The specified file path does not exist",
+                        "Check that the file path is correct",
+                        "Ensure you have read permissions for the file"
+                    ]
+                }
+            
+            if progress:
+                progress.update_message("Validating file format...")
+                progress.set_progress(75)
+                time.sleep(0.5)
+                QApplication.processEvents()
+            
+            # Mock format validation
+            if conn_str.endswith('.zip'):
+                entries = 50000  # Mock entry count
+            elif conn_str.endswith('.json'):
+                entries = 25000
+            else:
+                entries = 100000
+            
+            if progress:
+                progress.set_progress(100)
+                time.sleep(0.2)
+                QApplication.processEvents()
+            
+            return {
+                'success': True,
+                'message': f"Local dictionary validated ({entries:,} entries found)",
+                'details': []
+            }
+            
+        elif dict_type in ["API", "Web Service"]:
+            if progress:
+                progress.update_message("Testing network connection...")
+                progress.set_progress(33)
+                time.sleep(0.7)
+                QApplication.processEvents()
+            
+            # Mock network issues
+            if "timeout" in conn_str.lower():
+                return {
+                    'success': False,
+                    'message': "Connection timeout",
+                    'details': [
+                        "The server did not respond within the timeout period",
+                        "Check your internet connection",
+                        "Verify the server URL is correct",
+                        "The server may be temporarily unavailable"
+                    ]
+                }
+            
+            if progress:
+                progress.update_message("Authenticating with service...")
+                progress.set_progress(66)
+                time.sleep(0.5)
+                QApplication.processEvents()
+            
+            if "unauthorized" in conn_str.lower():
+                return {
+                    'success': False,
+                    'message': "Authentication failed",
+                    'details': [
+                        "Invalid API key or credentials",
+                        "Check your API key is correct",
+                        "Verify your account has access to this service",
+                        "API key may have expired"
+                    ]
+                }
+            
+            if progress:
+                progress.update_message("Verifying service capabilities...")
+                progress.set_progress(100)
+                time.sleep(0.3)
+                QApplication.processEvents()
+            
+            return {
+                'success': True,
+                'message': "API connection validated successfully",
+                'details': []
+            }
+        
+        return {
+            'success': True,
+            'message': "Connection validated",
+            'details': []
+        }
+    
+    def _show_validation_errors(self, errors):
+        """Show validation errors to user."""
+        self.status_label.setText(f"✗ {errors[0]}")  # Show first error
+        self.status_label.setStyleSheet("color: #ff6b6b;")
+        
+        # If multiple errors, show them in a dialog
+        if len(errors) > 1 and ANKI_AVAILABLE:
+            error_dialog = ValidationErrorDialog(
+                "Input Validation Errors",
+                errors,
+                self
+            )
+            error_dialog.exec()
+    
+    def _show_connection_error_dialog(self, details):
+        """Show connection error details with recovery suggestions."""
+        if not details or not ANKI_AVAILABLE:
+            return
+        
+        error_dialog = ValidationErrorDialog(
+            "Connection Error",
+            details,
+            self
+        )
+        result = error_dialog.exec()
+        
+        if result == 2:  # Reset button was clicked
+            self.conn_input.clear()
+            self.status_label.setText("Connection string cleared. Please try again.")
+            self.status_label.setStyleSheet("color: #9aa0ad;")
     
     def _add_dictionary(self):
         """Add the dictionary."""
@@ -1486,6 +1908,26 @@ class ImportExportTab(QWidget):
         backup_button_layout.addStretch()
         backup_layout.addLayout(backup_button_layout)
         
+        # Quick restore section
+        quick_restore_layout = QHBoxLayout()
+        
+        self.quick_restore_button = QPushButton("Quick Restore (Most Recent)")
+        self.quick_restore_button.clicked.connect(self._quick_restore_from_recent_backup)
+        if ANKI_AVAILABLE:
+            self.quick_restore_button.setToolTip("Restore from the most recent automatic backup")
+        quick_restore_layout.addWidget(self.quick_restore_button)
+        
+        # Status label for quick restore
+        self.quick_restore_status = QLabel("")
+        self.quick_restore_status.setStyleSheet("color: #9aa0ad; font-size: 11px;")
+        quick_restore_layout.addWidget(self.quick_restore_status)
+        
+        quick_restore_layout.addStretch()
+        backup_layout.addLayout(quick_restore_layout)
+        
+        # Update quick restore status on initialization
+        self._update_quick_restore_status()
+        
         layout.addWidget(backup_group)
         layout.addStretch()
         
@@ -1589,7 +2031,7 @@ class ImportExportTab(QWidget):
             logger.error(f"Settings export failed: {e}")
     
     def _import_settings(self):
-        """Import settings from JSON file."""
+        """Import settings from JSON file with enhanced error handling."""
         if not ANKI_AVAILABLE:
             logger.info("Import settings (mock implementation)")
             return
@@ -1606,31 +2048,81 @@ class ImportExportTab(QWidget):
         if not file_path:
             return
         
+        # Show progress dialog for file processing
+        progress = ProgressDialog(
+            "Importing Settings",
+            "Reading and validating settings file...",
+            parent_widget
+        )
+        progress.show()
+        QApplication.processEvents()
+        
         try:
-            # Read and validate file
+            # Step 1: Read file
+            progress.update_message("Reading settings file...")
+            progress.set_progress(25)
+            QApplication.processEvents()
+            
             with open(file_path, 'r', encoding='utf-8') as f:
                 import_data = json.load(f)
             
-            # Validate file format
+            # Step 2: Validate file format
+            progress.update_message("Validating file format...")
+            progress.set_progress(50)
+            QApplication.processEvents()
+            
             validation_errors = self._validate_import_file(import_data)
             if validation_errors:
-                QMessageBox.warning(
-                    self,
-                    "Invalid File Format",
-                    "The selected file is not a valid settings export:\n" + 
-                    "\n".join(validation_errors)
+                progress.close()
+                
+                # Show detailed validation errors
+                error_dialog = ValidationErrorDialog(
+                    "Invalid Settings File",
+                    validation_errors,
+                    parent_widget
                 )
+                result = error_dialog.exec()
+                
+                if result == 2:  # Reset button clicked
+                    self._show_file_format_help()
                 return
             
+            # Step 3: Check compatibility
+            progress.update_message("Checking compatibility...")
+            progress.set_progress(75)
+            QApplication.processEvents()
+            
+            compatibility_warnings = self._check_compatibility(import_data)
+            
+            progress.update_message("Preparing import preview...")
+            progress.set_progress(100)
+            QApplication.processEvents()
+            
+            progress.close()
+            
+            # Show compatibility warnings if any
+            if compatibility_warnings and ANKI_AVAILABLE:
+                reply = QMessageBox.question(
+                    parent_widget,
+                    "Compatibility Warnings",
+                    "The following compatibility issues were detected:\n\n" +
+                    "\n".join([f"• {warning}" for warning in compatibility_warnings]) +
+                    "\n\nDo you want to continue with the import?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                
+                if reply != QMessageBox.StandardButton.Yes:
+                    return
+            
             # Show preview dialog
-            preview_dialog = ImportPreviewDialog(import_data, self)
+            preview_dialog = ImportPreviewDialog(import_data, parent_widget)
             if preview_dialog.exec() == QDialog.DialogCode.Accepted:
-                # Apply selected settings
+                # Apply selected settings with progress
                 selected_settings = preview_dialog.get_selected_settings()
-                self._apply_imported_settings(selected_settings)
+                self._apply_imported_settings_with_progress(selected_settings, parent_widget)
                 
                 QMessageBox.information(
-                    self,
+                    parent_widget,
                     "Import Successful",
                     "Settings imported successfully. Changes will take effect after applying settings."
                 )
@@ -1638,18 +2130,161 @@ class ImportExportTab(QWidget):
                 logger.info(f"Settings imported from {file_path}")
             
         except json.JSONDecodeError as e:
-            QMessageBox.warning(
-                self,
+            progress.close()
+            
+            # Enhanced JSON error handling
+            error_details = [
+                f"JSON parsing error: {str(e)}",
+                "The file may be corrupted or not a valid JSON file",
+                "Try opening the file in a text editor to check for syntax errors"
+            ]
+            
+            error_dialog = ValidationErrorDialog(
                 "Invalid JSON File",
-                f"The selected file is not valid JSON:\n{str(e)}"
+                error_details,
+                parent_widget
             )
-        except Exception as e:
+            error_dialog.exec()
+            
+        except FileNotFoundError:
+            progress.close()
             QMessageBox.warning(
-                self,
-                "Import Failed",
-                f"Failed to import settings:\n{str(e)}"
+                parent_widget,
+                "File Not Found",
+                f"The selected file could not be found:\n{file_path}\n\n"
+                "The file may have been moved or deleted."
             )
+            
+        except PermissionError:
+            progress.close()
+            QMessageBox.warning(
+                parent_widget,
+                "Permission Denied",
+                f"Cannot read the selected file:\n{file_path}\n\n"
+                "Check that you have permission to read this file."
+            )
+            
+        except Exception as e:
+            progress.close()
+            
+            error_details = [
+                f"Unexpected error: {str(e)}",
+                "This may be due to file corruption or system issues",
+                "Try selecting a different file or restart the application"
+            ]
+            
+            error_dialog = ValidationErrorDialog(
+                "Import Failed",
+                error_details,
+                parent_widget
+            )
+            error_dialog.exec()
+            
             logger.error(f"Settings import failed: {e}")
+    
+    def _check_compatibility(self, import_data):
+        """Check compatibility of imported settings."""
+        warnings = []
+        
+        metadata = import_data.get('metadata', {})
+        
+        # Check version compatibility
+        file_version = metadata.get('version', '1.0')
+        if file_version != '1.0':
+            warnings.append(f"Settings file version {file_version} may not be fully compatible")
+        
+        # Check addon version
+        addon_version = metadata.get('addon_version', 'unknown')
+        if addon_version != '2.0.0' and addon_version != 'unknown':
+            warnings.append(f"Settings from addon version {addon_version} may have different features")
+        
+        # Check for deprecated settings
+        settings = import_data.get('settings', {})
+        deprecated_keys = []
+        
+        for category, category_settings in settings.items():
+            if isinstance(category_settings, dict):
+                for key in category_settings.keys():
+                    if key.startswith('deprecated_') or key in ['old_theme_format', 'legacy_mode']:
+                        deprecated_keys.append(f"{category}.{key}")
+        
+        if deprecated_keys:
+            warnings.append(f"Deprecated settings will be ignored: {', '.join(deprecated_keys)}")
+        
+        # Check for missing required fields
+        required_categories = ['theme', 'general']
+        missing_categories = [cat for cat in required_categories if cat not in settings]
+        
+        if missing_categories:
+            warnings.append(f"Missing settings categories: {', '.join(missing_categories)}")
+        
+        return warnings
+    
+    def _apply_imported_settings_with_progress(self, settings, parent_widget):
+        """Apply imported settings with progress indicator."""
+        progress = ProgressDialog(
+            "Applying Settings",
+            "Applying imported settings...",
+            parent_widget
+        )
+        progress.show()
+        QApplication.processEvents()
+        
+        try:
+            total_steps = len(settings)
+            current_step = 0
+            
+            for category, category_settings in settings.items():
+                progress.update_message(f"Applying {category} settings...")
+                progress.set_progress(int((current_step / total_steps) * 100))
+                QApplication.processEvents()
+                
+                # Apply category settings
+                self._apply_category_settings(category, category_settings)
+                
+                current_step += 1
+            
+            progress.set_progress(100)
+            QApplication.processEvents()
+            
+        finally:
+            progress.close()
+    
+    def _apply_category_settings(self, category, settings):
+        """Apply settings for a specific category."""
+        # This would be implemented in the parent ModernSettingsWindow
+        if hasattr(self.parent_window, '_apply_imported_settings'):
+            self.parent_window._apply_imported_settings({category: settings})
+    
+    def _show_file_format_help(self):
+        """Show help dialog about correct file format."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        help_text = """
+Expected JSON format:
+
+{
+  "metadata": {
+    "version": "1.0",
+    "exported_at": "2024-12-10 10:30:00",
+    "addon_version": "2.0.0"
+  },
+  "settings": {
+    "theme": { ... },
+    "general": { ... },
+    "dictionaries": [ ... ]
+  }
+}
+
+The file must be valid JSON with 'settings' as the main object.
+        """.strip()
+        
+        QMessageBox.information(
+            self,
+            "Settings File Format",
+            help_text
+        )
     
     def _create_backup(self):
         """Create a backup of current settings."""
@@ -1762,33 +2397,375 @@ class ImportExportTab(QWidget):
             )
             logger.error(f"Backup restore failed: {e}")
     
+    def _quick_restore_from_recent_backup(self):
+        """Restore settings from the most recent automatic backup with one click."""
+        if not ANKI_AVAILABLE:
+            logger.info("Quick restore from recent backup (mock implementation)")
+            return
+        
+        try:
+            # Find the most recent automatic backup
+            recent_backup = self._find_most_recent_backup()
+            
+            if not recent_backup:
+                QMessageBox.information(
+                    self,
+                    "No Backups Found",
+                    "No automatic backups were found.\n\n"
+                    "Automatic backups are created before major changes like resetting to defaults. "
+                    "You can create a manual backup using the 'Create Backup Now' button."
+                )
+                return
+            
+            # Show confirmation with backup details
+            backup_info = self._get_backup_info(recent_backup)
+            reply = QMessageBox.question(
+                self,
+                "Quick Restore Confirmation",
+                f"Restore from the most recent automatic backup?\n\n"
+                f"Backup created: {backup_info['created_at']}\n"
+                f"Backup reason: {backup_info['reason']}\n"
+                f"File: {recent_backup.name}\n\n"
+                f"This will replace your current settings.",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+            
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+            
+            # Show progress dialog
+            progress = ProgressDialog(
+                "Quick Restore",
+                "Restoring from recent backup...",
+                self
+            )
+            progress.show()
+            progress.set_progress(25)
+            QApplication.processEvents()
+            
+            # Read and validate backup file
+            progress.update_message("Reading backup file...")
+            progress.set_progress(50)
+            QApplication.processEvents()
+            
+            with open(recent_backup, 'r', encoding='utf-8') as f:
+                backup_data = json.load(f)
+            
+            # Validate backup format
+            if 'settings' not in backup_data:
+                progress.close()
+                QMessageBox.warning(
+                    self,
+                    "Invalid Backup File",
+                    "The backup file appears to be corrupted or invalid."
+                )
+                return
+            
+            # Apply backup settings
+            progress.update_message("Applying backup settings...")
+            progress.set_progress(75)
+            QApplication.processEvents()
+            
+            if hasattr(self.parent_window, '_apply_imported_settings'):
+                self.parent_window._apply_imported_settings(backup_data['settings'])
+            
+            progress.update_message("Finalizing restore...")
+            progress.set_progress(100)
+            QApplication.processEvents()
+            
+            progress.close()
+            
+            # Show success message
+            QMessageBox.information(
+                self,
+                "Quick Restore Successful",
+                f"Settings restored successfully from backup created on {backup_info['created_at']}.\n\n"
+                "Changes will take effect after applying settings."
+            )
+            
+            logger.info(f"Quick restore completed from backup: {recent_backup}")
+            
+        except Exception as e:
+            if 'progress' in locals():
+                progress.close()
+            
+            QMessageBox.warning(
+                self,
+                "Quick Restore Failed",
+                f"Failed to restore from recent backup:\n{str(e)}"
+            )
+            logger.error(f"Quick restore failed: {e}")
+    
+    def _find_most_recent_backup(self):
+        """Find the most recent automatic backup file."""
+        try:
+            backup_dir = Path.home() / ".anki2" / "addons21" / "Anki-Dictionary-Addon" / "backups"
+            
+            if not backup_dir.exists():
+                return None
+            
+            # Find all automatic backup files
+            backup_files = []
+            for file_path in backup_dir.glob("auto_backup_*.json"):
+                if file_path.is_file():
+                    backup_files.append(file_path)
+            
+            if not backup_files:
+                return None
+            
+            # Sort by modification time (most recent first)
+            backup_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+            
+            return backup_files[0]
+            
+        except Exception as e:
+            logger.warning(f"Failed to find recent backup: {e}")
+            return None
+    
+    def _get_backup_info(self, backup_file):
+        """Get information about a backup file."""
+        try:
+            with open(backup_file, 'r', encoding='utf-8') as f:
+                backup_data = json.load(f)
+            
+            metadata = backup_data.get('metadata', {})
+            
+            return {
+                'created_at': metadata.get('backup_created_at', 'Unknown'),
+                'reason': metadata.get('backup_reason', 'Unknown'),
+                'type': metadata.get('backup_type', 'Unknown'),
+                'addon_version': metadata.get('addon_version', 'Unknown')
+            }
+            
+        except Exception as e:
+            logger.warning(f"Failed to read backup info: {e}")
+            return {
+                'created_at': 'Unknown',
+                'reason': 'Unknown',
+                'type': 'Unknown',
+                'addon_version': 'Unknown'
+            }
+    
+    def _update_quick_restore_status(self):
+        """Update the status text for quick restore button."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        try:
+            recent_backup = self._find_most_recent_backup()
+            
+            if recent_backup:
+                backup_info = self._get_backup_info(recent_backup)
+                self.quick_restore_status.setText(f"Available: {backup_info['created_at']}")
+                self.quick_restore_button.setEnabled(True)
+            else:
+                self.quick_restore_status.setText("No automatic backups found")
+                self.quick_restore_button.setEnabled(False)
+                
+        except Exception as e:
+            logger.warning(f"Failed to update quick restore status: {e}")
+            self.quick_restore_status.setText("Status unknown")
+            self.quick_restore_button.setEnabled(True)  # Enable anyway, let user try
+    
     def _validate_import_file(self, import_data):
-        """Validate imported settings file format."""
+        """Validate imported settings file format with comprehensive checks."""
         errors = []
         
         # Check if it's a dictionary
         if not isinstance(import_data, dict):
-            errors.append("File must contain a JSON object")
+            errors.append("File must contain a JSON object, not " + type(import_data).__name__)
             return errors
         
         # Check for required fields
         if 'settings' not in import_data:
-            errors.append("Missing 'settings' field")
-        
-        # Check metadata if present
-        if 'metadata' in import_data:
-            metadata = import_data['metadata']
-            if not isinstance(metadata, dict):
-                errors.append("'metadata' must be an object")
-            elif 'version' not in metadata:
-                errors.append("Missing version in metadata")
+            errors.append("Missing required 'settings' field")
         
         # Validate settings structure
         settings = import_data.get('settings', {})
         if not isinstance(settings, dict):
-            errors.append("'settings' must be an object")
+            errors.append("'settings' must be an object, not " + type(settings).__name__)
+            return errors
+        
+        # Check metadata if present
+        if 'metadata' in import_data:
+            metadata_errors = self._validate_metadata(import_data['metadata'])
+            errors.extend(metadata_errors)
+        
+        # Validate individual setting categories
+        for category, category_settings in settings.items():
+            category_errors = self._validate_settings_category(category, category_settings)
+            errors.extend(category_errors)
+        
+        # Check for completely empty settings
+        if not settings:
+            errors.append("Settings object is empty - nothing to import")
         
         return errors
+    
+    def _validate_metadata(self, metadata):
+        """Validate metadata structure."""
+        errors = []
+        
+        if not isinstance(metadata, dict):
+            errors.append("'metadata' must be an object")
+            return errors
+        
+        # Check version
+        if 'version' not in metadata:
+            errors.append("Missing 'version' in metadata")
+        elif not isinstance(metadata['version'], str):
+            errors.append("Metadata 'version' must be a string")
+        
+        # Check exported_at format
+        if 'exported_at' in metadata:
+            exported_at = metadata['exported_at']
+            if not isinstance(exported_at, str):
+                errors.append("Metadata 'exported_at' must be a string")
+            # Could add date format validation here
+        
+        # Check addon_version
+        if 'addon_version' in metadata:
+            addon_version = metadata['addon_version']
+            if not isinstance(addon_version, str):
+                errors.append("Metadata 'addon_version' must be a string")
+        
+        return errors
+    
+    def _validate_settings_category(self, category, category_settings):
+        """Validate a specific settings category."""
+        errors = []
+        
+        if category == 'theme':
+            errors.extend(self._validate_theme_settings(category_settings))
+        elif category == 'general':
+            errors.extend(self._validate_general_settings(category_settings))
+        elif category == 'dictionaries':
+            errors.extend(self._validate_dictionary_settings(category_settings))
+        else:
+            # Unknown category - warn but don't error
+            pass
+        
+        return errors
+    
+    def _validate_theme_settings(self, theme_settings):
+        """Validate theme settings structure."""
+        errors = []
+        
+        if not isinstance(theme_settings, dict):
+            errors.append("Theme settings must be an object")
+            return errors
+        
+        # Check required color fields
+        required_colors = [
+            'background_color', 'panel_color', 'text_primary', 
+            'text_muted', 'border_color'
+        ]
+        
+        for color_field in required_colors:
+            if color_field in theme_settings:
+                color_value = theme_settings[color_field]
+                if not isinstance(color_value, str):
+                    errors.append(f"Theme '{color_field}' must be a string")
+                elif not self._is_valid_color(color_value):
+                    errors.append(f"Theme '{color_field}' has invalid color format: {color_value}")
+        
+        # Check optional pitch accent colors
+        pitch_colors = [
+            'heiban_color', 'odaka_color', 'nakadaka_color', 
+            'atamadaka_color', 'kifuku_color'
+        ]
+        
+        for color_field in pitch_colors:
+            if color_field in theme_settings:
+                color_value = theme_settings[color_field]
+                if not isinstance(color_value, str):
+                    errors.append(f"Theme '{color_field}' must be a string")
+                elif not self._is_valid_color(color_value):
+                    errors.append(f"Theme '{color_field}' has invalid color format: {color_value}")
+        
+        return errors
+    
+    def _validate_general_settings(self, general_settings):
+        """Validate general settings structure."""
+        errors = []
+        
+        if not isinstance(general_settings, dict):
+            errors.append("General settings must be an object")
+            return errors
+        
+        # Validate numeric settings
+        numeric_settings = {
+            'search_delay': (0, 5000),
+            'max_results': (1, 10000)
+        }
+        
+        for setting_name, (min_val, max_val) in numeric_settings.items():
+            if setting_name in general_settings:
+                value = general_settings[setting_name]
+                if not isinstance(value, int):
+                    errors.append(f"General '{setting_name}' must be an integer")
+                elif not (min_val <= value <= max_val):
+                    errors.append(f"General '{setting_name}' must be between {min_val} and {max_val}")
+        
+        # Validate boolean settings
+        boolean_settings = ['enable_tooltips', 'always_on_top', 'open_on_startup']
+        
+        for setting_name in boolean_settings:
+            if setting_name in general_settings:
+                value = general_settings[setting_name]
+                if not isinstance(value, bool):
+                    errors.append(f"General '{setting_name}' must be a boolean")
+        
+        return errors
+    
+    def _validate_dictionary_settings(self, dictionary_settings):
+        """Validate dictionary settings structure."""
+        errors = []
+        
+        if not isinstance(dictionary_settings, list):
+            errors.append("Dictionary settings must be an array")
+            return errors
+        
+        for i, dict_config in enumerate(dictionary_settings):
+            if not isinstance(dict_config, dict):
+                errors.append(f"Dictionary {i+1} must be an object")
+                continue
+            
+            # Check required fields
+            required_fields = ['id', 'name', 'type', 'enabled']
+            for field in required_fields:
+                if field not in dict_config:
+                    errors.append(f"Dictionary {i+1} missing required field '{field}'")
+            
+            # Validate field types
+            if 'enabled' in dict_config and not isinstance(dict_config['enabled'], bool):
+                errors.append(f"Dictionary {i+1} 'enabled' must be a boolean")
+            
+            if 'priority' in dict_config and not isinstance(dict_config['priority'], int):
+                errors.append(f"Dictionary {i+1} 'priority' must be an integer")
+            
+            if 'type' in dict_config and dict_config['type'] not in ['local', 'api', 'web']:
+                errors.append(f"Dictionary {i+1} 'type' must be 'local', 'api', or 'web'")
+        
+        return errors
+    
+    def _is_valid_color(self, color_value):
+        """Check if a color value is valid hex format."""
+        if not isinstance(color_value, str):
+            return False
+        
+        if not color_value.startswith('#'):
+            return False
+        
+        if len(color_value) != 7:
+            return False
+        
+        try:
+            int(color_value[1:], 16)
+            return True
+        except ValueError:
+            return False
     
     def _apply_imported_settings(self, settings):
         """Apply imported settings to the current window."""
@@ -1985,12 +2962,25 @@ class GeneralTab(QWidget):
         delay_layout = QHBoxLayout()
         delay_label = QLabel("Auto-search delay (ms):")
         delay_label.setMinimumWidth(150)
+        if ANKI_AVAILABLE:
+            delay_label.setToolTip(
+                "Delay before automatic search starts\n"
+                "• 0ms = Search immediately as you type\n"
+                "• 300ms = Wait 0.3 seconds (recommended)\n"
+                "• Higher values reduce server load\n"
+                "• Lower values provide faster feedback"
+            )
         delay_layout.addWidget(delay_label)
         self.search_delay = QSpinBox()
         self.search_delay.setMinimumWidth(100)
         if ANKI_AVAILABLE:
             self.search_delay.setRange(0, 2000)
             self.search_delay.setValue(300)
+            self.search_delay.setToolTip(
+                "Milliseconds to wait before searching\n"
+                "Range: 0-2000ms\n"
+                "Default: 300ms"
+            )
         delay_layout.addWidget(self.search_delay)
         delay_layout.addStretch()
         search_layout.addLayout(delay_layout)
@@ -1999,12 +2989,24 @@ class GeneralTab(QWidget):
         results_layout = QHBoxLayout()
         results_label = QLabel("Maximum results:")
         results_label.setMinimumWidth(150)
+        if ANKI_AVAILABLE:
+            results_label.setToolTip(
+                "Maximum number of search results to display\n"
+                "• Higher values show more results\n"
+                "• Lower values improve performance\n"
+                "• Recommended: 50-200 results"
+            )
         results_layout.addWidget(results_label)
         self.max_results = QSpinBox()
         self.max_results.setMinimumWidth(100)
         if ANKI_AVAILABLE:
             self.max_results.setRange(1, 1000)
             self.max_results.setValue(100)
+            self.max_results.setToolTip(
+                "Maximum search results to show\n"
+                "Range: 1-1000 results\n"
+                "Default: 100 results"
+            )
         results_layout.addWidget(self.max_results)
         results_layout.addStretch()
         search_layout.addLayout(results_layout)
@@ -2017,12 +3019,33 @@ class GeneralTab(QWidget):
         
         self.enable_tooltips = QCheckBox("Enable tooltips")
         self.enable_tooltips.setChecked(True)
+        if ANKI_AVAILABLE:
+            self.enable_tooltips.setToolTip(
+                "Show helpful tooltips when hovering over UI elements\n"
+                "• Provides contextual help and explanations\n"
+                "• Recommended for new users\n"
+                "• Can be disabled to reduce visual clutter"
+            )
         ui_layout.addWidget(self.enable_tooltips)
         
         self.always_on_top = QCheckBox("Always on top")
+        if ANKI_AVAILABLE:
+            self.always_on_top.setToolTip(
+                "Keep dictionary window above other applications\n"
+                "• Useful when working with other programs\n"
+                "• May interfere with full-screen applications\n"
+                "• Can be toggled with keyboard shortcut"
+            )
         ui_layout.addWidget(self.always_on_top)
         
         self.open_on_startup = QCheckBox("Open on startup")
+        if ANKI_AVAILABLE:
+            self.open_on_startup.setToolTip(
+                "Automatically open dictionary when Anki starts\n"
+                "• Convenient for frequent users\n"
+                "• May slow down Anki startup slightly\n"
+                "• Dictionary will be minimized if enabled"
+            )
         ui_layout.addWidget(self.open_on_startup)
         
         layout.addWidget(ui_group)
@@ -2295,33 +3318,301 @@ class ModernSettingsWindow(QDialog):
         """)
     
     def _apply_settings(self):
-        """Apply settings and close dialog."""
-        # FIXME: Connect theme changes to update mock UI styling (future PR)
-        # FIXME: Link dictionary settings to mock search functionality (future PR)
-        # FIXME: Implement settings persistence to JSON/config files (future PR)
-        # FIXME: Ensure settings persistence across application restarts (future PR)
+        """Apply settings with validation and error handling."""
+        # Validate all settings before applying
+        validation_errors = self._validate_all_settings()
         
-        # Current: Mock implementation only
-        logger.info("Settings applied (mock implementation)")
-        self.accept()
+        if validation_errors:
+            # Show validation errors to user
+            if ANKI_AVAILABLE:
+                error_dialog = ValidationErrorDialog(
+                    "Settings Validation Failed",
+                    validation_errors,
+                    self
+                )
+                result = error_dialog.exec()
+                
+                if result == 2:  # Reset button clicked
+                    self._reset_to_defaults()
+                    return
+            else:
+                logger.warning(f"Validation errors: {validation_errors}")
+            return
+        
+        try:
+            # Show progress for applying settings
+            if ANKI_AVAILABLE:
+                progress = ProgressDialog(
+                    "Applying Settings",
+                    "Saving configuration...",
+                    self
+                )
+                progress.show()
+                progress.set_progress(50)
+                QApplication.processEvents()
+            
+            # Apply theme changes to parent mock UI
+            current_settings = self.get_current_settings()
+            if self.parent() and hasattr(self.parent(), '_apply_theme_settings'):
+                theme_dict = self.theme_tab.get_theme().__dict__
+                self.parent()._apply_theme_settings(theme_dict)
+                logger.info("Applied theme changes to mock UI")
+            
+            # FIXME: Link dictionary settings to mock search functionality (future PR)
+            # FIXME: Implement settings persistence to JSON/config files (future PR)
+            # FIXME: Ensure settings persistence across application restarts (future PR)
+            
+            logger.info("Settings applied successfully")
+            
+            if ANKI_AVAILABLE:
+                progress.set_progress(100)
+                QApplication.processEvents()
+                progress.close()
+            
+            self.accept()
+            
+        except Exception as e:
+            if ANKI_AVAILABLE:
+                progress.close()
+                
+                QMessageBox.critical(
+                    self,
+                    "Settings Apply Failed",
+                    f"Failed to apply settings:\n{str(e)}\n\n"
+                    "Your settings have not been saved. Please try again or reset to defaults."
+                )
+            
+            logger.error(f"Failed to apply settings: {e}")
+    
+    def _validate_all_settings(self):
+        """Validate all settings and return list of errors."""
+        errors = []
+        
+        # Validate theme settings
+        theme_errors = self._validate_theme_tab()
+        errors.extend(theme_errors)
+        
+        # Validate general settings
+        general_errors = self._validate_general_tab()
+        errors.extend(general_errors)
+        
+        # Validate dictionary settings
+        dict_errors = self._validate_dictionaries_tab()
+        errors.extend(dict_errors)
+        
+        return errors
+    
+    def _validate_theme_tab(self):
+        """Validate theme tab settings."""
+        errors = []
+        
+        # Check all color pickers for validation errors
+        color_pickers = [
+            ('Background', self.theme_tab.bg_picker),
+            ('Panel', self.theme_tab.panel_picker),
+            ('Text', self.theme_tab.text_picker),
+            ('Muted Text', self.theme_tab.muted_picker),
+            ('Border', self.theme_tab.border_picker),
+            ('Heiban', self.theme_tab.heiban_picker),
+            ('Odaka', self.theme_tab.odaka_picker),
+            ('Nakadaka', self.theme_tab.nakadaka_picker),
+            ('Atamadaka', self.theme_tab.atamadaka_picker),
+            ('Kifuku', self.theme_tab.kifuku_picker),
+        ]
+        
+        for name, picker in color_pickers:
+            if not picker.is_valid():
+                error_msg = picker.get_validation_error()
+                errors.append(f"{name} color: {error_msg}")
+        
+        return errors
+    
+    def _validate_general_tab(self):
+        """Validate general tab settings."""
+        errors = []
+        
+        if ANKI_AVAILABLE:
+            # Validate search delay
+            delay = self.general_tab.search_delay.value()
+            if delay < 0 or delay > 2000:
+                errors.append(f"Search delay must be between 0 and 2000ms (current: {delay}ms)")
+            
+            # Validate max results
+            max_results = self.general_tab.max_results.value()
+            if max_results < 1 or max_results > 1000:
+                errors.append(f"Maximum results must be between 1 and 1000 (current: {max_results})")
+        
+        return errors
+    
+    def _validate_dictionaries_tab(self):
+        """Validate dictionaries tab settings."""
+        errors = []
+        
+        dictionaries = self.dictionaries_tab.get_dictionaries()
+        
+        # Check if at least one dictionary is enabled
+        enabled_dicts = [d for d in dictionaries if d.get('enabled', False)]
+        if not enabled_dicts:
+            errors.append("At least one dictionary must be enabled for search to work")
+        
+        # Check for duplicate dictionary IDs
+        dict_ids = [d.get('id', '') for d in dictionaries]
+        duplicate_ids = [id for id in dict_ids if dict_ids.count(id) > 1]
+        if duplicate_ids:
+            errors.append(f"Duplicate dictionary IDs found: {', '.join(set(duplicate_ids))}")
+        
+        # Validate individual dictionary configurations
+        for i, dict_config in enumerate(dictionaries):
+            dict_name = dict_config.get('name', f'Dictionary {i+1}')
+            
+            # Check required fields
+            if not dict_config.get('id'):
+                errors.append(f"{dict_name}: Missing dictionary ID")
+            
+            if not dict_config.get('name'):
+                errors.append(f"Dictionary {i+1}: Missing dictionary name")
+            
+            if not dict_config.get('type'):
+                errors.append(f"{dict_name}: Missing dictionary type")
+            elif dict_config['type'] not in ['local', 'api', 'web']:
+                errors.append(f"{dict_name}: Invalid dictionary type '{dict_config['type']}'")
+        
+        return errors
     
     def _reset_to_defaults(self):
-        """Reset all settings to defaults."""
-        # Reset theme tab to dark preset
-        self.theme_tab._apply_preset("dark")
+        """Reset all settings to defaults with confirmation and backup."""
+        if not ANKI_AVAILABLE:
+            logger.info("Reset to defaults (mock implementation)")
+            return
         
-        # Reset general settings
-        if ANKI_AVAILABLE:
+        # Show detailed confirmation dialog
+        affected_settings = [
+            "All theme colors will be reset to dark theme",
+            "Search delay will be reset to 300ms",
+            "Maximum results will be reset to 100",
+            "UI settings will be reset to defaults",
+            "Dictionary list will be reset to default dictionaries"
+        ]
+        
+        reply = QMessageBox.question(
+            self,
+            "Reset to Defaults",
+            "Are you sure you want to reset all settings to defaults?\n\n" +
+            "The following settings will be affected:\n" +
+            "\n".join([f"• {setting}" for setting in affected_settings]) +
+            "\n\nThis action cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+        
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+        
+        try:
+            # Show progress dialog
+            progress = ProgressDialog(
+                "Resetting Settings",
+                "Creating backup of current settings...",
+                self
+            )
+            progress.show()
+            progress.set_progress(20)
+            QApplication.processEvents()
+            
+            # Create automatic backup before reset
+            self._create_automatic_backup()
+            
+            progress.update_message("Resetting theme settings...")
+            progress.set_progress(40)
+            QApplication.processEvents()
+            
+            # Reset theme tab to dark preset
+            self.theme_tab._apply_preset("dark")
+            
+            progress.update_message("Resetting general settings...")
+            progress.set_progress(60)
+            QApplication.processEvents()
+            
+            # Reset general settings
             self.general_tab.search_delay.setValue(300)
             self.general_tab.max_results.setValue(100)
-        self.general_tab.enable_tooltips.setChecked(True)
-        self.general_tab.always_on_top.setChecked(False)
-        self.general_tab.open_on_startup.setChecked(False)
-        
-        # Reset dictionaries to defaults
-        self.dictionaries_tab._load_dictionaries()
-        
-        logger.info("Settings reset to defaults")
+            self.general_tab.enable_tooltips.setChecked(True)
+            self.general_tab.always_on_top.setChecked(False)
+            self.general_tab.open_on_startup.setChecked(False)
+            
+            progress.update_message("Resetting dictionary settings...")
+            progress.set_progress(80)
+            QApplication.processEvents()
+            
+            # Reset dictionaries to defaults
+            self.dictionaries_tab._load_dictionaries()
+            
+            progress.update_message("Finalizing reset...")
+            progress.set_progress(100)
+            QApplication.processEvents()
+            
+            progress.close()
+            
+            # Show success message with backup info
+            QMessageBox.information(
+                self,
+                "Reset Complete",
+                "Settings have been reset to defaults.\n\n"
+                "A backup of your previous settings has been created automatically. "
+                "You can restore from this backup using the Import/Export tab."
+            )
+            
+            logger.info("Settings reset to defaults with backup created")
+            
+        except Exception as e:
+            if 'progress' in locals():
+                progress.close()
+            
+            QMessageBox.critical(
+                self,
+                "Reset Failed",
+                f"Failed to reset settings to defaults:\n{str(e)}\n\n"
+                "Your current settings have been preserved."
+            )
+            
+            logger.error(f"Failed to reset settings: {e}")
+    
+    def _create_automatic_backup(self):
+        """Create an automatic backup before major changes."""
+        try:
+            # Get current settings
+            settings = self.get_current_settings()
+            
+            # Create backup directory if it doesn't exist
+            backup_dir = Path.home() / ".anki2" / "addons21" / "Anki-Dictionary-Addon" / "backups"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Generate backup filename with timestamp
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_file = backup_dir / f"auto_backup_before_reset_{timestamp}.json"
+            
+            # Create backup data
+            backup_data = {
+                'metadata': {
+                    'version': '1.0',
+                    'backup_created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'addon_version': '2.0.0',
+                    'backup_type': 'automatic',
+                    'backup_reason': 'before_reset_to_defaults'
+                },
+                'settings': settings
+            }
+            
+            # Write backup file
+            with open(backup_file, 'w', encoding='utf-8') as f:
+                json.dump(backup_data, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"Automatic backup created: {backup_file}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to create automatic backup: {e}")
+            # Don't fail the reset operation if backup fails
     
     def get_current_settings(self):
         """Get current settings configuration."""

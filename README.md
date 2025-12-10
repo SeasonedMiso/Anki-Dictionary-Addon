@@ -86,6 +86,25 @@
 - **Draw Search**: Handwriting recognition for kanji lookup
 - **Voice Search**: Speech-to-text for audio-based dictionary queries
 
+**Search History & Navigation**
+- **Search History**: Storage and retrieval system for previous lookups
+- **Tabbed Interface**: Multiple word searches in separate tabs
+- **History Dropdown/Sidebar**: Quick access to recent searches
+- **Tab Management**: Open, close, switch between tabs with keyboard shortcuts
+- **Session Persistence**: Maintain search history across application restarts
+
+**Enhanced Frequency System**
+- **Contextual Frequency Labels**: Group frequency lists by domain (fiction books, non-fiction, TV, YouTube, etc.)
+- **Smart Frequency Descriptions**: Context-aware labels like "Common book word", "Common speaking word", "Technical term"
+- **Domain-Specific Rankings**: Show frequency within specific contexts (e.g., "Rare in general, but common in anime")
+- **Frequency Visualization**: Charts and graphs showing word usage across different domains
+
+**Keyboard Shortcuts Integration**
+- **Font Size Controls**: Ctrl/Cmd +/-/0 for text scaling across all components
+- **Navigation Shortcuts**: Ctrl+F focus search, Tab navigation, Enter to search
+- **Dictionary Actions**: Ctrl+A audio, Ctrl+C copy, Ctrl+E export shortcuts
+- **Cross-Platform Support**: Consistent shortcuts across macOS/Windows/Linux
+
 **For Developers:**
 - Run tests: `python3 -m pytest tests/ -v`
 
