@@ -8,28 +8,17 @@ Use this to validate the design before building real functionality.
 
 from typing import Optional
 import logging
-from dataclasses import dataclass
-
 from aqt.qt import QWidget, QVBoxLayout, QHBoxLayout, QLabel, Qt, QSizePolicy, QPushButton
 
-from .modern_components import (
+from .dictionary_widgets import (
     ModernSearchBar,
-    WordSection,
+    WordSection, 
     DictionaryFilterBar,
     ModernResultsArea
 )
+from .styling import get_theme_manager, StyleGenerator
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class _Palette:
-    bg: str = "#0f0f0f"
-    panel: str = "#1c1c1c"
-    accent: str = "#3a7afe"
-    text_primary: str = "#e6e6e6"
-    text_muted: str = "#9aa0ad"
-    border: str = "#2b2f36"
 
 
 class UIMockWindow(QWidget):
@@ -51,19 +40,13 @@ class UIMockWindow(QWidget):
         
         self.setWindowTitle("Dictionary UI Mock - Design Preview")
         self.setMinimumSize(600, 400)  # Smaller minimum for better usability
-        palette = _Palette()
-        self.palette = palette  # keep for later tweaks
-        self.setStyleSheet(f"""
-            QWidget {{
-                background-color: {palette.bg};
-                color: {palette.text_primary};
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            }}
-            QLabel#subtitle {{
-                color: {palette.text_muted};
-                font-size: 13px;
-            }}
-        """)
+        
+        # Use centralized theming system
+        self.theme_manager = get_theme_manager()
+        self.style_generator = StyleGenerator(self.theme_manager.current_theme)
+        self.theme_manager.register_observer(self._on_theme_changed)
+        
+        self._apply_theme_styling()
 
         self._setup_ui()
         self._populate_sample_data()
@@ -86,34 +69,15 @@ class UIMockWindow(QWidget):
         outer.addWidget(container)  # Remove alignment to fill available space
 
         # Title label
-        title = QLabel("🎨 UI Design Preview (mock / sample data)")
-        title.setStyleSheet(f"""
-            QLabel {{
-                font-size: 15px;
-                color: {self.palette.text_primary};
-                padding: 12px;
-                background-color: {self.palette.panel};
-                border: 1px solid {self.palette.border};
-                border-radius: 10px;
-                font-weight: 600;
-            }}
-        """)
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        container_layout.addWidget(title)
+        self.title = QLabel("UI Design Preview (mock / sample data)")
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        container_layout.addWidget(self.title)
 
         # Subtitle with branch/base info
-        subtitle = QLabel("Branch: ui/mock-refresh → dev · Visual-only mock (no real data)")
-        subtitle.setObjectName("subtitle")
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        subtitle.setStyleSheet(f"""
-            QLabel#subtitle {{
-                padding: 6px 10px;
-                background-color: {self.palette.panel};
-                border: 1px dashed {self.palette.border};
-                border-radius: 8px;
-            }}
-        """)
-        container_layout.addWidget(subtitle)
+        self.subtitle = QLabel("Branch: ui/mock-refresh → dev · Visual-only mock (no real data)")
+        self.subtitle.setObjectName("subtitle")
+        self.subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        container_layout.addWidget(self.subtitle)
         
         # Search bar
         self.search_bar = ModernSearchBar()
@@ -143,23 +107,6 @@ class UIMockWindow(QWidget):
         # Floating options button in bottom right corner
         self.options_btn = QPushButton("⚙")
         self.options_btn.setFixedSize(40, 40)
-        self.options_btn.setStyleSheet(f"""
-            QPushButton {{
-                background: {self.palette.panel};
-                color: {self.palette.text_primary};
-                border: 1px solid {self.palette.border};
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: bold;
-            }}
-            QPushButton:hover {{
-                background: #333;
-                border-color: #555;
-            }}
-            QPushButton:pressed {{
-                background: #222;
-            }}
-        """)
         self.options_btn.clicked.connect(self._on_options_clicked)
         
         # Position the button in bottom right corner
@@ -274,9 +221,106 @@ class UIMockWindow(QWidget):
         """Handle action button clicks."""
         self.status_label.setText(f"{action} clicked for '{word}' (mock - no real action)")
     
+    def _on_theme_changed(self, new_theme):
+        """Handle theme changes from the centralized theme manager."""
+        self.style_generator = StyleGenerator(new_theme)
+        self._apply_theme_styling()
+        logger.info("Applied theme changes to mock UI")
+    
+    def _apply_theme_styling(self):
+        """Apply current theme styling to all UI elements."""
+        theme = self.theme_manager.current_theme
+        
+        # Apply main window styling
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }}
+            QLabel#subtitle {{
+                color: {theme.text_muted};
+                font-size: {theme.get_font_size('small')}px;
+            }}
+        """)
+        
+        # Update title styling
+        if hasattr(self, 'title'):
+            title_style = f"""
+                QLabel {{
+                    font-size: {theme.get_font_size('medium')}px;
+                    color: {theme.text_primary};
+                    padding: 12px;
+                    background-color: {theme.panel_color};
+                    border: 1px solid {theme.border_color};
+                    border-radius: 10px;
+                    font-weight: 600;
+                }}
+            """
+            self.title.setStyleSheet(title_style)
+        
+        # Update subtitle styling
+        if hasattr(self, 'subtitle'):
+            subtitle_style = f"""
+                QLabel#subtitle {{
+                    padding: 6px 10px;
+                    background-color: {theme.panel_color};
+                    border: 1px dashed {theme.border_color};
+                    border-radius: 8px;
+                    color: {theme.text_muted};
+                    font-size: {theme.get_font_size('small')}px;
+                }}
+            """
+            self.subtitle.setStyleSheet(subtitle_style)
+        
+        # Update options button styling
+        self._update_options_button_style()
+        
+        # Update components with new theme
+        if hasattr(self, 'search_bar') and hasattr(self.search_bar, 'update_theme'):
+            self.search_bar.update_theme(theme)
+        
+        if hasattr(self, 'filter_bar') and hasattr(self.filter_bar, 'update_theme'):
+            self.filter_bar.update_theme(theme)
+        
+        if hasattr(self, 'results_area') and hasattr(self.results_area, 'update_theme'):
+            self.results_area.update_theme(theme)
+    
+    def _update_options_button_style(self):
+        """Update options button styling with current theme colors."""
+        theme = self.theme_manager.current_theme
+        
+        # Use the centralized style generator
+        button_style = self.style_generator.button_style(
+            bg_color=theme.panel_color,
+            text_color=theme.text_primary,
+            border_radius=8,
+            padding="8px",
+            size_type="medium",
+            font_weight="bold"
+        )
+        
+        self.options_btn.setStyleSheet(button_style)
+
+
+
     def _on_options_clicked(self):
         """Handle options button click."""
-        self.status_label.setText("Options clicked (mock - would open settings dialog)")
+        try:
+            from .settings_window import show_modern_settings
+            
+            # Show modern settings dialog
+            settings = show_modern_settings(self)
+            
+            if settings:
+                self.status_label.setText("Settings applied successfully!")
+                # Theme changes are automatically applied via the theme manager observer
+            else:
+                self.status_label.setText("Settings cancelled")
+                
+        except Exception as e:
+            logger.error(f"Error opening settings: {e}", exc_info=True)
+            self.status_label.setText(f"Error opening settings: {str(e)}")
 
 
 def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:
@@ -293,10 +337,5 @@ def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:
     
     window = UIMockWindow(parent)
     window.show()
-    
-    # If auto-close flag is set, close after 3 seconds
-    if os.environ.get('ANKI_DICT_AUTO_CLOSE') == '1':
-        from aqt.qt import QTimer
-        QTimer.singleShot(3000, window.close)
-    
+        
     return window
