@@ -1,13 +1,14 @@
 #!/bin/bash
-# Anki Debug Launcher - Opens UI MOCK window (errors only)
+# Anki Debug Launcher - Quick test (auto-closes after 3s)
 
-echo "🎨 Anki Debug Mode (UI MOCK - errors only)"
-echo "Mock window stays open | Ctrl+C to stop"
+echo "🎨 Anki Debug Mode (QUICK TEST - auto-closes)"
+echo "Mock opens for 3s then closes | Ctrl+C to stop early"
 echo "=========================================="
 
-# Set environment variables to open mock window (no auto-close)
+# Set environment variables to open mock window with auto-close
 export ANKI_DICT_AUTO_OPEN=1
 export ANKI_DICT_OPEN_MOCK=1
+export ANKI_DICT_AUTO_CLOSE=1
 
 # Launch Anki and filter to show only errors/exceptions (not INFO logs)
 if [ -f "/Applications/Anki.app/Contents/MacOS/launcher" ]; then

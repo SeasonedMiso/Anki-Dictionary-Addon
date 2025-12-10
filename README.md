@@ -31,6 +31,15 @@
 - Frequency information
 - Sentence mining
 
+### Known Issues
+
+- **Dropdown Theme Issue**: QComboBox dropdown menus show white background instead of dark theme. The popup view styling is not being applied correctly despite multiple attempts with QAbstractItemView styling, palette changes, and showPopup overrides. This appears to be a Qt/PyQt theming limitation where the dropdown popup is a separate widget that inherits system styling.
+
+### Future Features
+
+- **Radical Search**: Search for kanji by radical components
+- **Draw Search**: Handwriting recognition for kanji lookup
+- **Voice Search**: Speech-to-text for audio-based dictionary queries
 
 **For Developers:**
 - Run tests: `python3 -m pytest tests/ -v`

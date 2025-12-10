@@ -14,7 +14,7 @@ from aqt.qt import QWidget, QVBoxLayout, QLabel, Qt, QSizePolicy
 
 from .modern_components import (
     ModernSearchBar,
-    DefinitionCard,
+    WordSection,
     DictionaryFilterBar,
     ModernResultsArea
 )
@@ -142,57 +142,86 @@ class UIMockWindow(QWidget):
         container_layout.addWidget(self.status_label)
     
     def _populate_sample_data(self):
-        """Populate with sample definition cards."""
-        # Sample data matching DefinitionCard's expected format
-        sample_definitions = [
-            {
-                'word': '食べる',
-                'phonetic': 'たべる',
-                'frequency': 1250,
-                'definitions': [
-                    {'type': 'verb', 'text': 'to eat'},
-                    {'type': 'verb', 'text': 'to live on (e.g. a salary); to live off; to subsist on'}
-                ],
-                'examples': ['毎日野菜を食べる', 'I eat vegetables every day']
-            },
-            {
-                'word': '食事',
-                'phonetic': 'しょくじ',
-                'frequency': 890,
-                'definitions': [
-                    {'type': 'noun', 'text': 'meal; dinner'},
-                    {'type': 'noun', 'text': 'diet'}
-                ],
-                'examples': ['朝食事をする', 'Have breakfast']
-            },
-            {
-                'word': '勉強',
-                'phonetic': 'べんきょう',
-                'frequency': 450,
-                'definitions': [
-                    {'type': 'noun', 'text': 'study; studying'},
-                    {'type': 'verb', 'text': 'to study'}
-                ],
-                'examples': ['日本語を勉強する', 'Study Japanese']
-            }
-        ]
+        """Populate with sample word sections (new structure: Word > Dictionary)."""
         
-        # Create cards for each sample
-        for word_data in sample_definitions:
-            card = DefinitionCard(word_data=word_data)
-            
-            # Connect action buttons (just for demo feedback)
-            card.audioRequested.connect(
-                lambda w=word_data['word']: self._on_action('Audio', w)
-            )
-            card.imageRequested.connect(
-                lambda w=word_data['word']: self._on_action('Image', w)
-            )
-            card.exportRequested.connect(
-                lambda w=word_data['word']: self._on_action('Export', w)
-            )
-            
-            self.results_area.add_card(card)
+        # Word: 食べる
+        taberu_data = {
+            'word': '食べる',
+            'phonetic': 'たべる',
+            'pitch_accent': '2',
+            'frequencies': {
+                'JLPT': 1250,
+                'Anime': 890,
+                'News': 2100
+            }
+        }
+        
+        taberu_section = WordSection(taberu_data)
+        taberu_section.audioRequested.connect(lambda w: self._on_action('Audio', w))
+        taberu_section.imageRequested.connect(lambda w: self._on_action('Image', w))
+        
+        # Add JMdict definition (primary - expanded by default)
+        taberu_section.add_dictionary_section(
+            "JMdict (Japanese-English)",
+            [
+                {'type': 'verb', 'text': 'to eat'},
+                {'type': 'verb', 'text': 'to live on (e.g. a salary); to live off; to subsist on'}
+            ],
+            ['毎日野菜を食べる', 'I eat vegetables every day'],
+            is_primary=True
+        )
+        
+        # Add 大辞林 definition (collapsed by default)
+        taberu_section.add_dictionary_section(
+            "大辞林 (Daijirin)",
+            [
+                {'type': '動詞', 'text': '口に入れて噛み、飲み込む。'},
+                {'type': '動詞', 'text': '生活の糧とする。暮らしを立てる。'}
+            ],
+            ['ご飯を食べる', '魚を食べる'],
+            is_primary=False
+        )
+        
+        self.results_area.add_card(taberu_section)
+        
+        # Word: 勉強
+        benkyou_data = {
+            'word': '勉強',
+            'phonetic': 'べんきょう',
+            'pitch_accent': '0',
+            'frequencies': {
+                'JLPT': 450,
+                'Textbooks': 320
+            }
+        }
+        
+        benkyou_section = WordSection(benkyou_data)
+        benkyou_section.audioRequested.connect(lambda w: self._on_action('Audio', w))
+        benkyou_section.imageRequested.connect(lambda w: self._on_action('Image', w))
+        
+        # Add JMdict definition (primary)
+        benkyou_section.add_dictionary_section(
+            "JMdict (Japanese-English)",
+            [
+                {'type': 'noun', 'text': 'study; studying'},
+                {'type': 'verb', 'text': 'to study'}
+            ],
+            ['日本語を勉強する', 'Study Japanese'],
+            is_primary=True
+        )
+        
+        # Add 大辞林 definition (collapsed)
+        benkyou_section.add_dictionary_section(
+            "大辞林 (Daijirin)",
+            [
+                {'type': '名詞', 'text': '学問や技術を学ぶこと。'},
+                {'type': '動詞', 'text': '努力して学習すること。'}
+            ],
+            ['数学を勉強する', '勉強に励む'],
+            is_primary=False
+        )
+        
+        self.results_area.add_card(benkyou_section)
     
     def _on_search_changed(self, text: str):
         """Handle search text changes."""
@@ -229,8 +258,8 @@ def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:
     window = UIMockWindow(parent)
     window.show()
     
-    # If auto-opened via debug script, close after 3 seconds
-    if os.environ.get('ANKI_DICT_AUTO_OPEN') == '1':
+    # If auto-close flag is set, close after 3 seconds
+    if os.environ.get('ANKI_DICT_AUTO_CLOSE') == '1':
         from aqt.qt import QTimer
         QTimer.singleShot(3000, window.close)
     
