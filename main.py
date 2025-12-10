@@ -53,7 +53,7 @@ def on_profile_loaded():
         # If ANKI_DICT_OPEN_MOCK is set, open mock window instead
         if os.environ.get('ANKI_DICT_OPEN_MOCK') == '1':
             from .src.ui.ui_mock import show_ui_mock
-            show_ui_mock(mw)
+            show_ui_mock(None)  # No parent = independent window
         else:
             plugin.open_dictionary()
 

@@ -10,7 +10,7 @@ from typing import Optional
 import logging
 from dataclasses import dataclass
 
-from aqt.qt import QWidget, QVBoxLayout, QLabel, Qt, QSizePolicy
+from aqt.qt import QWidget, QVBoxLayout, QHBoxLayout, QLabel, Qt, QSizePolicy, QPushButton
 
 from .modern_components import (
     ModernSearchBar,
@@ -50,7 +50,7 @@ class UIMockWindow(QWidget):
         super().__init__(parent)
         
         self.setWindowTitle("Dictionary UI Mock - Design Preview")
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(600, 400)  # Smaller minimum for better usability
         palette = _Palette()
         self.palette = palette  # keep for later tweaks
         self.setStyleSheet(f"""
@@ -81,11 +81,9 @@ class UIMockWindow(QWidget):
         container_layout = QVBoxLayout(container)
         container_layout.setContentsMargins(20, 20, 20, 20)
         container_layout.setSpacing(14)
-        container.setMaximumWidth(1080)
-        outer.addWidget(
-            container,
-            alignment=Align.AlignHCenter | Align.AlignTop,
-        )
+        # Remove maximum width constraint for responsive design
+        # container.setMaximumWidth(1080)  # Removed to allow full width
+        outer.addWidget(container)  # Remove alignment to fill available space
 
         # Title label
         title = QLabel("🎨 UI Design Preview (mock / sample data)")
@@ -127,9 +125,10 @@ class UIMockWindow(QWidget):
         self.filter_bar.filterChanged.connect(self._on_filters_changed)
         container_layout.addWidget(self.filter_bar)
         
-        # Results area
+        # Results area - should expand to fill available space
         self.results_area = ModernResultsArea()
-        container_layout.addWidget(self.results_area)
+        self.results_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        container_layout.addWidget(self.results_area, 1)  # Stretch factor 1 to expand
         
         # Status bar
         self.status_label = QLabel("Ready — Type in search bar or toggle filters (mock only)")
@@ -140,6 +139,39 @@ class UIMockWindow(QWidget):
             }
         """)
         container_layout.addWidget(self.status_label)
+        
+        # Floating options button in bottom right corner
+        self.options_btn = QPushButton("⚙")
+        self.options_btn.setFixedSize(40, 40)
+        self.options_btn.setStyleSheet(f"""
+            QPushButton {{
+                background: {self.palette.panel};
+                color: {self.palette.text_primary};
+                border: 1px solid {self.palette.border};
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                background: #333;
+                border-color: #555;
+            }}
+            QPushButton:pressed {{
+                background: #222;
+            }}
+        """)
+        self.options_btn.clicked.connect(self._on_options_clicked)
+        
+        # Position the button in bottom right corner
+        self.options_btn.setParent(self)
+        self.options_btn.move(self.width() - 60, self.height() - 60)
+        self.options_btn.raise_()  # Bring to front
+    
+    def resizeEvent(self, event):
+        """Handle window resize to keep options button in corner."""
+        super().resizeEvent(event)
+        if hasattr(self, 'options_btn'):
+            self.options_btn.move(self.width() - 60, self.height() - 60)
     
     def _populate_sample_data(self):
         """Populate with sample word sections (new structure: Word > Dictionary)."""
@@ -241,6 +273,10 @@ class UIMockWindow(QWidget):
     def _on_action(self, action: str, word: str):
         """Handle action button clicks."""
         self.status_label.setText(f"{action} clicked for '{word}' (mock - no real action)")
+    
+    def _on_options_clicked(self):
+        """Handle options button click."""
+        self.status_label.setText("Options clicked (mock - would open settings dialog)")
 
 
 def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:

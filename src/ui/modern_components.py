@@ -1253,18 +1253,19 @@ class DictionaryFilterBar(QWidget):
         
         self.dictionary_groups = dictionary_groups
         
-        # Create layout
+        # Create horizontal layout with better responsive behavior
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(12)
+        layout.setSpacing(8)  # Reduced spacing to fit better
         
         # Dictionary Group section
         dict_label = QLabel("Dictionary Group:")
         dict_label.setStyleSheet("""
             QLabel {
                 color: #ccc;
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: 500;
+                min-width: 100px;
             }
         """)
         layout.addWidget(dict_label)
@@ -1272,7 +1273,8 @@ class DictionaryFilterBar(QWidget):
         # Dictionary group dropdown
         self.dict_dropdown = QComboBox()
         self.dict_dropdown.setMinimumHeight(36)
-        self.dict_dropdown.setMinimumWidth(180)
+        self.dict_dropdown.setMinimumWidth(120)  # Smaller minimum width
+        self.dict_dropdown.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         
         # Add dictionary group items
         for name, group_id in dictionary_groups:
@@ -1313,16 +1315,17 @@ class DictionaryFilterBar(QWidget):
             QTimer.singleShot(0, position_dict_arrow)
         self.dict_dropdown.resizeEvent = new_resize
         
-        # Spacer
-        layout.addSpacing(20)
+        # Add spacing
+        layout.addSpacing(12)
         
         # Search Mode section
         search_label = QLabel("Search Mode:")
         search_label.setStyleSheet("""
             QLabel {
                 color: #ccc;
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: 500;
+                min-width: 80px;
             }
         """)
         layout.addWidget(search_label)
@@ -1330,7 +1333,8 @@ class DictionaryFilterBar(QWidget):
         # Search mode dropdown
         self.search_dropdown = QComboBox()
         self.search_dropdown.setMinimumHeight(36)
-        self.search_dropdown.setMinimumWidth(140)
+        self.search_dropdown.setMinimumWidth(80)  # Smaller minimum width
+        self.search_dropdown.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         
         # Add search mode items
         search_modes = [
@@ -1381,8 +1385,8 @@ class DictionaryFilterBar(QWidget):
             QTimer.singleShot(0, position_search_arrow)
         self.search_dropdown.resizeEvent = new_resize
         
-        # Spacer
-        layout.addSpacing(20)
+        # Add some spacing
+        layout.addSpacing(12)
         
         # Conjugation toggle button
         self.conjugation_button = QPushButton("活用 ON")
@@ -1391,6 +1395,10 @@ class DictionaryFilterBar(QWidget):
         self.conjugation_button.setMinimumHeight(36)
         self.conjugation_button.setMinimumWidth(80)
         self.conjugation_button.clicked.connect(self._on_conjugation_toggled)
+        layout.addWidget(self.conjugation_button)
+        
+        # Add stretch to push everything to the left
+        layout.addStretch()
         
         # Style conjugation button
         self.conjugation_button.setStyleSheet("""
@@ -1418,7 +1426,7 @@ class DictionaryFilterBar(QWidget):
             }
         """)
         
-        layout.addWidget(self.conjugation_button)
+
         
         # Apply common dropdown styling
         dropdown_style = """
@@ -1529,8 +1537,6 @@ class DictionaryFilterBar(QWidget):
         
         create_dark_dropdown(self.dict_dropdown)
         create_dark_dropdown(self.search_dropdown)
-        
-        layout.addStretch()
         
         logger.debug(f"DictionaryFilterBar initialized with {len(dictionary_groups)} groups")
     

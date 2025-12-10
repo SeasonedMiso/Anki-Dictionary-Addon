@@ -324,7 +324,7 @@ class MenuManager:
             from ..ui.ui_mock import show_ui_mock
             
             # Create and show mock window
-            mock_window = show_ui_mock(self.mw)
+            mock_window = show_ui_mock(None)  # No parent = independent window
             
             logger.info("UI mock window opened")
             
