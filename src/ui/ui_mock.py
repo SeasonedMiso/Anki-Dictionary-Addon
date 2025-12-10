@@ -36,6 +36,10 @@ class UIMockWindow(QWidget):
     
     def __init__(self, parent: Optional[QWidget] = None):
         """Initialize UI mock window."""
+        # SET LIGHT THEME FIRST - before super().__init__
+        from .styling import THEME_PRESETS
+        get_theme_manager().update_theme(THEME_PRESETS["light"])
+        
         super().__init__(parent)
         
         self.setWindowTitle("Dictionary UI Mock - Design Preview")
@@ -138,6 +142,40 @@ class UIMockWindow(QWidget):
         taberu_section.audioRequested.connect(lambda w: self._on_action('Audio', w))
         taberu_section.imageRequested.connect(lambda w: self._on_action('Image', w))
         
+        # DIAGNOSTIC CODE
+        print("========== DIAGNOSTIC START ==========")
+        print(f"WordSection type: {type(taberu_section)}")
+        print(f"WordSection class: {taberu_section.__class__.__name__}")
+        
+        if hasattr(taberu_section, 'collapsible_box'):
+            print(f"✓ Has collapsible_box attribute")
+            print(f"  Type: {type(taberu_section.collapsible_box)}")
+            print(f"  Class: {taberu_section.collapsible_box.__class__.__name__}")
+            
+            if hasattr(taberu_section.collapsible_box, 'header'):
+                print(f"  ✓ Has header attribute")
+                print(f"    Header parent: {taberu_section.collapsible_box.header.parent()}")
+                print(f"    Header stylesheet: {taberu_section.collapsible_box.header.styleSheet()[:100]}...")
+            else:
+                print(f"  ✗ NO header attribute!")
+            
+            if hasattr(taberu_section.collapsible_box, 'content_frame'):
+                print(f"  ✓ Has content_frame attribute")
+                print(f"    Content frame parent: {taberu_section.collapsible_box.content_frame.parent()}")
+            else:
+                print(f"  ✗ NO content_frame attribute!")
+            
+            container_style = taberu_section.collapsible_box.styleSheet()
+            print(f"  Container stylesheet length: {len(container_style)}")
+            if "border-left" in container_style:
+                print(f"  ✓ Has border-left styling")
+            else:
+                print(f"  ✗ NO border-left styling!")
+        else:
+            print(f"✗ NO collapsible_box attribute!")
+        
+        print("========== DIAGNOSTIC END ==========\n")
+        
         # Add JMdict definition (primary - expanded by default)
         taberu_section.add_dictionary_section(
             "JMdict (Japanese-English)",
@@ -224,6 +262,21 @@ class UIMockWindow(QWidget):
         """Handle theme changes from the centralized theme manager."""
         self.style_generator = StyleGenerator(new_theme)
         self._apply_theme_styling()
+        
+        # Update all word sections in results area
+        if hasattr(self, 'results_area') and hasattr(self.results_area, 'layout'):
+            layout = self.results_area.layout
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if item:
+                    widget = item.widget()
+                    if widget and hasattr(widget, 'update_theme'):
+                        widget.update_theme(new_theme)
+        
+        # Update results area itself
+        if hasattr(self, 'results_area') and hasattr(self.results_area, 'update_theme'):
+            self.results_area.update_theme(new_theme)
+        
         logger.info("Applied theme changes to mock UI")
     
     def _apply_theme_styling(self):

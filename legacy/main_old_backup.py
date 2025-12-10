@@ -21,7 +21,7 @@ from aqt import mw
 from aqt.qt import *
 from . import dictdb
 from aqt.webview import AnkiWebView
-from .miutils import miInfo, miAsk
+from .utils.miutils import miInfo, miAsk
 from .addonSettings import SettingsGui
 import codecs
 from operator import itemgetter

@@ -1,8 +1,8 @@
 from aqt import mw
 from aqt import addons
-from .src.legacy.database import dictdb
+from ..database import dictdb
 from anki.hooks import  wrap, addHook
-from .src.legacy.utils.dialogs import show_info as show_info_dialog
+from .dialogs import show_info as show_info_dialog
 import time
 from anki.httpclient import HttpClient
 

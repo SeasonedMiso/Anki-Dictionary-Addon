@@ -18,7 +18,7 @@ from .settings_window import ModernSettingsWindow, show_modern_settings
 from .ui_mock import UIMockWindow, show_ui_mock
 from .export_widgets import ExportQueueWidget, ExportPreviewPanel
 from .styling import ThemeColors, ThemeManager, StyleGenerator, get_theme_manager, THEME_PRESETS
-from ..utils.keyboard import (
+from ..legacy.utils.keyboard import (
     KeyboardManager, get_keyboard_manager, setup_font_shortcuts,
     setup_navigation_shortcuts, setup_dictionary_shortcuts, get_shortcut_help
 )

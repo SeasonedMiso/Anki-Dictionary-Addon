@@ -16,9 +16,9 @@ from os.path import dirname, join
 import platform
 from .addDictGroup import DictGroupEditor
 from .addTemplate import TemplateEditor
-from .miutils import miInfo, miAsk
+from .utils.miutils import miInfo, miAsk
 from . dictionaryManager import DictionaryManagerWidget
-from .ffmpegInstaller import FFMPEGInstaller
+from .utils.ffmpegInstaller import FFMPEGInstaller
 try:
     from PyQt5.QtSvg import QSvgWidget
 except ModuleNotFoundError:
