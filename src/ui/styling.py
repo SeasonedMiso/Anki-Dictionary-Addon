@@ -78,10 +78,11 @@ class ThemeColors:
 class ThemeManager:
     """Centralized theme management system with font size controls."""
     
-    def __init__(self, initial_theme: Optional[ThemeColors] = None):
-        """Initialize theme manager with optional initial theme."""
+    def __init__(self, initial_theme: Optional[ThemeColors] = None, config_path: Optional[str] = None):
+        """Initialize theme manager with optional initial theme and config path."""
         self.current_theme = initial_theme or ThemeColors()
         self._observers = []
+        self.config_path = config_path
     
     def register_observer(self, callback):
         """Register a callback to be notified of theme changes."""
@@ -96,6 +97,52 @@ class ThemeManager:
         """Update the current theme and notify all observers."""
         self.current_theme = new_theme
         self._notify_observers()
+    
+    def save_theme_preference(self, theme_name: str):
+        """Save the current theme preference to config."""
+        if not self.config_path:
+            return
+        
+        try:
+            import json
+            from pathlib import Path
+            
+            config_file = Path(self.config_path)
+            if config_file.exists():
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                
+                config['currentTheme'] = theme_name
+                
+                with open(config_file, 'w') as f:
+                    json.dump(config, f, indent=4)
+                
+                logger.info(f"Saved theme preference: {theme_name}")
+        except Exception as e:
+            logger.warning(f"Failed to save theme preference: {e}")
+    
+    def load_theme_preference(self) -> Optional[str]:
+        """Load the saved theme preference from config."""
+        if not self.config_path:
+            return None
+        
+        try:
+            import json
+            from pathlib import Path
+            
+            config_file = Path(self.config_path)
+            if config_file.exists():
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                
+                theme_name = config.get('currentTheme')
+                if theme_name:
+                    logger.info(f"Loaded theme preference: {theme_name}")
+                    return theme_name
+        except Exception as e:
+            logger.warning(f"Failed to load theme preference: {e}")
+        
+        return None
     
     def increase_font_size(self):
         """Increase font scale factor (Ctrl/Cmd + Plus)."""
@@ -152,6 +199,287 @@ class ThemeManager:
             'spacing': self.current_theme.spacing,
             'padding': self.current_theme.padding,
             'show_borders': self.current_theme.show_borders
+        }
+    
+    def _ensure_themes_directory(self):
+        """Ensure user_files/themes directory exists."""
+        from pathlib import Path
+        themes_dir = Path(__file__).parent.parent.parent / "user_files" / "themes"
+        themes_dir.mkdir(parents=True, exist_ok=True)
+        return themes_dir
+    
+    def load_user_themes(self) -> Dict[str, ThemeColors]:
+        """Load user-created themes from user_themes.json."""
+        try:
+            import json
+            from pathlib import Path
+            
+            themes_dir = self._ensure_themes_directory()
+            user_themes_file = themes_dir / "user_themes.json"
+            
+            if not user_themes_file.exists():
+                return {}
+            
+            with open(user_themes_file, 'r') as f:
+                data = json.load(f)
+            
+            themes = {}
+            for theme_name, theme_data in data.get('themes', {}).items():
+                try:
+                    colors = theme_data.get('colors', {})
+                    # Convert numeric strings back to numbers
+                    if 'base_font_size' in colors and isinstance(colors['base_font_size'], str):
+                        colors['base_font_size'] = int(colors['base_font_size'])
+                    if 'font_scale_factor' in colors and isinstance(colors['font_scale_factor'], str):
+                        colors['font_scale_factor'] = float(colors['font_scale_factor'])
+                    if 'border_radius' in colors and isinstance(colors['border_radius'], str):
+                        colors['border_radius'] = int(colors['border_radius'])
+                    if 'spacing' in colors and isinstance(colors['spacing'], str):
+                        colors['spacing'] = int(colors['spacing'])
+                    if 'padding' in colors and isinstance(colors['padding'], str):
+                        colors['padding'] = int(colors['padding'])
+                    if 'show_borders' in colors and isinstance(colors['show_borders'], str):
+                        colors['show_borders'] = colors['show_borders'].lower() == 'true'
+                    
+                    themes[theme_name] = ThemeColors(**colors)
+                except Exception as e:
+                    logger.warning(f"Failed to load theme {theme_name}: {e}")
+            
+            return themes
+        except Exception as e:
+            logger.warning(f"Failed to load user themes: {e}")
+            return {}
+    
+    def save_user_theme(self, name: str, theme: ThemeColors) -> bool:
+        """Save a user-created theme."""
+        try:
+            import json
+            from datetime import datetime
+            
+            if not name or not isinstance(name, str):
+                logger.warning("Invalid theme name")
+                return False
+            
+            themes_dir = self._ensure_themes_directory()
+            user_themes_file = themes_dir / "user_themes.json"
+            
+            # Load existing themes
+            if user_themes_file.exists():
+                with open(user_themes_file, 'r') as f:
+                    data = json.load(f)
+            else:
+                data = {'themes': {}}
+            
+            # Add/update theme
+            data['themes'][name] = {
+                'name': name,
+                'created': datetime.now().isoformat(),
+                'modified': datetime.now().isoformat(),
+                'colors': self._theme_to_dict(theme)
+            }
+            
+            # Write back
+            with open(user_themes_file, 'w') as f:
+                json.dump(data, f, indent=2)
+            
+            logger.info(f"Saved user theme: {name}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save user theme: {e}")
+            return False
+    
+    def delete_user_theme(self, name: str) -> bool:
+        """Delete a user-created theme."""
+        try:
+            import json
+            
+            if self.is_preset_theme(name):
+                logger.warning(f"Cannot delete preset theme: {name}")
+                return False
+            
+            themes_dir = self._ensure_themes_directory()
+            user_themes_file = themes_dir / "user_themes.json"
+            
+            if not user_themes_file.exists():
+                return False
+            
+            with open(user_themes_file, 'r') as f:
+                data = json.load(f)
+            
+            if name in data.get('themes', {}):
+                del data['themes'][name]
+                
+                with open(user_themes_file, 'w') as f:
+                    json.dump(data, f, indent=2)
+                
+                logger.info(f"Deleted user theme: {name}")
+                return True
+            
+            return False
+        except Exception as e:
+            logger.error(f"Failed to delete user theme: {e}")
+            return False
+    
+    def export_theme(self, theme_name: str, file_path: str) -> bool:
+        """Export a theme to a JSON file."""
+        try:
+            import json
+            from pathlib import Path
+            from datetime import datetime
+            
+            # Get theme
+            all_themes = self.get_all_themes()
+            if theme_name not in all_themes:
+                logger.warning(f"Theme not found: {theme_name}")
+                return False
+            
+            theme = all_themes[theme_name]
+            
+            # Create export data
+            export_data = {
+                'metadata': {
+                    'name': theme_name,
+                    'version': '1.0',
+                    'created': datetime.now().isoformat(),
+                    'description': f'Theme: {theme_name}'
+                },
+                'colors': self._theme_to_dict(theme)
+            }
+            
+            # Write to file
+            with open(file_path, 'w') as f:
+                json.dump(export_data, f, indent=2)
+            
+            logger.info(f"Exported theme to: {file_path}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to export theme: {e}")
+            return False
+    
+    def import_theme(self, file_path: str, import_name: str = None) -> tuple:
+        """Import a theme from a JSON file. Returns (success, ThemeColors)."""
+        try:
+            import json
+            from pathlib import Path
+            
+            if not Path(file_path).exists():
+                logger.warning(f"Theme file not found: {file_path}")
+                return (False, None)
+            
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            
+            # Validate structure
+            if 'colors' not in data:
+                logger.warning("Invalid theme file: missing 'colors' field")
+                return (False, None)
+            
+            # Create ThemeColors from imported data
+            colors = data['colors']
+            
+            # Convert numeric strings back to numbers
+            if 'base_font_size' in colors and isinstance(colors['base_font_size'], str):
+                colors['base_font_size'] = int(colors['base_font_size'])
+            if 'font_scale_factor' in colors and isinstance(colors['font_scale_factor'], str):
+                colors['font_scale_factor'] = float(colors['font_scale_factor'])
+            if 'border_radius' in colors and isinstance(colors['border_radius'], str):
+                colors['border_radius'] = int(colors['border_radius'])
+            if 'spacing' in colors and isinstance(colors['spacing'], str):
+                colors['spacing'] = int(colors['spacing'])
+            if 'padding' in colors and isinstance(colors['padding'], str):
+                colors['padding'] = int(colors['padding'])
+            if 'show_borders' in colors and isinstance(colors['show_borders'], str):
+                colors['show_borders'] = colors['show_borders'].lower() == 'true'
+            
+            theme = ThemeColors(**colors)
+            
+            logger.info(f"Imported theme from: {file_path}")
+            return (True, theme)
+        except Exception as e:
+            logger.error(f"Failed to import theme: {e}")
+            return (False, None)
+    
+    def validate_theme_file(self, file_path: str) -> bool:
+        """Validate a theme file format."""
+        try:
+            import json
+            from pathlib import Path
+            
+            if not Path(file_path).exists():
+                return False
+            
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            
+            # Check required fields
+            if 'colors' not in data:
+                return False
+            
+            # Try to create ThemeColors to validate all fields
+            ThemeColors(**data['colors'])
+            return True
+        except Exception as e:
+            logger.warning(f"Theme file validation failed: {e}")
+            return False
+    
+    def get_all_themes(self) -> Dict[str, ThemeColors]:
+        """Get all available themes (presets + user themes)."""
+        all_themes = {}
+        
+        # Add presets
+        all_themes.update(THEME_PRESETS)
+        
+        # Add user themes
+        all_themes.update(self.load_user_themes())
+        
+        return all_themes
+    
+    def is_preset_theme(self, name: str) -> bool:
+        """Check if theme is a built-in preset."""
+        return name in THEME_PRESETS
+    
+    def is_user_theme(self, name: str) -> bool:
+        """Check if theme is user-created."""
+        user_themes = self.load_user_themes()
+        return name in user_themes
+    
+    def theme_exists(self, name: str) -> bool:
+        """Check if theme exists (preset or user)."""
+        return name in self.get_all_themes()
+    
+    def _theme_to_dict(self, theme: ThemeColors) -> Dict[str, Any]:
+        """Convert ThemeColors to dictionary."""
+        return {
+            'background_color': theme.background_color,
+            'panel_color': theme.panel_color,
+            'text_primary': theme.text_primary,
+            'text_muted': theme.text_muted,
+            'accent_color': theme.accent_color,
+            'border_color': theme.border_color,
+            'success_color': theme.success_color,
+            'warning_color': theme.warning_color,
+            'error_color': theme.error_color,
+            'info_color': theme.info_color,
+            'heiban_color': theme.heiban_color,
+            'odaka_color': theme.odaka_color,
+            'nakadaka_color': theme.nakadaka_color,
+            'atamadaka_color': theme.atamadaka_color,
+            'kifuku_color': theme.kifuku_color,
+            'freq_very_common': theme.freq_very_common,
+            'freq_common': theme.freq_common,
+            'freq_uncommon': theme.freq_uncommon,
+            'freq_rare': theme.freq_rare,
+            'freq_very_rare': theme.freq_very_rare,
+            'audio_color': theme.audio_color,
+            'image_color': theme.image_color,
+            'copy_color': theme.copy_color,
+            'export_color': theme.export_color,
+            'base_font_size': theme.base_font_size,
+            'font_scale_factor': theme.font_scale_factor,
+            'border_radius': theme.border_radius,
+            'spacing': theme.spacing,
+            'padding': theme.padding,
+            'show_borders': theme.show_borders
         }
 
 

@@ -36,11 +36,26 @@ class UIMockWindow(QWidget):
     
     def __init__(self, parent: Optional[QWidget] = None):
         """Initialize UI mock window."""
-        # SET LIGHT THEME FIRST - before super().__init__
-        from .styling import THEME_PRESETS
-        get_theme_manager().update_theme(THEME_PRESETS["light"])
-        
         super().__init__(parent)
+        
+        # Load saved theme preference or default to dark
+        from .styling import THEME_PRESETS
+        from pathlib import Path
+        
+        theme_manager = get_theme_manager()
+        config_path = Path(__file__).parent.parent.parent / "config" / "config.json"
+        theme_manager.config_path = str(config_path)
+        
+        saved_theme = theme_manager.load_theme_preference()
+        
+        # Get all available themes (presets + user themes)
+        all_themes = theme_manager.get_all_themes()
+        
+        # Use saved theme if it exists, otherwise default to dark
+        if saved_theme and saved_theme in all_themes:
+            theme_manager.update_theme(all_themes[saved_theme])
+        else:
+            theme_manager.update_theme(THEME_PRESETS["dark"])
         
         self.setWindowTitle("Dictionary UI Mock - Design Preview")
         self.setMinimumSize(600, 400)  # Smaller minimum for better usability
