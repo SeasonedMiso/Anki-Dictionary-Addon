@@ -8,7 +8,7 @@ across all modern UI components.
 """
 
 from typing import Dict, Any, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import logging
 
 logger = logging.getLogger(__name__)
@@ -197,7 +197,7 @@ class StyleGenerator:
                     bg_color: Optional[str] = None,
                     text_color: str = "white",
                     border_radius: Optional[int] = None,
-                    padding: str = "8px 16px",
+                    padding: str = "10px 20px",
                     size_type: str = "base",
                     font_weight: str = "bold") -> str:
         """Generate button style with responsive font sizing."""
@@ -217,6 +217,9 @@ class StyleGenerator:
                 padding: {padding};
                 font-size: {font_size}px;
                 font-weight: {font_weight};
+                min-width: 60px;
+                min-height: 32px;
+                text-align: center;
             }}
             QPushButton:hover {{
                 background-color: {hover_bg};
@@ -288,64 +291,73 @@ class StyleGenerator:
         """
     
     def dropdown_style(self) -> str:
-        """Generate dropdown/combobox style."""
+        """Generate dropdown/combobox style with proper bounds."""
         hover_bg = self.adjust_color_brightness(self.theme.panel_color, 1.2)
-        
         return f"""
-            QComboBox {{
-                background-color: {self.theme.panel_color};
-                border: 1px solid {self.theme.border_color};
-                border-radius: {self.theme.border_radius}px;
-                padding: 8px 12px;
-                padding-right: 30px;
-                color: {self.theme.text_primary};
-                font-size: 14px;
-            }}
-            QComboBox:hover {{
-                border-color: {self.adjust_color_brightness(self.theme.border_color, 1.5)};
-                background-color: {hover_bg};
-            }}
-            QComboBox:focus {{
-                border-color: {self.theme.accent_color};
-            }}
-            QComboBox::drop-down {{
-                subcontrol-origin: padding;
-                subcontrol-position: top right;
-                width: 20px;
-                border: none;
-                background: transparent;
-            }}
-            QComboBox::down-arrow {{
-                image: none;
-                border: none;
-                width: 12px;
-                height: 12px;
-                background: transparent;
-            }}
-            QComboBox QAbstractItemView {{
-                background-color: {self.theme.panel_color};
-                border: 1px solid {self.theme.border_color};
-                border-radius: {self.theme.border_radius}px;
-                selection-background-color: {self.theme.accent_color};
-                selection-color: white;
-                color: {self.theme.text_primary};
-                outline: none;
-            }}
-            QComboBox QAbstractItemView::item {{
-                padding: 8px 12px;
-                border: none;
-                background-color: {self.theme.panel_color};
-                color: {self.theme.text_primary};
-                min-height: 20px;
-            }}
-            QComboBox QAbstractItemView::item:hover {{
-                background-color: {hover_bg};
-            }}
-            QComboBox QAbstractItemView::item:selected {{
-                background-color: {self.theme.accent_color};
-                color: white;
-            }}
-        """
+QComboBox {{
+    background-color: {self.theme.panel_color};
+    border: 1px solid {self.theme.border_color};
+    border-radius: {self.theme.border_radius}px;
+    padding: 4px 12px;
+    padding-right: 30px;
+    color: {self.theme.text_primary};
+    font-size: {self.theme.get_font_size('small')}px;
+    min-height: 36px;
+    max-height: 36px;
+    max-width: 400px;  /* Prevent excessive width */
+}}
+QComboBox:hover {{
+    border-color: {self.adjust_color_brightness(self.theme.border_color, 1.5)};
+    background-color: {hover_bg};
+}}
+QComboBox:focus {{
+    border-color: {self.theme.accent_color};
+}}
+QComboBox::drop-down {{
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border: none;
+    background: transparent;
+}}
+QComboBox::down-arrow {{
+    image: none;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid {self.theme.text_muted};
+    margin-right: 8px;
+}}
+QComboBox QAbstractItemView {{
+    background-color: {self.theme.panel_color};
+    border: 1px solid {self.theme.border_color};
+    border-radius: {self.theme.border_radius}px;
+    selection-background-color: {self.theme.accent_color};
+    selection-color: white;
+    color: {self.theme.text_primary};
+    outline: none;
+    /* Prevent dropdown from being too wide */
+    min-width: 200px;
+    max-width: 400px;
+}}
+QComboBox QAbstractItemView::item {{
+    padding: 8px 12px;
+    border: none;
+    background-color: {self.theme.panel_color};
+    color: {self.theme.text_primary};
+    min-height: 20px;
+    /* Ensure text doesn't overflow */
+    text-overflow: ellipsis;
+}}
+QComboBox QAbstractItemView::item:hover {{
+    background-color: {hover_bg};
+}}
+QComboBox QAbstractItemView::item:selected {{
+    background-color: {self.theme.accent_color};
+    color: white;
+}}
+"""
     
     def action_button_style(self, action_type: str) -> str:
         """Generate action button style for specific actions."""
@@ -361,7 +373,67 @@ class StyleGenerator:
         }
         
         bg_color = color_map.get(action_type, self.theme.accent_color)
-        return self.button_style(bg_color=bg_color, border_radius=8)
+        hover_bg = self.adjust_color_brightness(bg_color, 1.2)
+        pressed_bg = self.adjust_color_brightness(bg_color, 0.8)
+        font_size = self.theme.get_font_size("small")
+        
+        return f"""
+            QPushButton {{
+                background-color: {bg_color};
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 4px 8px;
+                font-size: {font_size}px;
+                font-weight: bold;
+                min-width: 24px;
+                min-height: 24px;
+                max-width: 24px;
+                max-height: 24px;
+                text-align: center;
+            }}
+            QPushButton:hover {{
+                background-color: {hover_bg};
+            }}
+            QPushButton:pressed {{
+                background-color: {pressed_bg};
+            }}
+        """
+    
+    def compact_icon_button_style(self, action_type: str) -> str:
+        """Generate very compact icon button style for small header buttons."""
+        color_map = {
+            'audio': self.theme.audio_color,
+            'image': self.theme.image_color,
+            'copy': self.theme.copy_color,
+            'export': self.theme.export_color
+        }
+        
+        bg_color = color_map.get(action_type, self.theme.accent_color)
+        hover_bg = self.adjust_color_brightness(bg_color, 1.2)
+        pressed_bg = self.adjust_color_brightness(bg_color, 0.8)
+        
+        return f"""
+            QPushButton {{
+                background-color: {bg_color};
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 2px;
+                font-size: 8px;
+                min-width: 20px;
+                min-height: 20px;
+                max-width: 24px;
+                max-height: 24px;
+                text-align: center;
+            }}
+            QPushButton:hover {{
+                background-color: {hover_bg};
+            }}
+            QPushButton:pressed {{
+                background-color: {pressed_bg};
+            }}
+        """
     
     def frequency_badge_style(self, frequency: int) -> str:
         """Generate frequency badge style based on frequency value."""
@@ -382,9 +454,12 @@ class StyleGenerator:
                 color: white;
                 border: none;
                 border-radius: 6px;
-                padding: 4px 12px;
+                padding: 2px 12px;
                 font-size: 11px;
                 font-weight: bold;
+                min-width: 60px;
+                min-height: 24px;
+                max-height: 24px;
             }}
             QPushButton:hover {{
                 opacity: 0.8;
@@ -423,7 +498,25 @@ THEME_PRESETS = {
         text_primary="#e6e6e6",
         text_muted="#9aa0ad",
         border_color="#2b2f36",
-        accent_color="#4a9eff"
+        accent_color="#4a9eff",
+        success_color="#22c55e",
+        warning_color="#fbbf24",
+        error_color="#ef4444",
+        info_color="#3b82f6",
+        heiban_color="#4a9eff",
+        odaka_color="#51cf66",
+        nakadaka_color="#ffd43b",
+        atamadaka_color="#ff6b6b",
+        kifuku_color="#9775fa",
+        freq_very_common="#4ade80",
+        freq_common="#60a5fa",
+        freq_uncommon="#fbbf24",
+        freq_rare="#fb923c",
+        freq_very_rare="#f87171",
+        audio_color="#4a9eff",
+        image_color="#50c878",
+        copy_color="#64748b",
+        export_color="#9b59b6"
     ),
     "light": ThemeColors(
         background_color="#ffffff",
@@ -440,7 +533,16 @@ THEME_PRESETS = {
         odaka_color="#2b8a3e",
         nakadaka_color="#e67700",
         atamadaka_color="#c92a2a",
-        kifuku_color="#7048e8"
+        kifuku_color="#7048e8",
+        freq_very_common="#2b8a3e",
+        freq_common="#0066cc",
+        freq_uncommon="#e67700",
+        freq_rare="#d9480f",
+        freq_very_rare="#c92a2a",
+        audio_color="#0066cc",
+        image_color="#2b8a3e",
+        copy_color="#666666",
+        export_color="#7048e8"
     ),
     "blue": ThemeColors(
         background_color="#0a0e1a",
@@ -448,7 +550,25 @@ THEME_PRESETS = {
         text_primary="#e1e8f0",
         text_muted="#8a9bb8",
         border_color="#2a3441",
-        accent_color="#3a7afe"
+        accent_color="#3a7afe",
+        success_color="#22c55e",
+        warning_color="#fbbf24",
+        error_color="#ef4444",
+        info_color="#3b82f6",
+        heiban_color="#3a7afe",
+        odaka_color="#51cf66",
+        nakadaka_color="#ffd43b",
+        atamadaka_color="#ff6b6b",
+        kifuku_color="#9775fa",
+        freq_very_common="#4ade80",
+        freq_common="#60a5fa",
+        freq_uncommon="#fbbf24",
+        freq_rare="#fb923c",
+        freq_very_rare="#f87171",
+        audio_color="#3a7afe",
+        image_color="#50c878",
+        copy_color="#64748b",
+        export_color="#9b59b6"
     )
 }
 

@@ -3106,11 +3106,14 @@ class ModernSettingsWindow(QDialog):
     def __init__(self, parent=None):
         """Initialize modern settings window."""
         super().__init__(parent)
+        self.theme_manager = get_theme_manager()  # Add this
+        self.style_generator = StyleGenerator(self.theme_manager.current_theme)  # Add this
+        self.theme_manager.register_observer(self._on_theme_changed)  # Add this
         self._setup_window()
         self._create_tabs()
         self._setup_layout()
         self._setup_buttons()
-        self._apply_styling()
+        self._apply_styling()  # This will now use current theme
         
         logger.info("Modern settings window initialized")
     
@@ -3184,11 +3187,12 @@ class ModernSettingsWindow(QDialog):
         self.layout().addWidget(buttons_widget)
     
     def _apply_styling(self):
-        """Apply dark theme styling to the dialog."""
+        """Apply theme styling to the dialog."""
         if not ANKI_AVAILABLE:
             return
         
-        theme = ThemeColors()
+        # Use current theme instead of hardcoded ThemeColors()
+        theme = self.theme_manager.current_theme
         self.setStyleSheet(f"""
             QDialog {{
                 background-color: {theme.background_color};
@@ -3740,6 +3744,19 @@ class ModernSettingsWindow(QDialog):
         except Exception as e:
             logger.error(f"Failed to apply imported settings: {e}")
             raise
+    
+    def _on_theme_changed(self, new_theme: ThemeColors):
+        """Handle theme changes from theme manager."""
+        self.style_generator = StyleGenerator(new_theme)
+        self._apply_styling()  # Reapply styling with new theme
+        # Also update the theme tab if it exists
+        if hasattr(self, 'theme_tab'):
+            self.theme_tab.update_theme(new_theme)
+    
+    def closeEvent(self, event):
+        """Clean up theme observer on close."""
+        self.theme_manager.unregister_observer(self._on_theme_changed)
+        super().closeEvent(event)
 
 
 def show_modern_settings(parent=None):
