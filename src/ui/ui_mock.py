@@ -36,11 +36,26 @@ class UIMockWindow(QWidget):
     
     def __init__(self, parent: Optional[QWidget] = None):
         """Initialize UI mock window."""
-        # SET LIGHT THEME FIRST - before super().__init__
-        from .styling import THEME_PRESETS
-        get_theme_manager().update_theme(THEME_PRESETS["light"])
-        
         super().__init__(parent)
+        
+        # Load saved theme preference or default to dark
+        from .styling import THEME_PRESETS
+        from pathlib import Path
+        
+        theme_manager = get_theme_manager()
+        config_path = Path(__file__).parent.parent.parent / "config" / "config.json"
+        theme_manager.config_path = str(config_path)
+        
+        saved_theme = theme_manager.load_theme_preference()
+        
+        # Get all available themes (presets + user themes)
+        all_themes = theme_manager.get_all_themes()
+        
+        # Use saved theme if it exists, otherwise default to dark
+        if saved_theme and saved_theme in all_themes:
+            theme_manager.update_theme(all_themes[saved_theme])
+        else:
+            theme_manager.update_theme(THEME_PRESETS["dark"])
         
         self.setWindowTitle("Dictionary UI Mock - Design Preview")
         self.setMinimumSize(600, 400)  # Smaller minimum for better usability
@@ -109,19 +124,25 @@ class UIMockWindow(QWidget):
         
         # Floating options button in bottom right corner
         self.options_btn = QPushButton("⚙")
-        self.options_btn.setFixedSize(40, 40)
+        self.options_btn.setFixedSize(24, 24)
         self.options_btn.clicked.connect(self._on_options_clicked)
         
-        # Position the button in bottom right corner
+        # Position the button in bottom right corner with padding
         self.options_btn.setParent(self)
-        self.options_btn.move(self.width() - 60, self.height() - 60)
+        # Position will be set in showEvent when window size is known
         self.options_btn.raise_()  # Bring to front
+    
+    def showEvent(self, event):
+        """Position button when window is shown."""
+        super().showEvent(event)
+        if hasattr(self, 'options_btn'):
+            self.options_btn.move(self.width() - 70, self.height() - 70)
     
     def resizeEvent(self, event):
         """Handle window resize to keep options button in corner."""
         super().resizeEvent(event)
         if hasattr(self, 'options_btn'):
-            self.options_btn.move(self.width() - 60, self.height() - 60)
+            self.options_btn.move(self.width() - 70, self.height() - 70)
     
     def _populate_sample_data(self):
         """Populate with sample word sections (new structure: Word > Dictionary)."""
@@ -263,6 +284,11 @@ class UIMockWindow(QWidget):
         self.style_generator = StyleGenerator(new_theme)
         self._apply_theme_styling()
         
+        # Update all child components
+        for component in [self.search_bar, self.filter_bar, self.results_area]:
+            if hasattr(component, 'update_theme'):
+                component.update_theme(new_theme)
+        
         # Update all word sections in results area
         if hasattr(self, 'results_area') and hasattr(self.results_area, 'layout'):
             layout = self.results_area.layout
@@ -272,10 +298,6 @@ class UIMockWindow(QWidget):
                     widget = item.widget()
                     if widget and hasattr(widget, 'update_theme'):
                         widget.update_theme(new_theme)
-        
-        # Update results area itself
-        if hasattr(self, 'results_area') and hasattr(self.results_area, 'update_theme'):
-            self.results_area.update_theme(new_theme)
         
         logger.info("Applied theme changes to mock UI")
     
@@ -306,7 +328,7 @@ class UIMockWindow(QWidget):
                 color: {theme.text_primary};
                 border: 1px solid {theme.border_color};
                 border-radius: {theme.border_radius}px;
-                padding: 8px 16px;
+                padding: 8px 8px;
             }}
             QPushButton:hover {{
                 background-color: {theme.accent_color};
@@ -359,15 +381,27 @@ class UIMockWindow(QWidget):
         """Update options button styling with current theme colors."""
         theme = self.theme_manager.current_theme
         
-        # Use the centralized style generator
-        button_style = self.style_generator.button_style(
-            bg_color=theme.panel_color,
-            text_color=theme.text_primary,
-            border_radius=8,
-            padding="8px",
-            size_type="medium",
-            font_weight="bold"
-        )
+        # Custom square button style for options button
+        button_style = f"""
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 6px;
+                padding: 0px;
+                font-size: 14px;
+                font-weight: bold;
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+                max-width: 40px;
+                max-height: 40px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.accent_color};
+            }}
+        """
         
         self.options_btn.setStyleSheet(button_style)
 

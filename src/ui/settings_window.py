@@ -267,7 +267,7 @@ class ProgressDialog(QDialog):
                 padding: 6px 12px;
             }}
             QPushButton:hover {{
-                background-color: #333;
+                background-color: {StyleGenerator(theme).adjust_color_brightness(theme.panel_color, 1.2)};
             }}
         """)
     
@@ -325,7 +325,8 @@ class ValidationErrorDialog(QDialog):
         suggestion_text = "\n".join([f"• {suggestion}" for suggestion in suggestions])
         suggestion_label = QLabel(suggestion_text)
         suggestion_label.setWordWrap(True)
-        suggestion_label.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        suggestion_label.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         layout.addWidget(suggestion_label)
         
         # Buttons
@@ -379,7 +380,7 @@ class ValidationErrorDialog(QDialog):
                 padding: 8px 16px;
             }}
             QPushButton:hover {{
-                background-color: #333;
+                background-color: {StyleGenerator(theme).adjust_color_brightness(theme.panel_color, 1.2)};
             }}
             QPushButton:default {{
                 background-color: {theme.accent_color};
@@ -433,7 +434,7 @@ class LivePreview(QWidget):
     def __init__(self, parent=None):
         """Initialize live preview."""
         super().__init__(parent)
-        self.theme = ThemeColors()
+        self.theme = get_theme_manager().current_theme
         self._setup_ui()
         self._apply_theme()
     
@@ -679,7 +680,8 @@ class ColorPicker(QWidget):
         
         # Error message label (initially hidden)
         self.error_label = QLabel()
-        self.error_label.setStyleSheet("color: #ff6b6b; font-size: 11px; margin-left: 100px;")
+        theme = get_theme_manager().current_theme
+        self.error_label.setStyleSheet(f"color: {theme.error_color}; font-size: 11px; margin-left: 100px;")
         self.error_label.setVisible(False)
         layout.addWidget(self.error_label)
         
@@ -691,7 +693,8 @@ class ColorPicker(QWidget):
             return
         
         # Add border color based on validation state
-        border_color = "#ff6b6b" if self.validation_error else "#555"
+        theme = get_theme_manager().current_theme
+        border_color = theme.error_color if self.validation_error else theme.border_color
         
         self.color_button.setStyleSheet(f"""
             QPushButton {{
@@ -771,21 +774,351 @@ class ColorPicker(QWidget):
         self._update_button_color()
 
 
+class SaveThemeDialog(QDialog):
+    """Dialog for saving a new theme."""
+    
+    def __init__(self, parent=None):
+        """Initialize save theme dialog."""
+        super().__init__(parent)
+        self.setWindowTitle("Save Theme")
+        self.setModal(True)
+        self.setMinimumWidth(400)
+        
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Theme name input
+        name_layout = QHBoxLayout()
+        name_label = QLabel("Theme Name:")
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText("e.g., Ocean Blue")
+        name_layout.addWidget(name_label)
+        name_layout.addWidget(self.name_input)
+        layout.addLayout(name_layout)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        self.save_button = QPushButton("Save")
+        self.cancel_button = QPushButton("Cancel")
+        self.save_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout.addStretch()
+        button_layout.addWidget(self.save_button)
+        button_layout.addWidget(self.cancel_button)
+        layout.addLayout(button_layout)
+        
+        self._apply_styling()
+    
+    def _apply_styling(self):
+        """Apply theme styling."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme = get_theme_manager().current_theme
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+            }}
+            QLineEdit {{
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                color: {theme.text_primary};
+                padding: 6px;
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                padding: 6px 12px;
+                min-width: 60px;
+            }}
+            QPushButton:hover {{
+                background-color: {StyleGenerator(theme).adjust_color_brightness(theme.panel_color, 1.2)};
+            }}
+        """)
+    
+    def get_theme_name(self) -> str:
+        """Get entered theme name."""
+        return self.name_input.text().strip()
+
+
+class DeleteThemeDialog(QDialog):
+    """Dialog for confirming theme deletion."""
+    
+    def __init__(self, theme_name: str, parent=None):
+        """Initialize delete theme dialog."""
+        super().__init__(parent)
+        self.setWindowTitle("Delete Theme")
+        self.setModal(True)
+        self.setMinimumWidth(350)
+        
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Warning message
+        warning_label = QLabel(f"Delete theme '{theme_name}'?")
+        warning_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        layout.addWidget(warning_label)
+        
+        # Warning text
+        warning_text = QLabel("This action cannot be undone.")
+        warning_text.setStyleSheet("color: #ff6b6b;")
+        layout.addWidget(warning_text)
+        
+        layout.addSpacing(12)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        self.delete_button = QPushButton("Delete")
+        self.cancel_button = QPushButton("Cancel")
+        self.delete_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout.addStretch()
+        button_layout.addWidget(self.delete_button)
+        button_layout.addWidget(self.cancel_button)
+        layout.addLayout(button_layout)
+        
+        self._apply_styling()
+    
+    def _apply_styling(self):
+        """Apply theme styling."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme = get_theme_manager().current_theme
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                padding: 6px 12px;
+                min-width: 60px;
+            }}
+            QPushButton:hover {{
+                background-color: {StyleGenerator(theme).adjust_color_brightness(theme.panel_color, 1.2)};
+            }}
+        """)
+
+
+class RenameThemeDialog(QDialog):
+    """Dialog for renaming a theme."""
+    
+    def __init__(self, current_name: str, parent=None):
+        """Initialize rename theme dialog."""
+        super().__init__(parent)
+        self.setWindowTitle("Rename Theme")
+        self.setModal(True)
+        self.setMinimumWidth(400)
+        
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Current name
+        current_layout = QHBoxLayout()
+        current_label = QLabel("Current Name:")
+        current_display = QLabel(current_name)
+        current_display.setStyleSheet("font-weight: bold;")
+        current_layout.addWidget(current_label)
+        current_layout.addWidget(current_display)
+        current_layout.addStretch()
+        layout.addLayout(current_layout)
+        
+        layout.addSpacing(8)
+        
+        # New name input
+        new_layout = QHBoxLayout()
+        new_label = QLabel("New Name:")
+        self.name_input = QLineEdit()
+        self.name_input.setText(current_name)
+        self.name_input.selectAll()
+        new_layout.addWidget(new_label)
+        new_layout.addWidget(self.name_input)
+        layout.addLayout(new_layout)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        self.rename_button = QPushButton("Rename")
+        self.cancel_button = QPushButton("Cancel")
+        self.rename_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout.addStretch()
+        button_layout.addWidget(self.rename_button)
+        button_layout.addWidget(self.cancel_button)
+        layout.addLayout(button_layout)
+        
+        self._apply_styling()
+    
+    def _apply_styling(self):
+        """Apply theme styling."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme = get_theme_manager().current_theme
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+            }}
+            QLineEdit {{
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                color: {theme.text_primary};
+                padding: 6px;
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                padding: 6px 12px;
+                min-width: 60px;
+            }}
+            QPushButton:hover {{
+                background-color: {StyleGenerator(theme).adjust_color_brightness(theme.panel_color, 1.2)};
+            }}
+        """)
+    
+    def get_new_name(self) -> str:
+        """Get entered theme name."""
+        return self.name_input.text().strip()
+
+
+class ImportPreviewDialog(QDialog):
+    """Dialog for previewing imported theme before confirming."""
+    
+    def __init__(self, theme_name: str, theme: 'ThemeColors', parent=None):
+        """Initialize import preview dialog."""
+        super().__init__(parent)
+        self.setWindowTitle("Import Theme Preview")
+        self.setModal(True)
+        self.setMinimumSize(500, 300)
+        
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Theme info
+        info_label = QLabel(f"Theme: {theme_name}")
+        info_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        layout.addWidget(info_label)
+        
+        # Color preview
+        preview_label = QLabel("Color Preview:")
+        layout.addWidget(preview_label)
+        
+        # Create a simple color grid
+        colors_layout = QHBoxLayout()
+        colors = [
+            ("Background", theme.background_color),
+            ("Panel", theme.panel_color),
+            ("Text", theme.text_primary),
+            ("Accent", theme.accent_color),
+        ]
+        
+        for color_name, color_value in colors:
+            color_frame = QFrame()
+            color_frame.setStyleSheet(f"""
+                QFrame {{
+                    background-color: {color_value};
+                    border: 1px solid {theme.border_color};
+                    border-radius: 4px;
+                }}
+            """)
+            color_frame.setFixedSize(60, 60)
+            
+            color_layout = QVBoxLayout()
+            color_layout.addWidget(color_frame)
+            color_label = QLabel(color_name)
+            color_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            color_label.setStyleSheet("font-size: 10px;")
+            color_layout.addWidget(color_label)
+            
+            colors_layout.addLayout(color_layout)
+        
+        colors_layout.addStretch()
+        layout.addLayout(colors_layout)
+        
+        layout.addSpacing(12)
+        
+        # Buttons
+        button_layout = QHBoxLayout()
+        self.import_button = QPushButton("Import")
+        self.cancel_button = QPushButton("Cancel")
+        self.import_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
+        button_layout.addStretch()
+        button_layout.addWidget(self.import_button)
+        button_layout.addWidget(self.cancel_button)
+        layout.addLayout(button_layout)
+        
+        self._apply_styling()
+    
+    def _apply_styling(self):
+        """Apply theme styling."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme = get_theme_manager().current_theme
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {theme.background_color};
+                color: {theme.text_primary};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 4px;
+                padding: 6px 12px;
+                min-width: 60px;
+            }}
+            QPushButton:hover {{
+                background-color: {StyleGenerator(theme).adjust_color_brightness(theme.panel_color, 1.2)};
+            }}
+        """)
+
+
 class ThemeTab(QWidget):
     """Theme customization tab with live preview."""
     
     def __init__(self, parent=None):
         """Initialize theme tab."""
         super().__init__(parent)
-        self.theme = ThemeColors()
-        self._setup_ui()
         
-        # Timer for live updates (debounced)
+        # Timer for live updates (debounced) - MUST be created before _setup_ui()
+        # because color picker signals connect to _schedule_update() during setup
         self.update_timer = QTimer()
         self.update_timer.setSingleShot(True)
         self.update_timer.timeout.connect(self._update_preview)
         if ANKI_AVAILABLE:
             self.update_timer.setInterval(100)  # 100ms debounce
+        
+        self.theme = get_theme_manager().current_theme
+        self._setup_ui()
     
     def _setup_ui(self):
         """Set up theme tab UI."""
@@ -806,26 +1139,84 @@ class ThemeTab(QWidget):
         
         controls_scroll.setWidget(controls_widget)
         
+        # Theme selector group (at top)
+        theme_selector_group = QGroupBox("Theme")
+        theme_selector_layout = QVBoxLayout(theme_selector_group)
+        
+        # Theme dropdown
+        dropdown_layout = QHBoxLayout()
+        dropdown_layout.setSpacing(8)
+        
+        dropdown_label = QLabel("Select Theme:")
+        self.theme_dropdown = QComboBox()
+        self.theme_dropdown.currentTextChanged.connect(self._on_theme_selected)
+        
+        dropdown_layout.addWidget(dropdown_label)
+        dropdown_layout.addWidget(self.theme_dropdown, 1)
+        theme_selector_layout.addLayout(dropdown_layout)
+        
+        # Theme management buttons
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setSpacing(8)
+        
+        self.save_theme_btn = QPushButton("Save Theme")
+        self.delete_theme_btn = QPushButton("Delete")
+        self.rename_theme_btn = QPushButton("Rename")
+        self.export_theme_btn = QPushButton("Export")
+        self.import_theme_btn = QPushButton("Import")
+        
+        self.save_theme_btn.clicked.connect(self._on_save_theme_clicked)
+        self.delete_theme_btn.clicked.connect(self._on_delete_theme_clicked)
+        self.rename_theme_btn.clicked.connect(self._on_rename_theme_clicked)
+        self.export_theme_btn.clicked.connect(self._on_export_theme_clicked)
+        self.import_theme_btn.clicked.connect(self._on_import_theme_clicked)
+        
+        # Add tooltips
+        if ANKI_AVAILABLE:
+            self.theme_dropdown.setToolTip("Select a theme to apply")
+            self.save_theme_btn.setToolTip("Save current colors as a new theme")
+            self.delete_theme_btn.setToolTip("Delete selected user theme (presets cannot be deleted)")
+            self.rename_theme_btn.setToolTip("Rename selected user theme")
+            self.export_theme_btn.setToolTip("Export theme to file for sharing")
+            self.import_theme_btn.setToolTip("Import theme from file")
+        
+        buttons_layout.addWidget(self.save_theme_btn)
+        buttons_layout.addWidget(self.delete_theme_btn)
+        buttons_layout.addWidget(self.rename_theme_btn)
+        buttons_layout.addWidget(self.export_theme_btn)
+        buttons_layout.addWidget(self.import_theme_btn)
+        buttons_layout.addStretch(1)
+        
+        theme_selector_layout.addLayout(buttons_layout)
+        controls_layout.addWidget(theme_selector_group)
+        
+        # Add spacing
+        controls_layout.addSpacing(8)
+        
         # Color pickers group
         colors_group = QGroupBox("Colors")
         colors_layout = QVBoxLayout(colors_group)
         colors_layout.setSpacing(8)
         
-        # Basic colors
+        # Basic colors - initialize with current theme
         self.bg_picker = ColorPicker("Background:", self.theme.background_color)
         self.panel_picker = ColorPicker("Panel:", self.theme.panel_color)
         self.text_picker = ColorPicker("Text:", self.theme.text_primary)
         self.muted_picker = ColorPicker("Muted Text:", self.theme.text_muted)
         self.border_picker = ColorPicker("Border:", self.theme.border_color)
+        self.accent_picker = ColorPicker("Accent:", self.theme.accent_color)
         
         colors_layout.addWidget(self.bg_picker)
         colors_layout.addWidget(self.panel_picker)
         colors_layout.addWidget(self.text_picker)
         colors_layout.addWidget(self.muted_picker)
         colors_layout.addWidget(self.border_picker)
+        colors_layout.addWidget(self.accent_picker)
         
-        # Pitch accent colors (Japanese-specific) - only show if Japanese dictionaries are present
-        self.pitch_accent_group = QGroupBox("Pitch Accent Colors (Japanese)")
+        controls_layout.addWidget(colors_group)
+        
+        # Pitch accent colors (Japanese-specific) - separate group at same level
+        self.pitch_accent_group = QGroupBox("Pitch Accent Colors")
         pitch_accent_layout = QVBoxLayout(self.pitch_accent_group)
         pitch_accent_layout.setSpacing(8)
         
@@ -841,6 +1232,8 @@ class ThemeTab(QWidget):
         pitch_accent_layout.addWidget(self.nakadaka_picker)
         pitch_accent_layout.addWidget(self.atamadaka_picker)
         pitch_accent_layout.addWidget(self.kifuku_picker)
+        
+        controls_layout.addWidget(self.pitch_accent_group)
         
         # Add comprehensive tooltips for pitch accent explanations
         if ANKI_AVAILABLE:
@@ -875,11 +1268,6 @@ class ThemeTab(QWidget):
                 "• Example: でんしゃ (densha)"
             )
         
-        # Initially show pitch accent colors (will be hidden/shown based on language detection)
-        colors_layout.addWidget(self.pitch_accent_group)
-        
-        controls_layout.addWidget(colors_group)
-        
         # Add some spacing between major groups
         controls_layout.addSpacing(8)
         
@@ -901,37 +1289,6 @@ class ThemeTab(QWidget):
         buttons_layout.addWidget(self.export_btn_picker)
         
         controls_layout.addWidget(buttons_group)
-        
-        # Add some spacing between major groups
-        controls_layout.addSpacing(8)
-        
-        # Theme presets group
-        presets_group = QGroupBox("Presets")
-        presets_layout = QVBoxLayout(presets_group)
-        
-        preset_buttons_layout = QHBoxLayout()
-        preset_buttons_layout.setSpacing(8)
-        
-        self.dark_preset_btn = QPushButton("Dark")
-        self.light_preset_btn = QPushButton("Light")
-        self.blue_preset_btn = QPushButton("Blue")
-        
-        # Set consistent button sizes
-        for btn in [self.dark_preset_btn, self.light_preset_btn, self.blue_preset_btn]:
-            btn.setMinimumWidth(80)
-            btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        
-        self.dark_preset_btn.clicked.connect(lambda: self._apply_preset("dark"))
-        self.light_preset_btn.clicked.connect(lambda: self._apply_preset("light"))
-        self.blue_preset_btn.clicked.connect(lambda: self._apply_preset("blue"))
-        
-        preset_buttons_layout.addWidget(self.dark_preset_btn)
-        preset_buttons_layout.addWidget(self.light_preset_btn)
-        preset_buttons_layout.addWidget(self.blue_preset_btn)
-        preset_buttons_layout.addStretch(1)
-        
-        presets_layout.addLayout(preset_buttons_layout)
-        controls_layout.addWidget(presets_group)
         
         controls_layout.addStretch()
         # Set size policy for controls to allow expansion
@@ -960,12 +1317,13 @@ class ThemeTab(QWidget):
         
         # Add rounded border styling to live preview - fixed alignment
         if ANKI_AVAILABLE:
-            self.live_preview.setStyleSheet("""
-                LivePreview {
-                    border: 1px solid #2b2f36;
+            theme = get_theme_manager().current_theme
+            self.live_preview.setStyleSheet(f"""
+                LivePreview {{
+                    border: 1px solid {theme.border_color};
                     border-radius: 8px;
                     padding: 8px;
-                }
+                }}
             """)
         
         preview_layout.addWidget(self.live_preview)
@@ -976,9 +1334,34 @@ class ThemeTab(QWidget):
         
         layout.addWidget(preview_scroll, 1)  # Less space for preview
         
+        # Apply scrollbar styling
+        if ANKI_AVAILABLE:
+            theme = get_theme_manager().current_theme
+            scrollbar_style = f"""
+                QScrollBar:vertical {{
+                    background-color: {theme.panel_color};
+                    width: 12px;
+                    border: none;
+                }}
+                QScrollBar::handle:vertical {{
+                    background-color: {theme.border_color};
+                    border-radius: 6px;
+                    min-height: 20px;
+                }}
+                QScrollBar::handle:vertical:hover {{
+                    background-color: {theme.accent_color};
+                }}
+                QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                    border: none;
+                    background: none;
+                }}
+            """
+            controls_scroll.setStyleSheet(scrollbar_style)
+            preview_scroll.setStyleSheet(scrollbar_style)
+        
         # Connect color pickers to live update
         for picker in [self.bg_picker, self.panel_picker, self.text_picker, 
-                      self.muted_picker, self.border_picker,
+                      self.muted_picker, self.border_picker, self.accent_picker,
                       self.heiban_picker, self.odaka_picker, self.nakadaka_picker,
                       self.atamadaka_picker, self.kifuku_picker,
                       self.search_btn_picker, self.audio_btn_picker, self.image_btn_picker,
@@ -987,6 +1370,9 @@ class ThemeTab(QWidget):
         
         # Check if we should show pitch accent colors based on available dictionaries
         self._update_pitch_accent_visibility()
+        
+        # Populate theme dropdown (after all pickers are created)
+        self._refresh_theme_dropdown()
     
     def _schedule_update(self):
         """Schedule a debounced preview update."""
@@ -1002,12 +1388,12 @@ class ThemeTab(QWidget):
             text_primary=self.text_picker.get_color(),
             text_muted=self.muted_picker.get_color(),
             border_color=self.border_picker.get_color(),
+            accent_color=self.accent_picker.get_color(),
             heiban_color=self.heiban_picker.get_color(),
             odaka_color=self.odaka_picker.get_color(),
             nakadaka_color=self.nakadaka_picker.get_color(),
             atamadaka_color=self.atamadaka_picker.get_color(),
             kifuku_color=self.kifuku_picker.get_color(),
-            accent_color=self.search_btn_picker.get_color(),
             audio_color=self.audio_btn_picker.get_color(),
             image_color=self.image_btn_picker.get_color(),
             copy_color=self.copy_btn_picker.get_color(),
@@ -1050,6 +1436,7 @@ class ThemeTab(QWidget):
             self.text_picker.set_color(theme.text_primary)
             self.muted_picker.set_color(theme.text_muted)
             self.border_picker.set_color(theme.border_color)
+            self.accent_picker.set_color(theme.accent_color)
             self.heiban_picker.set_color(theme.heiban_color)
             self.odaka_picker.set_color(theme.odaka_color)
             self.nakadaka_picker.set_color(theme.nakadaka_color)
@@ -1086,6 +1473,9 @@ class ThemeTab(QWidget):
                     }}
                 """)
             
+            # Save theme preference immediately when preset is selected
+            get_theme_manager().save_theme_preference(preset_name)
+            
             # Apply theme changes to parent mock UI immediately
             parent_window = self.parent()
             while parent_window and not hasattr(parent_window, '_apply_theme_settings'):
@@ -1099,6 +1489,338 @@ class ThemeTab(QWidget):
     def get_theme(self):
         """Get current theme configuration."""
         return self.theme
+    
+    def _validate_theme_name(self, name: str) -> tuple:
+        """Validate theme name. Returns (is_valid, error_message)."""
+        if not name or not name.strip():
+            return (False, "Theme name cannot be empty")
+        
+        name = name.strip()
+        
+        if len(name) > 50:
+            return (False, "Theme name must be 50 characters or less")
+        
+        # Allow alphanumeric, spaces, hyphens, underscores
+        import re
+        if not re.match(r'^[a-zA-Z0-9\s\-_]+$', name):
+            return (False, "Theme name can only contain letters, numbers, spaces, hyphens, and underscores")
+        
+        return (True, "")
+    
+    def _refresh_theme_dropdown(self):
+        """Populate dropdown with all available themes."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        theme_manager = get_theme_manager()
+        all_themes = theme_manager.get_all_themes()
+        
+        self.theme_dropdown.clear()
+        
+        for theme_name in sorted(all_themes.keys()):
+            if theme_manager.is_preset_theme(theme_name):
+                display_name = f"[Preset] {theme_name.title()}"
+            else:
+                display_name = f"[Custom] {theme_name}"
+            
+            self.theme_dropdown.addItem(display_name, theme_name)
+    
+    def _on_theme_selected(self, display_name: str):
+        """Handle theme selection from dropdown."""
+        if not ANKI_AVAILABLE or not display_name:
+            return
+        
+        # Get actual theme name from item data
+        index = self.theme_dropdown.currentIndex()
+        if index < 0:
+            return
+        
+        theme_name = self.theme_dropdown.itemData(index)
+        if not theme_name:
+            return
+        
+        theme_manager = get_theme_manager()
+        all_themes = theme_manager.get_all_themes()
+        
+        if theme_name in all_themes:
+            theme = all_themes[theme_name]
+            self.theme = theme
+            
+            # Update color pickers
+            self.bg_picker.set_color(theme.background_color)
+            self.panel_picker.set_color(theme.panel_color)
+            self.text_picker.set_color(theme.text_primary)
+            self.muted_picker.set_color(theme.text_muted)
+            self.border_picker.set_color(theme.border_color)
+            self.accent_picker.set_color(theme.accent_color)
+            
+            # Update live preview (if it exists)
+            if hasattr(self, 'live_preview'):
+                self.live_preview.update_theme(theme)
+            
+            # Save preference
+            theme_manager.save_theme_preference(theme_name)
+            
+            logger.info(f"Selected theme: {theme_name}")
+    
+    def _on_save_theme_clicked(self):
+        """Handle save theme button click."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        dialog = SaveThemeDialog(self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            theme_name = dialog.get_theme_name()
+            
+            # Validate theme name
+            is_valid, error_msg = self._validate_theme_name(theme_name)
+            if not is_valid:
+                QMessageBox.warning(self, "Invalid Theme Name", error_msg)
+                return
+            
+            theme_manager = get_theme_manager()
+            
+            # Check if theme exists and ask to overwrite
+            if theme_manager.theme_exists(theme_name):
+                reply = QMessageBox.question(
+                    self,
+                    "Theme Exists",
+                    f"Theme '{theme_name}' already exists.\nDo you want to overwrite it?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                if reply != QMessageBox.StandardButton.Yes:
+                    return
+            
+            try:
+                # Save theme
+                if theme_manager.save_user_theme(theme_name, self.theme):
+                    self._refresh_theme_dropdown()
+                    # Select the newly saved theme
+                    for i in range(self.theme_dropdown.count()):
+                        if self.theme_dropdown.itemData(i) == theme_name:
+                            self.theme_dropdown.setCurrentIndex(i)
+                            break
+                    QMessageBox.information(self, "Success", f"Theme '{theme_name}' saved successfully")
+                    logger.info(f"Saved theme: {theme_name}")
+                else:
+                    QMessageBox.critical(self, "Error", "Failed to save theme. Check file permissions.")
+                    logger.error(f"Failed to save theme: {theme_name}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
+                logger.error(f"Exception saving theme: {e}", exc_info=True)
+    
+    def _on_delete_theme_clicked(self):
+        """Handle delete theme button click."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        index = self.theme_dropdown.currentIndex()
+        if index < 0:
+            QMessageBox.warning(self, "Error", "No theme selected")
+            return
+        
+        theme_name = self.theme_dropdown.itemData(index)
+        if not theme_name:
+            QMessageBox.warning(self, "Error", "Invalid theme selection")
+            return
+        
+        theme_manager = get_theme_manager()
+        
+        # Prevent deleting presets
+        if theme_manager.is_preset_theme(theme_name):
+            QMessageBox.warning(self, "Error", "Cannot delete preset themes. Only custom themes can be deleted.")
+            return
+        
+        dialog = DeleteThemeDialog(theme_name, self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            try:
+                if theme_manager.delete_user_theme(theme_name):
+                    self._refresh_theme_dropdown()
+                    # Fall back to dark preset
+                    for i in range(self.theme_dropdown.count()):
+                        if self.theme_dropdown.itemData(i) == "dark":
+                            self.theme_dropdown.setCurrentIndex(i)
+                            break
+                    QMessageBox.information(self, "Success", f"Theme '{theme_name}' deleted successfully")
+                    logger.info(f"Deleted theme: {theme_name}")
+                else:
+                    QMessageBox.critical(self, "Error", "Failed to delete theme. Check file permissions.")
+                    logger.error(f"Failed to delete theme: {theme_name}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
+                logger.error(f"Exception deleting theme: {e}", exc_info=True)
+    
+    def _on_rename_theme_clicked(self):
+        """Handle rename theme button click."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        index = self.theme_dropdown.currentIndex()
+        if index < 0:
+            QMessageBox.warning(self, "Error", "No theme selected")
+            return
+        
+        theme_name = self.theme_dropdown.itemData(index)
+        if not theme_name:
+            QMessageBox.warning(self, "Error", "Invalid theme selection")
+            return
+        
+        theme_manager = get_theme_manager()
+        
+        # Prevent renaming presets
+        if theme_manager.is_preset_theme(theme_name):
+            QMessageBox.warning(self, "Error", "Cannot rename preset themes. Only custom themes can be renamed.")
+            return
+        
+        dialog = RenameThemeDialog(theme_name, self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            new_name = dialog.get_new_name()
+            
+            # Validate new name
+            is_valid, error_msg = self._validate_theme_name(new_name)
+            if not is_valid:
+                QMessageBox.warning(self, "Invalid Theme Name", error_msg)
+                return
+            
+            if new_name == theme_name:
+                return  # No change
+            
+            if theme_manager.theme_exists(new_name):
+                QMessageBox.warning(self, "Error", f"Theme '{new_name}' already exists")
+                return
+            
+            try:
+                # Rename by deleting old and saving new
+                user_themes = theme_manager.load_user_themes()
+                if theme_name in user_themes:
+                    old_theme = user_themes[theme_name]
+                    theme_manager.delete_user_theme(theme_name)
+                    theme_manager.save_user_theme(new_name, old_theme)
+                    
+                    self._refresh_theme_dropdown()
+                    # Select the renamed theme
+                    for i in range(self.theme_dropdown.count()):
+                        if self.theme_dropdown.itemData(i) == new_name:
+                            self.theme_dropdown.setCurrentIndex(i)
+                            break
+                    QMessageBox.information(self, "Success", f"Theme renamed to '{new_name}'")
+                    logger.info(f"Renamed theme to: {new_name}")
+                else:
+                    QMessageBox.critical(self, "Error", "Theme not found")
+                    logger.error(f"Theme not found for rename: {theme_name}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
+                logger.error(f"Exception renaming theme: {e}", exc_info=True)
+    
+    def _on_export_theme_clicked(self):
+        """Handle export theme button click."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        index = self.theme_dropdown.currentIndex()
+        if index < 0:
+            QMessageBox.warning(self, "Error", "No theme selected")
+            return
+        
+        theme_name = self.theme_dropdown.itemData(index)
+        if not theme_name:
+            QMessageBox.warning(self, "Error", "Invalid theme selection")
+            return
+        
+        # Open file save dialog
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export Theme",
+            f"{theme_name}.json",
+            "JSON Files (*.json)"
+        )
+        
+        if not file_path:
+            return
+        
+        try:
+            theme_manager = get_theme_manager()
+            if theme_manager.export_theme(theme_name, file_path):
+                QMessageBox.information(self, "Success", f"Theme exported successfully to:\n{file_path}")
+                logger.info(f"Exported theme to: {file_path}")
+            else:
+                QMessageBox.critical(self, "Error", "Failed to export theme. Check file permissions.")
+                logger.error(f"Failed to export theme: {theme_name}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
+            logger.error(f"Exception exporting theme: {e}", exc_info=True)
+    
+    def _on_import_theme_clicked(self):
+        """Handle import theme button click."""
+        if not ANKI_AVAILABLE:
+            return
+        
+        # Open file open dialog
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Import Theme",
+            "",
+            "JSON Files (*.json)"
+        )
+        
+        if not file_path:
+            return
+        
+        try:
+            theme_manager = get_theme_manager()
+            
+            # Validate file
+            if not theme_manager.validate_theme_file(file_path):
+                QMessageBox.critical(
+                    self,
+                    "Invalid Theme File",
+                    "The selected file is not a valid theme file.\nPlease check the file format."
+                )
+                return
+            
+            # Import theme
+            success, imported_theme = theme_manager.import_theme(file_path)
+            if not success or imported_theme is None:
+                QMessageBox.critical(self, "Error", "Failed to import theme from file")
+                return
+            
+            # Show preview
+            import_name = Path(file_path).stem  # Use filename as default name
+            preview_dialog = ImportPreviewDialog(import_name, imported_theme, self)
+            if preview_dialog.exec() == QDialog.DialogCode.Accepted:
+                # Validate import name
+                is_valid, error_msg = self._validate_theme_name(import_name)
+                if not is_valid:
+                    QMessageBox.warning(self, "Invalid Theme Name", error_msg)
+                    return
+                
+                # Check for conflicts
+                if theme_manager.theme_exists(import_name):
+                    reply = QMessageBox.question(
+                        self,
+                        "Theme Exists",
+                        f"Theme '{import_name}' already exists.\nOverwrite it?",
+                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                    )
+                    if reply != QMessageBox.StandardButton.Yes:
+                        return
+                
+                # Save imported theme
+                if theme_manager.save_user_theme(import_name, imported_theme):
+                    self._refresh_theme_dropdown()
+                    # Select the imported theme
+                    for i in range(self.theme_dropdown.count()):
+                        if self.theme_dropdown.itemData(i) == import_name:
+                            self.theme_dropdown.setCurrentIndex(i)
+                            break
+                    QMessageBox.information(self, "Success", f"Theme '{import_name}' imported successfully")
+                    logger.info(f"Imported theme: {import_name}")
+                else:
+                    QMessageBox.critical(self, "Error", "Failed to save imported theme. Check file permissions.")
+                    logger.error(f"Failed to save imported theme: {import_name}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"An error occurred: {str(e)}")
+            logger.error(f"Exception importing theme: {e}", exc_info=True)
     
     def _update_pitch_accent_visibility(self):
         """Show/hide pitch accent colors based on whether Japanese dictionaries are present."""
@@ -1184,7 +1906,8 @@ class DictionariesTab(QWidget):
         
         # Search priority info
         priority_label = QLabel("Drag dictionaries to reorder search priority, or use up/down buttons (top = highest priority)")
-        priority_label.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        priority_label.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         priority_label.setWordWrap(True)  # Allow text wrapping for better responsive behavior
         settings_layout.addWidget(priority_label)
         
@@ -1278,7 +2001,8 @@ class DictionariesTab(QWidget):
         # Details
         details = f"{dict_config['language']} • {dict_config['type'].title()} • {dict_config['entries']} entries"
         details_label = QLabel(details)
-        details_label.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        details_label.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         info_layout.addWidget(details_label)
         
         item_layout.addLayout(info_layout, 1)
@@ -1305,9 +2029,10 @@ class DictionariesTab(QWidget):
         
         item_layout.addLayout(reorder_layout)
         
-        # Remove button
-        remove_btn = QPushButton("Remove")
-        remove_btn.setFixedWidth(80)
+        # Remove button with trash icon
+        remove_btn = QPushButton("🗑")
+        remove_btn.setFixedSize(32, 32)
+        remove_btn.setToolTip("Remove dictionary")
         remove_btn.clicked.connect(
             lambda checked, dict_id=dict_config['id']: self._remove_dictionary(dict_id)
         )
@@ -1315,22 +2040,21 @@ class DictionariesTab(QWidget):
         
         # Priority indicator (far right)
         priority_label = QLabel(f"#{dict_config['priority'] + 1}")
-        priority_label.setStyleSheet("color: #9aa0ad; font-size: 12px; font-weight: bold;")
+        theme = get_theme_manager().current_theme
+        priority_label.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px; font-weight: bold;")
         priority_label.setFixedWidth(30)
         item_layout.addWidget(priority_label)
         
-        # Style the item
+        # Style the item using theme manager
         if not ANKI_AVAILABLE:
             return item_widget
         
+        theme = get_theme_manager().current_theme
         item_widget.setStyleSheet(f"""
             QWidget {{
-                background-color: #1c1c1c;
-                border: 1px solid #2b2f36;
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
                 border-radius: 6px;
-            }}
-            QWidget:hover {{
-                border-color: #4a9eff;
             }}
         """)
         
@@ -1555,7 +2279,8 @@ class AddDictionaryDialog(QDialog):
         
         # Validation status
         self.status_label = QLabel("")
-        self.status_label.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        self.status_label.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         layout.addWidget(self.status_label)
         
         # Buttons
@@ -1611,13 +2336,15 @@ class AddDictionaryDialog(QDialog):
             
             if validation_result['success']:
                 self.status_label.setText(f"✓ {validation_result['message']}")
-                self.status_label.setStyleSheet("color: #51cf66;")
+                theme = get_theme_manager().current_theme
+                self.status_label.setStyleSheet(f"color: {theme.success_color};")
                 
                 # Enable add button
                 self.add_btn.setEnabled(True)
             else:
                 self.status_label.setText(f"✗ {validation_result['message']}")
-                self.status_label.setStyleSheet("color: #ff6b6b;")
+                theme = get_theme_manager().current_theme
+                self.status_label.setStyleSheet(f"color: {theme.error_color};")
                 
                 # Show recovery options
                 self._show_connection_error_dialog(validation_result['details'])
@@ -1627,7 +2354,8 @@ class AddDictionaryDialog(QDialog):
                 progress.close()
             
             self.status_label.setText(f"✗ Validation failed: {str(e)}")
-            self.status_label.setStyleSheet("color: #ff6b6b;")
+            theme = get_theme_manager().current_theme
+            self.status_label.setStyleSheet(f"color: {theme.error_color};")
             logger.error(f"Dictionary validation error: {e}")
     
     def _validate_input_format(self, conn_str, dict_type):
@@ -1773,7 +2501,8 @@ class AddDictionaryDialog(QDialog):
     def _show_validation_errors(self, errors):
         """Show validation errors to user."""
         self.status_label.setText(f"✗ {errors[0]}")  # Show first error
-        self.status_label.setStyleSheet("color: #ff6b6b;")
+        theme = get_theme_manager().current_theme
+        self.status_label.setStyleSheet(f"color: {theme.error_color};")
         
         # If multiple errors, show them in a dialog
         if len(errors) > 1 and ANKI_AVAILABLE:
@@ -1799,20 +2528,23 @@ class AddDictionaryDialog(QDialog):
         if result == 2:  # Reset button was clicked
             self.conn_input.clear()
             self.status_label.setText("Connection string cleared. Please try again.")
-            self.status_label.setStyleSheet("color: #9aa0ad;")
+            theme = get_theme_manager().current_theme
+            self.status_label.setStyleSheet(f"color: {theme.text_muted};")
     
     def _add_dictionary(self):
         """Add the dictionary."""
         name = self.name_input.text().strip()
         if not name:
             self.status_label.setText("Please enter a dictionary name")
-            self.status_label.setStyleSheet("color: #ff6b6b;")
+            theme = get_theme_manager().current_theme
+            self.status_label.setStyleSheet(f"color: {theme.error_color};")
             return
         
         conn_str = self.conn_input.text().strip()
         if not conn_str:
             self.status_label.setText("Please enter a connection string")
-            self.status_label.setStyleSheet("color: #ff6b6b;")
+            theme = get_theme_manager().current_theme
+            self.status_label.setStyleSheet(f"color: {theme.error_color};")
             return
         
         # Create dictionary configuration
@@ -1864,7 +2596,8 @@ class ImportExportTab(QWidget):
         
         # Export description
         export_desc = QLabel("Export your current settings to a JSON file for backup or sharing.")
-        export_desc.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        export_desc.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         export_layout.addWidget(export_desc)
         
         # Export options
@@ -1907,7 +2640,8 @@ class ImportExportTab(QWidget):
         
         # Import description
         import_desc = QLabel("Import settings from a JSON file. You can preview changes before applying them.")
-        import_desc.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        import_desc.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         import_layout.addWidget(import_desc)
         
         # Import button
@@ -1927,7 +2661,8 @@ class ImportExportTab(QWidget):
         
         # Backup description
         backup_desc = QLabel("Automatic backups are created before major changes. You can restore from recent backups.")
-        backup_desc.setStyleSheet("color: #9aa0ad; font-size: 12px;")
+        theme = get_theme_manager().current_theme
+        backup_desc.setStyleSheet(f"color: {theme.text_muted}; font-size: 12px;")
         backup_layout.addWidget(backup_desc)
         
         # Backup buttons
@@ -1955,7 +2690,8 @@ class ImportExportTab(QWidget):
         
         # Status label for quick restore
         self.quick_restore_status = QLabel("")
-        self.quick_restore_status.setStyleSheet("color: #9aa0ad; font-size: 11px;")
+        theme = get_theme_manager().current_theme
+        self.quick_restore_status.setStyleSheet(f"color: {theme.text_muted}; font-size: 11px;")
         quick_restore_layout.addWidget(self.quick_restore_status)
         
         quick_restore_layout.addStretch()
@@ -2879,7 +3615,8 @@ class ImportPreviewDialog(QDialog):
         
         # Description
         desc_label = QLabel("Select which settings categories to import:")
-        desc_label.setStyleSheet("color: #9aa0ad; margin-bottom: 12px;")
+        theme = get_theme_manager().current_theme
+        desc_label.setStyleSheet(f"color: {theme.text_muted}; margin-bottom: 12px;")
         layout.addWidget(desc_label)
         
         # Settings preview
@@ -3106,11 +3843,14 @@ class ModernSettingsWindow(QDialog):
     def __init__(self, parent=None):
         """Initialize modern settings window."""
         super().__init__(parent)
+        self.theme_manager = get_theme_manager()  # Add this
+        self.style_generator = StyleGenerator(self.theme_manager.current_theme)  # Add this
+        self.theme_manager.register_observer(self._on_theme_changed)  # Add this
         self._setup_window()
         self._create_tabs()
         self._setup_layout()
         self._setup_buttons()
-        self._apply_styling()
+        self._apply_styling()  # This will now use current theme
         
         logger.info("Modern settings window initialized")
     
@@ -3184,11 +3924,12 @@ class ModernSettingsWindow(QDialog):
         self.layout().addWidget(buttons_widget)
     
     def _apply_styling(self):
-        """Apply dark theme styling to the dialog."""
+        """Apply theme styling to the dialog."""
         if not ANKI_AVAILABLE:
             return
         
-        theme = ThemeColors()
+        # Use current theme instead of hardcoded ThemeColors()
+        theme = self.theme_manager.current_theme
         self.setStyleSheet(f"""
             QDialog {{
                 background-color: {theme.background_color};
@@ -3220,7 +3961,7 @@ class ModernSettingsWindow(QDialog):
             }}
             
             QTabBar::tab:hover {{
-                background-color: #333;
+                background-color: {self.style_generator.adjust_color_brightness(theme.panel_color, 1.2)};
             }}
             
             QGroupBox {{
@@ -3269,17 +4010,17 @@ class ModernSettingsWindow(QDialog):
             }}
             
             QCheckBox:disabled {{
-                color: #555;
+                color: {theme.text_muted};
             }}
             
             QCheckBox::indicator:disabled {{
-                background-color: #333;
-                border-color: #555;
+                background-color: {self.style_generator.adjust_color_brightness(theme.panel_color, 0.8)};
+                border-color: {theme.border_color};
             }}
             
             QCheckBox::indicator:checked:disabled {{
-                background-color: #555;
-                border-color: #666;
+                background-color: {theme.border_color};
+                border-color: {self.style_generator.adjust_color_brightness(theme.border_color, 1.2)};
             }}
             
             QSpinBox, QLineEdit {{
@@ -3304,7 +4045,7 @@ class ModernSettingsWindow(QDialog):
             }}
             
             QSpinBox::up-button:hover, QSpinBox::down-button:hover {{
-                background-color: #333;
+                background-color: {self.style_generator.adjust_color_brightness(theme.panel_color, 1.2)};
             }}
             
             QSpinBox::up-arrow {{
@@ -3335,12 +4076,12 @@ class ModernSettingsWindow(QDialog):
             }}
             
             QPushButton:hover {{
-                background-color: #333;
-                border-color: #555;
+                background-color: {self.style_generator.adjust_color_brightness(theme.panel_color, 1.2)};
+                border-color: {self.style_generator.adjust_color_brightness(theme.border_color, 1.2)};
             }}
             
             QPushButton:pressed {{
-                background-color: #222;
+                background-color: {self.style_generator.adjust_color_brightness(theme.panel_color, 0.8)};
             }}
             
             QPushButton:default {{
@@ -3349,7 +4090,7 @@ class ModernSettingsWindow(QDialog):
             }}
             
             QPushButton:default:hover {{
-                background-color: #5a9fff;
+                background-color: {self.style_generator.adjust_color_brightness(theme.accent_color, 1.2)};
             }}
         """)
     
@@ -3740,6 +4481,19 @@ class ModernSettingsWindow(QDialog):
         except Exception as e:
             logger.error(f"Failed to apply imported settings: {e}")
             raise
+    
+    def _on_theme_changed(self, new_theme: ThemeColors):
+        """Handle theme changes from theme manager."""
+        self.style_generator = StyleGenerator(new_theme)
+        self._apply_styling()  # Reapply styling with new theme
+        # Also update the theme tab if it exists
+        if hasattr(self, 'theme_tab'):
+            self.theme_tab.update_theme(new_theme)
+    
+    def closeEvent(self, event):
+        """Clean up theme observer on close."""
+        self.theme_manager.unregister_observer(self._on_theme_changed)
+        super().closeEvent(event)
 
 
 def show_modern_settings(parent=None):
