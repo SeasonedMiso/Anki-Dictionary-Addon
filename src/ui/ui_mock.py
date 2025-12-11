@@ -38,6 +38,25 @@ class UIMockWindow(QWidget):
         """Initialize UI mock window."""
         super().__init__(parent)
         
+        # Load saved theme preference or default to dark
+        from .styling import THEME_PRESETS
+        from pathlib import Path
+        
+        theme_manager = get_theme_manager()
+        config_path = Path(__file__).parent.parent.parent / "config" / "config.json"
+        theme_manager.config_path = str(config_path)
+        
+        saved_theme = theme_manager.load_theme_preference()
+        
+        # Get all available themes (presets + user themes)
+        all_themes = theme_manager.get_all_themes()
+        
+        # Use saved theme if it exists, otherwise default to dark
+        if saved_theme and saved_theme in all_themes:
+            theme_manager.update_theme(all_themes[saved_theme])
+        else:
+            theme_manager.update_theme(THEME_PRESETS["dark"])
+        
         self.setWindowTitle("Dictionary UI Mock - Design Preview")
         self.setMinimumSize(600, 400)  # Smaller minimum for better usability
         
@@ -45,10 +64,9 @@ class UIMockWindow(QWidget):
         self.theme_manager = get_theme_manager()
         self.style_generator = StyleGenerator(self.theme_manager.current_theme)
         self.theme_manager.register_observer(self._on_theme_changed)
-        
-        self._apply_theme_styling()
 
         self._setup_ui()
+        self._apply_theme_styling()
         self._populate_sample_data()
     
     def _setup_ui(self):
@@ -106,19 +124,25 @@ class UIMockWindow(QWidget):
         
         # Floating options button in bottom right corner
         self.options_btn = QPushButton("⚙")
-        self.options_btn.setFixedSize(40, 40)
+        self.options_btn.setFixedSize(24, 24)
         self.options_btn.clicked.connect(self._on_options_clicked)
         
-        # Position the button in bottom right corner
+        # Position the button in bottom right corner with padding
         self.options_btn.setParent(self)
-        self.options_btn.move(self.width() - 60, self.height() - 60)
+        # Position will be set in showEvent when window size is known
         self.options_btn.raise_()  # Bring to front
+    
+    def showEvent(self, event):
+        """Position button when window is shown."""
+        super().showEvent(event)
+        if hasattr(self, 'options_btn'):
+            self.options_btn.move(self.width() - 70, self.height() - 70)
     
     def resizeEvent(self, event):
         """Handle window resize to keep options button in corner."""
         super().resizeEvent(event)
         if hasattr(self, 'options_btn'):
-            self.options_btn.move(self.width() - 60, self.height() - 60)
+            self.options_btn.move(self.width() - 70, self.height() - 70)
     
     def _populate_sample_data(self):
         """Populate with sample word sections (new structure: Word > Dictionary)."""
@@ -138,6 +162,40 @@ class UIMockWindow(QWidget):
         taberu_section = WordSection(taberu_data)
         taberu_section.audioRequested.connect(lambda w: self._on_action('Audio', w))
         taberu_section.imageRequested.connect(lambda w: self._on_action('Image', w))
+        
+        # DIAGNOSTIC CODE
+        print("========== DIAGNOSTIC START ==========")
+        print(f"WordSection type: {type(taberu_section)}")
+        print(f"WordSection class: {taberu_section.__class__.__name__}")
+        
+        if hasattr(taberu_section, 'collapsible_box'):
+            print(f"✓ Has collapsible_box attribute")
+            print(f"  Type: {type(taberu_section.collapsible_box)}")
+            print(f"  Class: {taberu_section.collapsible_box.__class__.__name__}")
+            
+            if hasattr(taberu_section.collapsible_box, 'header'):
+                print(f"  ✓ Has header attribute")
+                print(f"    Header parent: {taberu_section.collapsible_box.header.parent()}")
+                print(f"    Header stylesheet: {taberu_section.collapsible_box.header.styleSheet()[:100]}...")
+            else:
+                print(f"  ✗ NO header attribute!")
+            
+            if hasattr(taberu_section.collapsible_box, 'content_frame'):
+                print(f"  ✓ Has content_frame attribute")
+                print(f"    Content frame parent: {taberu_section.collapsible_box.content_frame.parent()}")
+            else:
+                print(f"  ✗ NO content_frame attribute!")
+            
+            container_style = taberu_section.collapsible_box.styleSheet()
+            print(f"  Container stylesheet length: {len(container_style)}")
+            if "border-left" in container_style:
+                print(f"  ✓ Has border-left styling")
+            else:
+                print(f"  ✗ NO border-left styling!")
+        else:
+            print(f"✗ NO collapsible_box attribute!")
+        
+        print("========== DIAGNOSTIC END ==========\n")
         
         # Add JMdict definition (primary - expanded by default)
         taberu_section.add_dictionary_section(
@@ -225,22 +283,55 @@ class UIMockWindow(QWidget):
         """Handle theme changes from the centralized theme manager."""
         self.style_generator = StyleGenerator(new_theme)
         self._apply_theme_styling()
+        
+        # Update all child components
+        for component in [self.search_bar, self.filter_bar, self.results_area]:
+            if hasattr(component, 'update_theme'):
+                component.update_theme(new_theme)
+        
+        # Update all word sections in results area
+        if hasattr(self, 'results_area') and hasattr(self.results_area, 'layout'):
+            layout = self.results_area.layout
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if item:
+                    widget = item.widget()
+                    if widget and hasattr(widget, 'update_theme'):
+                        widget.update_theme(new_theme)
+        
         logger.info("Applied theme changes to mock UI")
     
     def _apply_theme_styling(self):
         """Apply current theme styling to all UI elements."""
         theme = self.theme_manager.current_theme
         
-        # Apply main window styling
+        # Apply main window styling with comprehensive stylesheet
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {theme.background_color};
                 color: {theme.text_primary};
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             }}
+            QMainWindow {{
+                background-color: {theme.background_color};
+            }}
+            QLabel {{
+                color: {theme.text_primary};
+                background-color: transparent;
+            }}
             QLabel#subtitle {{
                 color: {theme.text_muted};
                 font-size: {theme.get_font_size('small')}px;
+            }}
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: {theme.border_radius}px;
+                padding: 8px 8px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.accent_color};
             }}
         """)
         
@@ -290,15 +381,27 @@ class UIMockWindow(QWidget):
         """Update options button styling with current theme colors."""
         theme = self.theme_manager.current_theme
         
-        # Use the centralized style generator
-        button_style = self.style_generator.button_style(
-            bg_color=theme.panel_color,
-            text_color=theme.text_primary,
-            border_radius=8,
-            padding="8px",
-            size_type="medium",
-            font_weight="bold"
-        )
+        # Custom square button style for options button
+        button_style = f"""
+            QPushButton {{
+                background-color: {theme.panel_color};
+                color: {theme.text_primary};
+                border: 1px solid {theme.border_color};
+                border-radius: 6px;
+                padding: 0px;
+                font-size: 14px;
+                font-weight: bold;
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+                max-width: 40px;
+                max-height: 40px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.accent_color};
+            }}
+        """
         
         self.options_btn.setStyleSheet(button_style)
 

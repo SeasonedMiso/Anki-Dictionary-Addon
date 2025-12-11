@@ -71,8 +71,7 @@ except ImportError:
 
 from .styling import ThemeColors, StyleGenerator, get_theme_manager
 from .base_widgets import (
-    ThemedWidget, ThemedButton, ThemedLabel, ThemedLineEdit, ThemedFrame,
-    ActionButton, CopyButton, FrequencyBadge, PitchAccentLabel
+    ThemedWidget, ThemedButton, ThemedLabel, ActionButton
 )
 
 logger = logging.getLogger(__name__)
@@ -255,26 +254,34 @@ class CollapsibleBox(ThemedWidget):
         if not ANKI_AVAILABLE:
             return
         
-        # Header button styling
-        header_style = self.style_generator.button_style(
-            bg_color=self.style_generator.theme.panel_color,
-            padding="12px 16px",
-            size_type="base"
-        )
-        # Override text alignment for header
-        header_style = header_style.replace(
-            "QPushButton {",
-            "QPushButton { text-align: left;"
-        )
+        theme = self.theme_manager.current_theme
+        
+        # Header button styling - no border, transparent background
+        header_style = f"""
+            QPushButton {{
+                background-color: transparent;
+                color: {theme.text_primary};
+                border: none;
+                padding: 12px 16px;
+                text-align: left;
+                font-size: {theme.get_font_size('base')}px;
+                font-weight: 600;
+            }}
+            QPushButton:hover {{
+                background-color: {self.style_generator.adjust_color_brightness(theme.background_color, 1.05)};
+            }}
+        """
         self.header.setStyleSheet(header_style)
         
-        # Content frame styling
-        content_style = """
-            QFrame {
-                background: transparent;
-                border: none;
+        # Content frame styling - border around content only, panel background
+        content_style = f"""
+            QFrame {{
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
+                border-radius: {theme.border_radius}px;
                 padding: 0px;
-            }
+                margin: 0px;
+            }}
         """
         self.content_frame.setStyleSheet(content_style)
     
@@ -318,13 +325,13 @@ class ModernSearchBar(ThemedWidget):
         # Create search input
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search for a word or phrase...")
-        self.search_input.setMinimumHeight(50)
+        self.search_input.setMinimumHeight(36)
         self.search_input.textChanged.connect(self._on_text_changed)
         self.search_input.returnPressed.connect(self._on_search_requested)
         
         # Create search button
         self.search_button = QPushButton("⌕")
-        self.search_button.setMinimumHeight(50)
+        self.search_button.setMinimumHeight(36)
         self.search_button.setMinimumWidth(60)
         self.search_button.clicked.connect(self._on_search_requested)
         
@@ -353,8 +360,8 @@ class ModernSearchBar(ThemedWidget):
         
         # Search input styling
         input_style = self.style_generator.input_style(
-            padding="12px 20px",
-            size_type="medium"
+            padding="6px 12px",
+            size_type="small"
         )
         # Override border radius for search bar
         input_style = input_style.replace(
@@ -363,14 +370,26 @@ class ModernSearchBar(ThemedWidget):
         )
         self.search_input.setStyleSheet(input_style)
         
-        # Search button styling
-        button_style = self.style_generator.button_style(
-            bg_color=self.style_generator.theme.accent_color,
-            text_color="white",
-            border_radius=12,
-            padding="12px 16px",
-            size_type="large"
-        )
+        # Search button styling - custom to match search bar height
+        theme = self.style_generator.theme
+        button_style = f"""
+            QPushButton {{
+                background-color: {theme.accent_color};
+                color: white;
+                border: 1px solid {theme.border_color};
+                border-radius: 12px;
+                padding: 0px 16px;
+                font-size: {theme.get_font_size('large')}px;
+                font-weight: bold;
+                min-width: 60px;
+            }}
+            QPushButton:hover {{
+                background-color: {self.style_generator.adjust_color_brightness(theme.accent_color, 1.2)};
+            }}
+            QPushButton:pressed {{
+                background-color: {self.style_generator.adjust_color_brightness(theme.accent_color, 0.8)};
+            }}
+        """
         self.search_button.setStyleSheet(button_style)
     
     def _on_text_changed(self, text: str) -> None:
@@ -670,23 +689,23 @@ class DefinitionCard(QWidget):
         
         word = self.word_data.get('word', '')
         
-        # Audio button (blue) - 🔊
-        audio_btn = ActionButton("Audio", "🔊", "audio", lambda: self.audioRequested.emit(word))
+        # Audio button (blue)
+        audio_btn = ActionButton("Audio", "audio", lambda: self.audioRequested.emit(word), compact=True)
         audio_btn.setToolTip("Play audio pronunciation")
         layout.addWidget(audio_btn, 1)  # Equal stretch
         
-        # Image button (green) - 🖼️
-        image_btn = ActionButton("Images", "🖼️", "image", lambda: self.imageRequested.emit(word))
+        # Image button (green)
+        image_btn = ActionButton("Images", "image", lambda: self.imageRequested.emit(word), compact=True)
         image_btn.setToolTip("Search images")
         layout.addWidget(image_btn, 1)  # Equal stretch
         
-        # Copy to clipboard button - ✂
-        copy_btn = ActionButton("Copy", "✂", "copy", lambda: self._copy_to_clipboard(copy_btn))
+        # Copy to clipboard button
+        copy_btn = ActionButton("Copy", "copy", lambda: self._copy_to_clipboard(copy_btn), compact=True)
         copy_btn.setToolTip("Copy definition to clipboard")
         layout.addWidget(copy_btn, 1)  # Equal stretch
         
-        # Export to Anki button (purple) - 💾
-        export_btn = ActionButton("Export", "💾", "export", lambda: self.exportRequested.emit(word))
+        # Export to Anki button (purple)
+        export_btn = ActionButton("Export", "export", lambda: self.exportRequested.emit(word), compact=True)
         export_btn.setToolTip("Add to card exporter")
         layout.addWidget(export_btn, 1)  # Equal stretch
         
@@ -861,55 +880,218 @@ class DefinitionCard(QWidget):
         return container
 
 
+class WordCollapsibleBox(QFrame):
+    """
+    Word container with header INSIDE the bordered box and colored pitch accent border.
+    
+    CRITICAL FIXES:
+    1. Header is INSIDE the bordered container (not outside)
+    2. Colored left border for pitch accent
+    3. Dictionary content boxes have visible borders
+    4. Example items have NO borders
+    """
+    
+    def __init__(self, word_text: str, pitch_accent: str = '', parent: Optional[QWidget] = None):
+        """Initialize word collapsible box with header INSIDE."""
+        super().__init__(parent)
+        
+        self.word_text = word_text
+        self.pitch_accent_type = pitch_accent
+        self.is_expanded = True
+        
+        # Get theme manager and register as observer
+        self.theme_manager = get_theme_manager()
+        self.style_generator = StyleGenerator(self.theme_manager.current_theme)
+        self.theme_manager.register_observer(self._on_theme_changed)
+        
+        # Main layout for THIS widget
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+        
+        # Header container with layout for title + buttons
+        self.header_container = QWidget()
+        self.header_layout = QHBoxLayout(self.header_container)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
+        self.header_layout.setSpacing(8)
+        
+        # Header title button (clickable)
+        self.header_button = QPushButton(f"▼ {word_text}")
+        self.header_button.clicked.connect(self.toggle)
+        self.header_layout.addWidget(self.header_button, 1)  # Stretch to fill
+        
+        self.main_layout.addWidget(self.header_container)
+        
+        # Content area goes INSIDE this widget
+        self.content_frame = QFrame()
+        self.content_layout = QVBoxLayout(self.content_frame)
+        self.content_layout.setContentsMargins(16, 16, 16, 16)
+        self.content_layout.setSpacing(12)
+        self.main_layout.addWidget(self.content_frame)  # ← Inside!
+        
+        # Apply styling
+        self._apply_styling()
+    
+    def add_content(self, widget: QWidget) -> None:
+        """Add widget to content area."""
+        self.content_layout.addWidget(widget)
+    
+    def add_header_widget(self, widget: QWidget) -> None:
+        """Add widget to header right side."""
+        self.header_layout.addWidget(widget, 0)  # Don't stretch
+    
+    def toggle(self) -> None:
+        """Toggle expanded/collapsed state."""
+        if self.is_expanded:
+            self.collapse()
+        else:
+            self.expand()
+    
+    def collapse(self) -> None:
+        """Collapse content area."""
+        if not self.is_expanded:
+            return
+        self.is_expanded = False
+        self.header_button.setText(f"▶ {self.word_text}")
+        self.content_frame.hide()
+    
+    def expand(self) -> None:
+        """Expand content area."""
+        if self.is_expanded:
+            return
+        self.is_expanded = True
+        self.header_button.setText(f"▼ {self.word_text}")
+        self.content_frame.show()
+    
+    def _on_theme_changed(self, new_theme: ThemeColors):
+        """Handle theme changes from theme manager."""
+        self.style_generator = StyleGenerator(new_theme)
+        self._apply_styling()
+    
+    def _apply_styling(self):
+        """Apply styling with colored pitch accent border using current theme."""
+        theme = self.theme_manager.current_theme
+        
+        # Get pitch accent color from theme - Fixed for verbs
+        pitch_colors = {
+            '0': theme.heiban_color,      # heiban - blue
+            '1': theme.atamadaka_color,   # atamadaka - red  
+            '2': theme.kifuku_color,      # kifuku - purple (for verbs like taberu)
+            '3': theme.nakadaka_color,    # nakadaka - orange
+            'odaka': theme.odaka_color,   # odaka - green
+            'kifuku': theme.kifuku_color  # kifuku - purple
+        }
+        pitch_color = pitch_colors.get(self.pitch_accent_type, theme.heiban_color)
+        
+        # DIAGNOSTIC
+        logger.debug(f"[WordCollapsibleBox] Applying pitch accent styling:")
+        logger.debug(f"  - pitch_accent_type: {self.pitch_accent_type}")
+        logger.debug(f"  - pitch_color: {pitch_color}")
+        logger.debug(f"  - theme.panel_color: {theme.panel_color}")
+        
+        # Apply to SELF (QFrame) - entire container uses panel color with colored left border
+        self.setObjectName("WordCollapsibleBox")
+        self.setStyleSheet(f"""
+            QFrame#WordCollapsibleBox {{
+                background-color: {theme.panel_color};
+                border: 1px solid {theme.border_color};
+                border-left: 5px solid {pitch_color} !important;
+                border-radius: {theme.border_radius}px;
+                margin: 0px;
+                padding: 0px;
+            }}
+        """)
+        
+        # Header container styling - transparent
+        self.header_container.setStyleSheet(f"""
+            QWidget {{
+                background-color: transparent;
+                border: none;
+                margin: 0px;
+                padding: 0px;
+            }}
+        """)
+        
+        # Header button styling - no border, transparent bg, part of panel
+        hover_bg = self.style_generator.adjust_color_brightness(theme.panel_color, 1.1)
+        self.header_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                color: {theme.text_primary};
+                border: none;
+                padding: 14px 16px;
+                text-align: left;
+                font-size: {theme.get_font_size('base')}px;
+                font-weight: 600;
+                margin: 0px;
+            }}
+            QPushButton:hover {{
+                background-color: {hover_bg};
+            }}
+        """)
+        
+        # Content frame - use panel color to match container
+        self.content_frame.setStyleSheet(f"""
+            QFrame {{
+                background-color: {theme.panel_color};
+                border: none;
+                margin: 0px;
+                padding: 0px;
+            }}
+        """)
+    
+    def closeEvent(self, event):
+        """Clean up theme observer on close."""
+        if hasattr(self, 'theme_manager'):
+            self.theme_manager.unregister_observer(self._on_theme_changed)
+        super().closeEvent(event)
+
+
 class WordSection(QWidget):
     """
     Section for a single word with multiple dictionary definitions.
     
-    Structure:
-    - Word header with pitch accent, frequency, audio/image buttons
-    - Multiple dictionary subsections (first expanded, others collapsed)
+    FIXED STRUCTURE:
+    - WordCollapsibleBox with header INSIDE the bordered container
+    - Colored left border for pitch accent
+    - Dictionary content boxes with visible borders
+    - Example items with NO borders
     """
     
     audioRequested = pyqtSignal(str)
     imageRequested = pyqtSignal(str)
     
     def __init__(self, word_data: Dict[str, Any], parent: Optional[QWidget] = None):
-        """
-        Initialize word section.
-        
-        Args:
-            word_data: Word information (word, phonetic, pitch_accent, frequencies)
-            parent: Parent widget
-        """
+        """Initialize word section with FIXED hierarchy."""
         super().__init__(parent)
         
         self.word_data = word_data
         self.dictionary_sections = []
         
-        # Create word header with audio/image controls
+        # Get theme manager and register observer
+        self.theme_manager = get_theme_manager()
+        self.theme_manager.register_observer(self._on_theme_changed)
+        
+        # Create word header with improved display
         word = word_data.get('word', 'Unknown')
         phonetic = word_data.get('phonetic', '')
         pitch_accent = word_data.get('pitch_accent', '')
+        verb_type = word_data.get('verb_type', '')  # godan/ichidan
         
-        # Build title with pitch accent notation
-        if phonetic and pitch_accent:
-            title = f"{word}({phonetic})[{pitch_accent}]"
-        elif phonetic:
-            title = f"{word}({phonetic})"
-        else:
-            title = word
-        
-        self.collapsible_box = CollapsibleBox(title, self)
-        
-        # Apply pitch accent color if available
+        # Build better title with furigana-style display and verb type
+        title_parts = [word]
+        if phonetic:
+            title_parts.append(f"[{phonetic}]")
         if pitch_accent:
-            pitch_color = self._get_pitch_color(pitch_accent)
-            current_style = self.collapsible_box.header.styleSheet()
-            new_style = current_style.replace(
-                "color: white;", 
-                f"color: white; border-left: 4px solid {pitch_color};"
-            )
-            self.collapsible_box.header.setStyleSheet(new_style)
+            title_parts.append(f"({pitch_accent})")
+        if verb_type:
+            verb_display = "u-verb" if verb_type == "godan" else "iru/eru-verb" if verb_type == "ichidan" else verb_type
+            title_parts.append(f"<{verb_display}>")
+        
+        title = "".join(title_parts)
+        
+        # Use NEW WordCollapsibleBox with header INSIDE
+        self.collapsible_box = WordCollapsibleBox(title, pitch_accent, self)
         
         # Add frequency and audio/image buttons to header
         self._add_word_controls()
@@ -918,7 +1100,7 @@ class WordSection(QWidget):
         self.content_widget = QWidget()
         self.content_layout = QVBoxLayout(self.content_widget)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
-        self.content_layout.setSpacing(8)
+        self.content_layout.setSpacing(0)
         
         self.collapsible_box.add_content(self.content_widget)
         
@@ -951,15 +1133,16 @@ class WordSection(QWidget):
             freq_text, freq_color = self._get_frequency_label(int(avg_freq))
             
             freq_button = QPushButton(freq_text)
-            freq_button.setMinimumHeight(28)
+            freq_button.setMinimumHeight(24)  # Smaller height
+            freq_button.setMinimumWidth(70)  # Minimum width (allows expansion)
             freq_button.setStyleSheet(f"""
                 QPushButton {{
                     background: {freq_color};
                     color: white;
                     border: none;
-                    border-radius: 6px;
-                    padding: 4px 12px;
-                    font-size: 11px;
+                    border-radius: 4px;
+                    padding: 2px 8px;
+                    font-size: 9px;
                     font-weight: bold;
                 }}
                 QPushButton:hover {{ opacity: 0.8; }}
@@ -967,20 +1150,18 @@ class WordSection(QWidget):
             freq_button.clicked.connect(lambda: self._show_frequency_breakdown(frequencies))
             self.collapsible_box.add_header_widget(freq_button)
         
-        # Audio button
-        audio_btn = ThemedButton("🔊", "audio")
-        audio_btn.setMinimumSize(32, 28)
-        audio_btn.setMaximumSize(32, 28)
+        # Audio button - COMPACT version
+        audio_btn = ActionButton("", "audio", 
+                                lambda: self.audioRequested.emit(self.word_data.get('word', '')),
+                                compact=True)
         audio_btn.setToolTip("Play audio pronunciation")
-        audio_btn.clicked.connect(lambda: self.audioRequested.emit(self.word_data.get('word', '')))
         self.collapsible_box.add_header_widget(audio_btn)
         
-        # Image button
-        image_btn = ThemedButton("🖼️", "image")
-        image_btn.setMinimumSize(32, 28)
-        image_btn.setMaximumSize(32, 28)
+        # Image button - COMPACT version
+        image_btn = ActionButton("", "image", 
+                               lambda: self.imageRequested.emit(self.word_data.get('word', '')),
+                               compact=True)
         image_btn.setToolTip("Search images")
-        image_btn.clicked.connect(lambda: self.imageRequested.emit(self.word_data.get('word', '')))
         self.collapsible_box.add_header_widget(image_btn)
     
     def _get_frequency_label(self, frequency: int) -> tuple[str, str]:
@@ -1019,194 +1200,278 @@ class WordSection(QWidget):
         self.dictionary_sections.append(dict_section)
         self.content_layout.addWidget(dict_section)
     
-    def update_theme(self, theme_settings: Dict[str, Any]) -> None:
+    def _on_theme_changed(self, new_theme: ThemeColors):
+        """Handle theme changes from theme manager."""
+        # Update collapsible box if it has theme support
+        if hasattr(self.collapsible_box, '_apply_styling'):
+            self.collapsible_box._apply_styling()
+        
+        # Update dictionary sections
+        for dict_section in self.dictionary_sections:
+            if hasattr(dict_section, 'update_theme'):
+                dict_section.update_theme(new_theme)
+    
+    def update_theme(self, theme: ThemeColors) -> None:
         """Update component styling with new theme."""
         # Update dictionary subsections
         for dict_section in self.dictionary_sections:
             if hasattr(dict_section, 'update_theme'):
-                dict_section.update_theme(theme_settings)
+                dict_section.update_theme(theme)
         
         # Update collapsible box if it has theme support
-        if hasattr(self.collapsible_box, 'update_theme'):
-            self.collapsible_box.update_theme(theme_settings)
+        if hasattr(self.collapsible_box, '_apply_styling'):
+            self.collapsible_box._apply_styling()
+    
+    def closeEvent(self, event):
+        """Clean up theme observer on close."""
+        if hasattr(self, 'theme_manager'):
+            self.theme_manager.unregister_observer(self._on_theme_changed)
+        super().closeEvent(event)
 
 
-class DictionarySubsection(QWidget):
+class DictionarySubsection(ThemedWidget):
     """
-    Subsection for a single dictionary's definition of a word.
-    Contains copy/export buttons specific to this dictionary.
+    Individual dictionary's definition section.
+    Creates POS badges and uses theme colors.
     """
     
-    def __init__(self, dict_name: str, definitions: list, examples: list = None, is_primary: bool = False):
-        """
-        Initialize dictionary subsection.
-        
-        Args:
-            dict_name: Dictionary name (JMdict, 大辞林, etc.)
-            definitions: List of definition dicts
-            examples: List of example sentences
-            is_primary: Whether this should be expanded by default
-        """
-        super().__init__()
+    def __init__(self, dict_name: str, definitions: list, examples: list = None, is_primary: bool = False, parent: Optional[QWidget] = None):
+        """Initialize dictionary subsection."""
+        super().__init__(parent)
         
         self.dict_name = dict_name
         self.definitions = definitions
         self.examples = examples or []
-        
-        # Create collapsible box
-        self.collapsible_box = CollapsibleBox(dict_name, self)
-        
-        # Set initial state
-        if not is_primary:
-            self.collapsible_box.collapse()
-        
-        # Add copy/export buttons to header
-        self._add_dict_controls()
-        
-        # Create content
-        content_widget = self._create_content()
-        self.collapsible_box.add_content(content_widget)
+        self.is_expanded = is_primary
         
         # Main layout
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 4)
-        layout.addWidget(self.collapsible_box)
-    
-    def _add_dict_controls(self) -> None:
-        """Add copy/export buttons to dictionary header."""
-        # Copy button
-        copy_btn = ThemedButton("✂", "copy")
-        copy_btn.setMinimumSize(28, 24)
-        copy_btn.setMaximumSize(28, 24)
-        copy_btn.setToolTip("Copy this dictionary's definition")
-        copy_btn.clicked.connect(self._copy_definition)
-        self.collapsible_box.add_header_widget(copy_btn)
-        
-        # Export button
-        export_btn = ThemedButton("💾", "export")
-        export_btn.setMinimumSize(28, 24)
-        export_btn.setMaximumSize(28, 24)
-        export_btn.setToolTip("Export this dictionary's definition")
-        export_btn.clicked.connect(self._export_definition)
-        self.collapsible_box.add_header_widget(export_btn)
-    
-    def _create_content(self) -> QWidget:
-        """Create content widget with definitions and examples."""
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(8)
+        layout.setSpacing(0)
+        
+        # Dictionary header container with layout for title + buttons
+        self.dict_header_container = QWidget()
+        self.dict_header_layout = QHBoxLayout(self.dict_header_container)
+        self.dict_header_layout.setContentsMargins(0, 0, 0, 0)
+        self.dict_header_layout.setSpacing(8)
+        
+        # Dictionary header button (clickable)
+        self.dict_header_button = QPushButton(f"▼ {dict_name}" if is_primary else f"▶ {dict_name}")
+        self.dict_header_button.clicked.connect(self._toggle_expanded)
+        self.dict_header_layout.addWidget(self.dict_header_button, 1)  # Stretch to fill
+        
+        # Add copy button with ThemedButton
+        self.copy_btn = ThemedButton("✂", "copy")
+        self.copy_btn.setMinimumSize(32, 28)
+        self.copy_btn.setMaximumSize(32, 28)
+        self.copy_btn.setToolTip("Copy definition")
+        self.copy_btn.clicked.connect(self._copy_definition)
+        self.dict_header_layout.addWidget(self.copy_btn, 0)
+        
+        # Add export button with ThemedButton
+        self.export_btn = ThemedButton("💾", "export")
+        self.export_btn.setMinimumSize(32, 28)
+        self.export_btn.setMaximumSize(32, 28)
+        self.export_btn.setToolTip("Export definition")
+        self.export_btn.clicked.connect(self._export_definition)
+        self.dict_header_layout.addWidget(self.export_btn, 0)
+        
+        layout.addWidget(self.dict_header_container)
+        
+        # Dictionary content box
+        self.dict_content_box = QFrame()
+        self.dict_content_layout = QVBoxLayout(self.dict_content_box)
+        self.dict_content_layout.setContentsMargins(16, 16, 16, 16)
+        self.dict_content_layout.setSpacing(8)
+        layout.addWidget(self.dict_content_box)
         
         # Add definitions
-        for i, defn in enumerate(self.definitions):
-            def_widget = self._create_definition_line(defn, i == 0)
-            layout.addWidget(def_widget)
+        for defn in definitions:
+            def_widget = self._create_definition_line(defn)
+            self.dict_content_layout.addWidget(def_widget)
         
-        # Add examples if present
-        if self.examples:
-            examples_widget = self._create_examples()
-            layout.addWidget(examples_widget)
+        # Add examples
+        if examples:
+            examples_widget = self._create_examples_section()
+            self.dict_content_layout.addWidget(examples_widget)
         
-        return widget
+        # Apply styling
+        self._apply_styling()
+        
+        # Set initial visibility
+        if not is_primary:
+            self.dict_content_box.hide()
     
-    def _create_definition_line(self, definition: dict, is_first: bool = False) -> QWidget:
-        """Create a single definition line."""
+    def add_header_button(self, button: QWidget) -> None:
+        """Add button to dictionary header right side."""
+        self.dict_header_layout.addWidget(button, 0)  # Don't stretch
+    
+    def _create_definition_line(self, definition: dict) -> QWidget:
+        """Create POS badge + definition text."""
+        theme = self.theme_manager.current_theme
+        
+        # Container - MUST be transparent
         container = QWidget()
+        container.setStyleSheet("QWidget { background-color: transparent; border: none; }")
+        
         layout = QHBoxLayout(container)
-        layout.setContentsMargins(0, 4, 0, 4)
+        layout.setContentsMargins(0, 6, 0, 6)
         layout.setSpacing(12)
         
-        # Part of speech badge
-        pos_type = definition.get('type', 'noun')
-        pos_label = ThemedLabel(pos_type)
-        
-        # Apply themed styling for part-of-speech badge
-        theme = get_theme_manager().current_theme
-        badge_color = theme.accent_color if is_first else theme.text_muted
-        pos_style = f"""
+        # POS BADGE - THIS WAS MISSING!
+        pos_label = QLabel(definition.get('type', 'noun'))
+        pos_label.setStyleSheet(f"""
             QLabel {{
-                background: {badge_color};
+                background-color: {theme.accent_color};
                 color: white;
-                padding: 3px 8px;
+                padding: 4px 10px;
                 border-radius: 4px;
-                font-size: {theme.get_font_size('small')}px;
+                font-size: 12px;
                 font-weight: bold;
             }}
-        """
-        pos_label.setStyleSheet(pos_style)
-        pos_label.setFixedHeight(22)
-        layout.addWidget(pos_label)
+        """)
+        layout.addWidget(pos_label, 0)  # 0 = don't stretch
         
         # Definition text
-        def_text = definition.get('text', '')
-        def_label = ThemedLabel(def_text)
+        def_label = QLabel(definition.get('text', ''))
         def_label.setWordWrap(True)
-        def_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        
-        # Apply themed styling for definition text
-        text_color = theme.text_primary if is_first else theme.text_muted
-        def_style = f"""
+        def_label.setStyleSheet(f"""
             QLabel {{
-                color: {text_color};
-                font-size: {theme.get_font_size('base')}px;
-                line-height: 1.5;
-                font-weight: {'600' if is_first else 'normal'};
+                background-color: transparent;
+                color: {theme.text_primary};
+                border: none;
             }}
-        """
-        def_label.setStyleSheet(def_style)
-        layout.addWidget(def_label, 1)
+        """)
+        layout.addWidget(def_label, 1)  # 1 = stretch to fill
         
         return container
     
-    def _create_examples(self) -> QWidget:
-        """Create examples section."""
+    def _create_examples_section(self) -> QWidget:
+        """Create examples with ONLY top border."""
+        theme = self.theme_manager.current_theme
+        
+        # Container - only border-top
         container = QWidget()
+        container.setStyleSheet(f"""
+            QWidget {{
+                background-color: transparent;
+                border: none;
+                border-top: 1px solid {theme.border_color};
+                padding-top: 12px;
+                margin-top: 12px;
+            }}
+        """)
+        
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(4)
         
-        # Examples header
-        header = ThemedLabel("Examples:", "muted")
-        header.setStyleSheet(f"font-weight: bold; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
-        layout.addWidget(header)
+        # "Examples:" label
+        label = QLabel("Examples:")
+        label.setStyleSheet(f"""
+            QLabel {{
+                color: {theme.text_muted};
+                font-weight: 600;
+                font-size: 13px;
+                background-color: transparent;
+                border: none;
+            }}
+        """)
+        layout.addWidget(label)
         
-        # Example sentences
+        # Example items - NO BORDERS
         for example in self.examples:
-            example_label = ThemedLabel(f"• {example}", "muted")
-            example_label.setWordWrap(True)
-            example_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-            example_label.setStyleSheet(f"font-style: italic; font-size: {get_theme_manager().current_theme.get_font_size('small')}px;")
-            layout.addWidget(example_label)
+            ex_label = QLabel(f"• {example}")
+            ex_label.setWordWrap(True)
+            ex_label.setStyleSheet(f"""
+                QLabel {{
+                    color: {theme.text_muted};
+                    font-size: 13px;
+                    background-color: transparent;
+                    border: none;
+                    padding: 3px 0;
+                }}
+            """)
+            layout.addWidget(ex_label)
         
         return container
+    
+    def _toggle_expanded(self):
+        """Toggle expanded/collapsed state."""
+        self.is_expanded = not self.is_expanded
+        self.dict_content_box.setVisible(self.is_expanded)
+        arrow = "▼" if self.is_expanded else "▶"
+        self.dict_header_button.setText(f"{arrow} {self.dict_name}")
     
     def _copy_definition(self) -> None:
         """Copy this dictionary's definition to clipboard."""
-        from aqt.qt import QApplication
-        
-        text_parts = [f"{self.dict_name}:"]
-        for i, defn in enumerate(self.definitions, 1):
-            def_type = defn.get('type', '')
-            def_text = defn.get('text', '')
-            text_parts.append(f"{i}. ({def_type}) {def_text}")
-        
-        if self.examples:
-            text_parts.extend(["", "Examples:"] + [f"• {ex}" for ex in self.examples])
-        
-        QApplication.clipboard().setText('\n'.join(text_parts))
-        
-        # Visual feedback (simplified)
-        print(f"Copied {self.dict_name} definition to clipboard")
+        try:
+            from aqt.qt import QApplication
+            text_parts = [f"{self.dict_name}:"]
+            for i, defn in enumerate(self.definitions, 1):
+                def_type = defn.get('type', '')
+                def_text = defn.get('text', '')
+                text_parts.append(f"{i}. ({def_type}) {def_text}")
+            if self.examples:
+                text_parts.extend(["", "Examples:"] + [f"• {ex}" for ex in self.examples])
+            QApplication.clipboard().setText('\n'.join(text_parts))
+        except Exception as e:
+            logger.error(f"Failed to copy: {e}")
     
     def _export_definition(self) -> None:
         """Export this dictionary's definition to Anki."""
-        print(f"Exported {self.dict_name} definition to Anki")
+        logger.info(f"Export requested for {self.dict_name}")
     
-    def update_theme(self, theme_settings: Dict[str, Any]) -> None:
-        """Update component styling with new theme."""
-        # Update collapsible box if it has theme support
-        if hasattr(self.collapsible_box, 'update_theme'):
-            self.collapsible_box.update_theme(theme_settings)
+    def _apply_styling(self):
+        """Apply styling to all components."""
+        theme = self.theme_manager.current_theme
+        
+        # Dictionary header container - transparent
+        dict_header_container_style = f"""
+            QWidget {{
+                background-color: transparent;
+                border: none;
+                border-top: 1px solid {theme.border_color};
+                margin: 0px;
+                padding: 0px;
+                min-height: 44px;
+            }}
+        """
+        self.dict_header_container.setStyleSheet(dict_header_container_style)
+        
+        # Dictionary header button - transparent, no border, part of panel
+        dict_header_style = f"""
+            QPushButton {{
+                background-color: transparent;
+                color: {theme.text_muted};
+                border: none;
+                padding: 0px 16px;
+                text-align: left;
+                line-height: 44px;
+                font-size: 13px;
+                font-weight: 600;
+                margin: 0px;
+            }}
+            QPushButton:hover {{
+                color: {theme.text_primary};
+            }}
+        """
+        self.dict_header_button.setStyleSheet(dict_header_style)
+        
+        # ThemedButtons (copy_btn and export_btn) handle their own styling
+        
+        # Dictionary content box - use panel color, no border (it's inside the panel)
+        dict_content_style = f"""
+            QFrame {{
+                background-color: {theme.panel_color};
+                border: none;
+                margin: 0px;
+                padding: 0px;
+            }}
+        """
+        self.dict_content_box.setStyleSheet(dict_content_style)
+    
+
 
 
 class DictionaryFilterBar(QWidget):
@@ -1243,6 +1508,11 @@ class DictionaryFilterBar(QWidget):
         """
         super().__init__(parent)
         
+        # Theme management
+        self.theme_manager = get_theme_manager()
+        self.style_generator = StyleGenerator(self.theme_manager.current_theme)
+        self.theme_manager.register_observer(self._on_theme_changed)
+        
         # Default dictionary groups if none provided
         if dictionary_groups is None:
             dictionary_groups = [
@@ -1268,8 +1538,8 @@ class DictionaryFilterBar(QWidget):
         # Dictionary group dropdown
         self.dict_dropdown = QComboBox()
         self.dict_dropdown.setMinimumHeight(36)
-        self.dict_dropdown.setMinimumWidth(120)  # Smaller minimum width
-        self.dict_dropdown.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.dict_dropdown.setMaximumWidth(250)  # Add maximum width
+        self.dict_dropdown.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         
         # Add dictionary group items
         for name, group_id in dictionary_groups:
@@ -1322,8 +1592,8 @@ class DictionaryFilterBar(QWidget):
         # Search mode dropdown
         self.search_dropdown = QComboBox()
         self.search_dropdown.setMinimumHeight(36)
-        self.search_dropdown.setMinimumWidth(80)  # Smaller minimum width
-        self.search_dropdown.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.search_dropdown.setMaximumWidth(180)  # Add maximum width
+        self.search_dropdown.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         
         # Add search mode items
         search_modes = [
@@ -1485,11 +1755,25 @@ class DictionaryFilterBar(QWidget):
         theme = get_theme_manager().current_theme
         style_gen = StyleGenerator(theme)
         
-        # Use centralized dropdown styling
+        # Use centralized dropdown styling with additional constraints
         dropdown_style = style_gen.dropdown_style()
         
-        self.dict_dropdown.setStyleSheet(dropdown_style)
-        self.search_dropdown.setStyleSheet(dropdown_style)
+        # Additional styling to ensure proper bounds
+        enhanced_style = dropdown_style + f"""
+QComboBox {{
+    qproperty-maximumWidth: 250px;
+}}
+QComboBox::drop-down {{
+    width: 24px;
+}}
+QComboBox QAbstractItemView {{
+    min-width: 200px;
+    max-width: 300px;
+}}
+"""
+        
+        self.dict_dropdown.setStyleSheet(enhanced_style)
+        self.search_dropdown.setStyleSheet(enhanced_style)
     
     def _on_dict_selection_changed(self, text: str) -> None:
         """Handle dictionary group selection change."""
@@ -1596,6 +1880,17 @@ class DictionaryFilterBar(QWidget):
         """
         self.conjugation_button.setChecked(enabled)
         self._on_conjugation_toggled(enabled)  # Update button text
+    
+    def _on_theme_changed(self, new_theme: ThemeColors):
+        """Handle theme changes from theme manager."""
+        self.style_generator = StyleGenerator(new_theme)
+        self.update_theme(new_theme)
+    
+    def closeEvent(self, event):
+        """Clean up theme observer on close."""
+        if hasattr(self, 'theme_manager'):
+            self.theme_manager.unregister_observer(self._on_theme_changed)
+        super().closeEvent(event)
     
     def update_theme(self, theme: ThemeColors) -> None:
         """

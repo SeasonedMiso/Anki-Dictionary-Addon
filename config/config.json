@@ -1,0 +1,82 @@
+{
+    "DictionaryGroups": {
+        "jp": {
+            "customFont": false,
+            "font": false,
+            "dictionaries": [
+                {
+                    "dict": "l161nameMonolingual_\u65fa\u6587\u793e\u56fd\u8a9e\u8f9e\u5178_\u7b2c\u5341\u4e00\u7248_Recommended",
+                    "lang": "jp"
+                },
+                {
+                    "dict": "l161nameMonolingual_\u4e09\u7701\u5802\u56fd\u8a9e\u8f9e\u5178_\u7b2c\u516b\u7248_Recommended",
+                    "lang": "jp"
+                },
+                {
+                    "dict": "l161nameMonolingual_\u5b9f\u7528\u65e5\u672c\u8a9e\u8868\u73fe\u8f9e\u5178_Recommended",
+                    "lang": "jp"
+                },
+                {
+                    "dict": "l161nameMonolingual_\u5b9f\u7528\u65e5\u672c\u8a9e\u8868\u73fe\u8f9e\u5178_Extended_Recommended",
+                    "lang": "jp"
+                },
+                {
+                    "dict": "l161nameMonolingual_\u65b0\u660e\u89e3\u56fd\u8a9e\u8f9e\u5178_\u7b2c\u516b\u7248",
+                    "lang": "jp"
+                },
+                {
+                    "dict": "l161nameMonolingual_\u660e\u93e1\u56fd\u8a9e\u8f9e\u5178_\u7b2c\u4e8c\u7248_Recommended_Improved",
+                    "lang": "jp"
+                }
+            ]
+        }
+    },
+    "ExportTemplates": {},
+    "GoogleImageFields": [],
+    "ForvoFields": [],
+    "ForvoAddType": "add",
+    "ForvoLanguage": "Japanese",
+    "GoogleImageAddType": "add",
+    "dictOnStart": false,
+    "highlightSentences": true,
+    "highlightTarget": true,
+    "maxSearch": 1000,
+    "dictSearch": 50,
+    "jReadingCards": true,
+    "jReadingEdit": true,
+    "googleSearchRegion": "United States",
+    "maxHeight": 400,
+    "maxWidth": 400,
+    "frontBracket": "\u3010",
+    "backBracket": "\u3011",
+    "showTarget": false,
+    "day": true,
+    "currentGroup": "jp",
+    "searchMode": "Forward",
+    "currentTemplate": false,
+    "currentDeck": false,
+    "deinflect": true,
+    "onetab": false,
+    "dictSizePos": false,
+    "exporterSizePos": false,
+    "fontSizes": [
+        12,
+        22
+    ],
+    "tooltips": true,
+    "globalHotkeys": true,
+    "openOnGlobal": true,
+    "mp3Convert": true,
+    "failedFFMPEGInstallation": false,
+    "dictAlwaysOnTop": false,
+    "displayAgain": true,
+    "autoDefinitionSettings": false,
+    "autoAddDefinitions": false,
+    "autoAddCards": false,
+    "unknownsToSearch": 3,
+    "massGenerationPreferences": false,
+    "safeSearch": true,
+    "condensedAudioDirectory": false,
+    "disableCondensed": false,
+    "currentTheme": "light"
+}

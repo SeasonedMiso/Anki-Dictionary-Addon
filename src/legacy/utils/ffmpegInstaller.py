@@ -4,7 +4,7 @@ import requests
 from anki.utils import is_mac, is_win, is_lin
 from anki.hooks import addHook
 from os.path import join, exists, dirname
-from .src.utils.dialogs import show_info as show_info_dialog
+from .dialogs import show_info as show_info_dialog
 from aqt.qt import *
 from aqt import mw
 import zipfile
@@ -49,14 +49,22 @@ class FFMPEGInstaller:
         return progressWidget, bar, textDisplay;
 
     def toggleMP3Conversion(self, enable):
-        config = self.mw.addonManager.getConfig(__name__)
-        config["mp3Convert"] = enable
-        self.mw.addonManager.writeConfig(__name__, config)
+        if self.config:
+            self.config["mp3Convert"] = enable
+            # Try to write config using the addon manager
+            try:
+                self.mw.addonManager.writeConfig(__name__, self.config)
+            except:
+                pass  # Silently fail if config write fails
 
     def toggleFailedInstallation(self, failedInstallation):
-        config = self.mw.addonManager.getConfig(__name__)
-        config["failedFFMPEGInstallation"] = failedInstallation
-        self.mw.addonManager.writeConfig(__name__, config)
+        if self.config:
+            self.config["failedFFMPEGInstallation"] = failedInstallation
+            # Try to write config using the addon manager
+            try:
+                self.mw.addonManager.writeConfig(__name__, self.config)
+            except:
+                pass  # Silently fail if config write fails
     
     def roundToKb(self, value):
         return round(value / 1000)
@@ -125,8 +133,8 @@ class FFMPEGInstaller:
 
         
     def installFFMPEG(self):
-        config = self.mw.addonManager.getConfig(__name__)
-        if (config["mp3Convert"] or config["failedFFMPEGInstallation"]) and not exists(self.ffmpegPath):
+        config = self.config
+        if config and (config.get("mp3Convert") or config.get("failedFFMPEGInstallation")) and not exists(self.ffmpegPath):
             currentStep = 1
             totalSteps = 3
             stepText = "Step {} of {}"

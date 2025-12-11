@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import Mock, MagicMock
 from pathlib import Path
 
-from src.ui.modern_dictionary_window import ModernDictionaryWindow
+from src.legacy.ui.modern_dictionary_window import ModernDictionaryWindow
 
 
 @pytest.fixture

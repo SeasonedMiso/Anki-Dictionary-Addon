@@ -30,12 +30,21 @@ try:
     )
     ANKI_AVAILABLE = True
 except ImportError:
-    # Mock classes for testing
+    # Mock classes for testing - define minimal mocks
     ANKI_AVAILABLE = False
-    from .modern_components import (
-        QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-        QLineEdit, QFrame, pyqtSignal, Qt, QTimer, QApplication
-    )
+    
+    class QWidget: pass
+    class QVBoxLayout: pass
+    class QHBoxLayout: pass
+    class QLabel: pass
+    class QPushButton: pass
+    class QLineEdit: pass
+    class QFrame: pass
+    class QApplication: pass
+    class QTimer: pass
+    class pyqtSignal:
+        def __init__(self, *args): pass
+    class Qt: pass
 
 from .styling import ThemeColors, StyleGenerator, get_theme_manager
 
@@ -97,12 +106,18 @@ class ThemedButton(QPushButton):
     
     def _apply_styling(self):
         """Apply button styling based on type."""
+        # Check if this is a small compact button (width <= 25px)
+        is_compact = hasattr(self, 'width') and self.width() <= 25
+        
         if self.button_type == "primary":
             style = self.style_generator.button_style(
                 bg_color=self.style_generator.theme.accent_color
             )
         elif self.button_type in ["success", "warning", "error", "audio", "image", "copy", "export"]:
-            style = self.style_generator.action_button_style(self.button_type)
+            if is_compact:
+                style = self.style_generator.compact_icon_button_style(self.button_type)
+            else:
+                style = self.style_generator.action_button_style(self.button_type)
         else:
             style = self.style_generator.button_style()
         
@@ -277,32 +292,66 @@ class ThemedFrame(QFrame):
 class ActionButton(ThemedButton):
     """Specialized action button with icon and feedback."""
     
+    # Define smaller icon mappings
+    ICON_MAP = {
+        'audio': '♪',      # Music note (smaller)
+        'image': '🖼',     # Picture frame (smaller)
+        'copy': '⎘',       # Copy symbol (smaller)
+        'export': '⤓',     # Down arrow (smaller)
+        'success': '✓',    # Check mark
+        'error': '✗',      # X mark
+        'warning': '⚠',    # Warning
+        'info': 'ℹ'       # Info
+    }
+    
     def __init__(self, 
                  text: str,
-                 icon: str,
                  action_type: str,
                  callback: Optional[Callable] = None,
+                 compact: bool = False,
                  parent: Optional[QWidget] = None):
         """
         Initialize action button.
         
         Args:
             text: Button text
-            icon: Icon character/emoji
             action_type: Action type for styling
             callback: Click callback function
+            compact: If True, use compact styling with icon only
             parent: Parent widget
         """
-        super().__init__(f"{icon} {text}", action_type, parent)
+        # Get icon from map
+        icon = self.ICON_MAP.get(action_type, '')
         
-        self.original_text = f"{icon} {text}"
-        self.icon = icon
+        # If compact, show only icon, otherwise show icon + text
+        if compact:
+            display_text = icon if icon else text[0]  # First char if no icon
+        else:
+            display_text = f"{icon} {text}" if icon else text
+        
+        super().__init__(display_text, action_type, parent)
+        
+        self.original_text = display_text
         self.action_type = action_type
+        self.compact = compact
         
         if callback:
             self.clicked.connect(callback)
         
-        self.setMinimumHeight(40)
+        # Set appropriate size based on compact mode
+        # if compact:
+            self.setFixedSize(200, 200)  # Small square button
+        # else:
+            # self.setMinimumHeight(32)  # Normal button height
+        
+        # Set font that supports Unicode symbols
+        if ANKI_AVAILABLE:
+            font = self.font()
+            if compact:
+                font.setPointSize(8)  # Smaller font for compact buttons
+            else:
+                font.setPointSize(10)  # Normal font size
+            self.setFont(font)
     
     def show_feedback(self, success: bool = True, duration: int = 800):
         """Show visual feedback for action completion."""
@@ -345,7 +394,6 @@ class CopyButton(ActionButton):
         """
         super().__init__(
             text="Copy",
-            icon="✂",
             action_type="copy",
             callback=self._copy_to_clipboard,
             parent=parent
