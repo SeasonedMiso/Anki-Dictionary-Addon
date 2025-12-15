@@ -8,11 +8,13 @@ the new UI components with the Anki backend and legacy services.
 
 from .search_service import SearchService
 from .result_formatter import ResultFormatter
+from .media_service import MediaService
+from .export_coordinator import ExportCoordinator
 
 __all__ = [
     'SearchService',
     'ResultFormatter',
-    'ExportCoordinator',
     'MediaService',
+    'ExportCoordinator',
     'ContextManager',
 ]
