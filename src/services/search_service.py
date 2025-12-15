@@ -6,8 +6,9 @@ This module provides search functionality without UI dependencies,
 returning structured data that can be used by any UI component.
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 

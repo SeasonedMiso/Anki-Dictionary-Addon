@@ -10,6 +10,8 @@ from .search_service import SearchService
 from .result_formatter import ResultFormatter
 from .media_service import MediaService
 from .export_coordinator import ExportCoordinator
+from .context_manager import ContextManager, get_context_manager
+from .validation_service import ValidationService, get_validation_service
 
 __all__ = [
     'SearchService',
@@ -17,4 +19,7 @@ __all__ = [
     'MediaService',
     'ExportCoordinator',
     'ContextManager',
+    'get_context_manager',
+    'ValidationService',
+    'get_validation_service',
 ]

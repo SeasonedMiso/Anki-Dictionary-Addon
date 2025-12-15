@@ -11,6 +11,7 @@ import logging
 from ..config import ConfigManager
 from ..database import DatabaseConnection, DictionaryRepository
 from ..services import SearchService, ExportService, MediaService
+from ...services import ExportCoordinator
 from ..constants import VERSION, DB_FILENAME
 from ..utils.logging_config import setup_logging, get_logger
 
@@ -82,6 +83,12 @@ class AnkiDictionaryPlugin:
             mw,
             self.config_manager,
             self.addon_path
+        )
+        self.export_coordinator = ExportCoordinator(
+            legacy_export_service=self.export_service,
+            search_service=self.search_service,
+            media_service=self.media_service,
+            config_manager=self.config_manager
         )
         
         # UI Components (lazy initialization)
@@ -365,6 +372,15 @@ class AnkiDictionaryPlugin:
             MediaService instance
         """
         return self.media_service
+    
+    def get_export_coordinator(self) -> ExportCoordinator:
+        """
+        Get export coordinator instance.
+        
+        Returns:
+            ExportCoordinator instance
+        """
+        return self.export_coordinator
     
     def get_dictionary_repository(self) -> DictionaryRepository:
         """

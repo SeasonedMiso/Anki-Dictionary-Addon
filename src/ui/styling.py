@@ -923,3 +923,58 @@ def apply_theme_to_widget(widget, theme: ThemeColors):
 
 
 # Font shortcuts moved to keyboard.py module
+
+
+def create_theme_from_base(base_theme: ThemeColors, overrides: Dict[str, Any]) -> ThemeColors:
+    """
+    Create a new theme by overriding specific colors in a base theme.
+    
+    Args:
+        base_theme: Base theme to start from
+        overrides: Dictionary of color overrides
+        
+    Returns:
+        New ThemeColors instance with overrides applied
+    """
+    # Convert base theme to dict
+    theme_dict = {}
+    for field in base_theme.__dataclass_fields__:
+        theme_dict[field] = getattr(base_theme, field)
+    
+    # Apply overrides
+    theme_dict.update(overrides)
+    
+    # Create new theme
+    return ThemeColors(**theme_dict)
+
+
+def interpolate_colors(color1: str, color2: str, factor: float) -> str:
+    """
+    Interpolate between two hex colors.
+    
+    Args:
+        color1: First hex color (e.g., "#ff0000")
+        color2: Second hex color (e.g., "#0000ff")
+        factor: Interpolation factor (0.0 = color1, 1.0 = color2)
+        
+    Returns:
+        Interpolated hex color
+    """
+    try:
+        # Remove # if present
+        color1 = color1.lstrip('#')
+        color2 = color2.lstrip('#')
+        
+        # Convert to RGB
+        r1, g1, b1 = int(color1[0:2], 16), int(color1[2:4], 16), int(color1[4:6], 16)
+        r2, g2, b2 = int(color2[0:2], 16), int(color2[2:4], 16), int(color2[4:6], 16)
+        
+        # Interpolate
+        factor = max(0.0, min(1.0, factor))  # Clamp to [0, 1]
+        r = int(r1 + (r2 - r1) * factor)
+        g = int(g1 + (g2 - g1) * factor)
+        b = int(b1 + (b2 - b1) * factor)
+        
+        return f"#{r:02x}{g:02x}{b:02x}"
+    except (ValueError, IndexError):
+        return color1  # Return first color if interpolation fails

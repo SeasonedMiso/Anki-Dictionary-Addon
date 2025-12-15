@@ -177,3 +177,188 @@ class ResultFormatter:
                 merged['sources'].append(source)
         
         return merged
+    
+    def filter_by_frequency(
+        self,
+        word_data_list: List[Dict[str, Any]],
+        max_frequency: Optional[int] = None,
+        min_frequency: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Filter word data by frequency range.
+        
+        Args:
+            word_data_list: List of word data to filter
+            max_frequency: Maximum frequency rank (lower = more common)
+            min_frequency: Minimum frequency rank (higher = less common)
+            
+        Returns:
+            Filtered list of word data
+        """
+        filtered = []
+        
+        for word_data in word_data_list:
+            frequency = word_data.get('frequency')
+            
+            # Skip entries without frequency data
+            if frequency is None:
+                continue
+            
+            # Apply frequency filters
+            if max_frequency is not None and frequency > max_frequency:
+                continue
+            if min_frequency is not None and frequency < min_frequency:
+                continue
+            
+            filtered.append(word_data)
+        
+        return filtered
+    
+    def sort_by_relevance(
+        self,
+        word_data_list: List[Dict[str, Any]],
+        search_term: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Sort word data by relevance to search term.
+        
+        Args:
+            word_data_list: List of word data to sort
+            search_term: Original search term
+            
+        Returns:
+            Sorted list with most relevant entries first
+        """
+        def relevance_score(word_data: Dict[str, Any]) -> int:
+            score = 0
+            word = word_data.get('word', '').lower()
+            search_lower = search_term.lower()
+            
+            # Exact match gets highest score
+            if word == search_lower:
+                score += 1000
+            
+            # Starts with search term
+            elif word.startswith(search_lower):
+                score += 500
+            
+            # Contains search term
+            elif search_lower in word:
+                score += 250
+            
+            # Frequency bonus (lower frequency rank = higher score)
+            frequency = word_data.get('frequency')
+            if frequency:
+                # Invert frequency so lower rank = higher score
+                score += max(0, 10000 - frequency) // 100
+            
+            # Dictionary priority (some dictionaries are more authoritative)
+            source_dict = word_data.get('source_dict', '').lower()
+            if 'jmdict' in source_dict or 'edict' in source_dict:
+                score += 100
+            elif 'daijirin' in source_dict or 'daijisen' in source_dict:
+                score += 80
+            
+            return score
+        
+        return sorted(word_data_list, key=relevance_score, reverse=True)
+    
+    def extract_examples(
+        self,
+        word_data_list: List[Dict[str, Any]],
+        max_examples: int = 3
+    ) -> List[str]:
+        """
+        Extract example sentences from word data.
+        
+        Args:
+            word_data_list: List of word data
+            max_examples: Maximum number of examples to return
+            
+        Returns:
+            List of example sentences
+        """
+        examples = []
+        
+        for word_data in word_data_list:
+            # Get examples from word data
+            word_examples = word_data.get('examples', [])
+            examples.extend(word_examples)
+            
+            # Get examples from definitions
+            definitions = word_data.get('definitions', [])
+            for definition in definitions:
+                def_examples = definition.get('examples', [])
+                examples.extend(def_examples)
+            
+            # Stop if we have enough examples
+            if len(examples) >= max_examples:
+                break
+        
+        # Remove duplicates while preserving order
+        unique_examples = []
+        seen = set()
+        for example in examples:
+            if example not in seen:
+                unique_examples.append(example)
+                seen.add(example)
+                if len(unique_examples) >= max_examples:
+                    break
+        
+        return unique_examples
+    
+    def get_summary_stats(
+        self,
+        word_data_list: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """
+        Get summary statistics for word data list.
+        
+        Args:
+            word_data_list: List of word data
+            
+        Returns:
+            Dictionary with summary statistics
+        """
+        if not word_data_list:
+            return {
+                'total_entries': 0,
+                'unique_words': 0,
+                'dictionaries': [],
+                'has_frequency': 0,
+                'has_pitch_accent': 0,
+                'avg_definitions': 0
+            }
+        
+        unique_words = set()
+        dictionaries = set()
+        frequency_count = 0
+        pitch_accent_count = 0
+        total_definitions = 0
+        
+        for word_data in word_data_list:
+            word = word_data.get('word', '')
+            if word:
+                unique_words.add(word)
+            
+            source_dict = word_data.get('source_dict', '')
+            if source_dict:
+                dictionaries.add(source_dict)
+            
+            if word_data.get('frequency') is not None:
+                frequency_count += 1
+            
+            if word_data.get('pitch_accent'):
+                pitch_accent_count += 1
+            
+            definitions = word_data.get('definitions', [])
+            total_definitions += len(definitions)
+        
+        return {
+            'total_entries': len(word_data_list),
+            'unique_words': len(unique_words),
+            'dictionaries': sorted(list(dictionaries)),
+            'has_frequency': frequency_count,
+            'has_pitch_accent': pitch_accent_count,
+            'avg_definitions': total_definitions / len(word_data_list) if word_data_list else 0
+        }
