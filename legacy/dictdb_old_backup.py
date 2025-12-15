@@ -3,7 +3,7 @@
 import sqlite3
 import os.path
 from aqt.utils import showInfo
-from .miutils import miInfo
+from .utils.miutils import miInfo
 import re
 import json
 addon_path = os.path.dirname(__file__)

@@ -32,7 +32,7 @@ import datetime
 import codecs
 from .forvodl import Forvo
 import ntpath
-from .miutils import miInfo
+from .utils.miutils import miInfo
 
 try:
     from PyQt6.QtSvgWidgets import QSvgWidget

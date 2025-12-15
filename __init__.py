@@ -12,4 +12,5 @@ libs_dir = addon_dir / "libs"
 if str(libs_dir) not in sys.path:
     sys.path.insert(0, str(libs_dir))
 
-from . import  main, ffmpegInstaller, miUpdater, miflix, checkForThirtyTwo
+from . import main
+from .src.legacy.utils import ffmpegInstaller, miUpdater, miflix, checkForThirtyTwo

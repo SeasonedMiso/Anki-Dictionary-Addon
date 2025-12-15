@@ -15,7 +15,7 @@ except ImportError:
     ANKI_AVAILABLE = False
     pytest.skip("Anki Qt not available", allow_module_level=True)
 
-from src.ui.modern_components import (
+from src.ui.dictionary_widgets import (
     ModernSearchBar,
     DefinitionCard,
     DictionaryFilterBar,

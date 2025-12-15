@@ -7,7 +7,7 @@ from anki.utils import is_mac, is_lin, is_win
 from aqt.utils import ensureWidgetInScreenBoundaries
 from os.path import join, exists
 from shutil import copyfile
-from .miutils import miInfo, miAsk
+from .utils.miutils import miInfo, miAsk
 import json
 from anki.notes import Note
 from anki import sound

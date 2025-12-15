@@ -13,8 +13,8 @@ from pathlib import Path
 from aqt import mw
 from anki.hooks import addHook
 
-from .src.core.plugin import AnkiDictionaryPlugin
-from .src.constants import VERSION
+from .src.legacy.core.plugin import AnkiDictionaryPlugin
+from .src.legacy.ui.settings_window import VERSION
 
 # ============================================================================
 # Plugin Initialization
@@ -41,11 +41,21 @@ def on_profile_loaded():
     
     Initializes the plugin and optionally opens dictionary on start.
     """
+    import os
+    
     plugin.initialize()
     
-    # Initialize dictionary on start if configured
-    if mw.AnkiDictConfig.get('dictOnStart', False):
-        plugin.open_dictionary()
+    # Check if we should auto-open
+    auto_open = mw.AnkiDictConfig.get('dictOnStart', False)
+    debug_mode = os.environ.get('ANKI_DICT_AUTO_OPEN') == '1'
+    
+    if auto_open or debug_mode:
+        # If ANKI_DICT_OPEN_MOCK is set, open mock window instead
+        if os.environ.get('ANKI_DICT_OPEN_MOCK') == '1':
+            from .src.ui.ui_mock import show_ui_mock
+            show_ui_mock(None)  # No parent = independent window
+        else:
+            plugin.open_dictionary()
 
 
 def on_unload_profile():

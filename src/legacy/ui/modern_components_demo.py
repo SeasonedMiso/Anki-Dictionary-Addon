@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 try:
     from aqt.qt import QApplication, QMainWindow, QVBoxLayout, QWidget
-    from src.ui.modern_components import (
+    from src.ui.dictionary_widgets import (
         ModernSearchBar,
         DefinitionCard,
         DictionaryFilterBar,

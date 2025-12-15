@@ -31,9 +31,29 @@ class DatabaseConnection:
         db_dir = os.path.dirname(self.db_path)
         os.makedirs(db_dir, exist_ok=True)
         
+        # Check if database needs initialization
+        needs_init = False
+        
         if not os.path.exists(self.db_path):
-            # Create empty database file
-            Path(self.db_path).touch()
+            needs_init = True
+        else:
+            # Check if tables exist
+            try:
+                conn = sqlite3.connect(self.db_path)
+                cursor = conn.cursor()
+                cursor.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='langnames';"
+                )
+                if not cursor.fetchone():
+                    needs_init = True
+                conn.close()
+            except Exception:
+                needs_init = True
+        
+        if needs_init:
+            # Create and initialize database with schema
+            from .init_db import initialize_sqlite_file
+            initialize_sqlite_file(self.db_path)
     
     def _connect(self) -> None:
         """Establish database connection."""

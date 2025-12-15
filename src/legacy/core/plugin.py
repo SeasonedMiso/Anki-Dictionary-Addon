@@ -249,17 +249,20 @@ class AnkiDictionaryPlugin:
     
     # Hook handler methods
     
-    def _on_setup_editor_buttons(self, buttons: list, editor: Any) -> None:
+    def _on_setup_editor_buttons(self, buttons: list, editor: Any) -> list:
         """
         Handle editor button setup hook.
         
         Args:
             buttons: List of editor buttons
             editor: Editor instance
+            
+        Returns:
+            Modified buttons list
         """
         # This will be implemented with the UI refactoring
         logger.debug("Editor buttons setup hook triggered")
-        pass
+        return buttons  # Return the buttons list unchanged for now
     
     def _on_editor_context_menu(self, web_view: Any, menu: Any) -> None:
         """
