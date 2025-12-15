@@ -57,7 +57,7 @@ class UIMockWindow(QWidget):
         else:
             theme_manager.update_theme(THEME_PRESETS["dark"])
         
-        self.setWindowTitle("Dictionary UI Mock - Design Preview")
+        self.setWindowTitle("Dictionary")
         self.setMinimumSize(600, 400)  # Smaller minimum for better usability
         
         # Use centralized theming system
@@ -86,16 +86,7 @@ class UIMockWindow(QWidget):
         # container.setMaximumWidth(1080)  # Removed to allow full width
         outer.addWidget(container)  # Remove alignment to fill available space
 
-        # Title label
-        self.title = QLabel("UI Design Preview (mock / sample data)")
-        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        container_layout.addWidget(self.title)
 
-        # Subtitle with branch/base info
-        self.subtitle = QLabel("Branch: ui/mock-refresh → dev · Visual-only mock (no real data)")
-        self.subtitle.setObjectName("subtitle")
-        self.subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        container_layout.addWidget(self.subtitle)
         
         # Search bar
         self.search_bar = ModernSearchBar()
@@ -113,7 +104,7 @@ class UIMockWindow(QWidget):
         container_layout.addWidget(self.results_area, 1)  # Stretch factor 1 to expand
         
         # Status bar
-        self.status_label = QLabel("Ready — Type in search bar or toggle filters (mock only)")
+        self.status_label = QLabel("Ready")
         self.status_label.setStyleSheet("""
             QLabel {
                 font-size: 12px;
