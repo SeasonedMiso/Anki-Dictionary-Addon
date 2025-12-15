@@ -42,11 +42,11 @@
 ### Development Roadmap
 
 **Current Phase: Export UI System (PR #1)**
-- [ ] Export queue management with drag-and-drop
+- [x] Export queue management with drag-and-drop
 - [ ] Card template editor with live preview
-- [ ] Export preview and confirmation workflow
-- [ ] Export history tracking and management
-- [ ] Modern replacement for legacy cardExporter.py (1100+ lines)
+- [x] Export preview and confirmation workflow
+- [x] Export history tracking and management
+- [x] Modern replacement for legacy cardExporter.py (1100+ lines)
 
 **Planned Features**
 - [ ] Enhanced search history & navigation with breadcrumbs and recent searches
@@ -120,6 +120,8 @@
 
 **For Developers:**
 - Run tests: `python3 -m pytest tests/ -v`
+- Demo export UI: `python3 demo_export_ui.py`
+- Demo dictionary UI: `python3 -c "from src.ui.ui_mock import show_ui_mock; import sys; from aqt.qt import QApplication; app=QApplication(sys.argv); show_ui_mock(); sys.exit(app.exec())"`
 
 ### Contributing
 

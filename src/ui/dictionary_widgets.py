@@ -1060,6 +1060,7 @@ class WordSection(QWidget):
     
     audioRequested = pyqtSignal(str)
     imageRequested = pyqtSignal(str)
+    exportRequested = pyqtSignal(str)
     
     def __init__(self, word_data: Dict[str, Any], parent: Optional[QWidget] = None):
         """Initialize word section with FIXED hierarchy."""
@@ -1163,6 +1164,13 @@ class WordSection(QWidget):
                                compact=True)
         image_btn.setToolTip("Search images")
         self.collapsible_box.add_header_widget(image_btn)
+        
+        # Export button - COMPACT version
+        export_btn = ActionButton("", "export", 
+                                lambda: self.exportRequested.emit(self.word_data.get('word', '')),
+                                compact=True)
+        export_btn.setToolTip("Add to export queue")
+        self.collapsible_box.add_header_widget(export_btn)
     
     def _get_frequency_label(self, frequency: int) -> tuple[str, str]:
         """Convert frequency rank to human-readable label using themed colors."""

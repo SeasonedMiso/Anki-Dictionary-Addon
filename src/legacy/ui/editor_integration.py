@@ -89,7 +89,11 @@ class EditorIntegration:
             
             # Bridge command interception
             self._original_bridge_cmd = aqt.editor.Editor.onBridgeCmd
-            aqt.editor.Editor.onBridgeCmd = self._bridge_reroute
+            
+            def bridge_wrapper(editor, cmd):
+                return self._bridge_reroute(editor, cmd)
+            
+            aqt.editor.Editor.onBridgeCmd = bridge_wrapper
             
             # Window lifecycle hooks
             Browser.on_current_row_changed = wrap(
@@ -403,7 +407,7 @@ class EditorIntegration:
         except Exception as e:
             logger.error(f"Error toggling dictionary: {e}", exc_info=True)
     
-    def _bridge_reroute(self, editor: Any, cmd: str) -> None:
+    def _bridge_reroute(self, editor: Any, cmd: str) -> Any:
         """
         Reroute bridge commands to handle dictionary integration.
         
@@ -423,10 +427,6 @@ class EditorIntegration:
                         widget = 'Browser'
                     target = self._get_target(widget)
                     dict_window.set_current_editor(editor, target)
-                
-                # Call original handler
-                if self._original_bridge_cmd:
-                    self._original_bridge_cmd(editor, cmd)
             
             elif cmd.startswith("focus"):
                 # Handle focus events
@@ -436,15 +436,10 @@ class EditorIntegration:
                         widget = 'Browser'
                     target = self._get_target(widget)
                     dict_window.set_current_editor(editor, target)
-                
-                # Call original handler
-                if self._original_bridge_cmd:
-                    self._original_bridge_cmd(editor, cmd)
             
-            else:
-                # Pass through to original handler
-                if self._original_bridge_cmd:
-                    self._original_bridge_cmd(editor, cmd)
+            # Call original handler
+            if self._original_bridge_cmd:
+                return self._original_bridge_cmd(editor, cmd)
         
         except Exception as e:
             logger.error(f"Error in bridge reroute: {e}", exc_info=True)

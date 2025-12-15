@@ -122,27 +122,48 @@ class UIMockWindow(QWidget):
         """)
         container_layout.addWidget(self.status_label)
         
-        # Floating options button in bottom right corner
+        # Floating action buttons in bottom right corner
         self.options_btn = QPushButton("⚙")
-        self.options_btn.setFixedSize(24, 24)
+        self.options_btn.setFixedSize(40, 40)
         self.options_btn.clicked.connect(self._on_options_clicked)
         
-        # Position the button in bottom right corner with padding
+        self.export_btn = QPushButton("📤")
+        self.export_btn.setFixedSize(40, 40)
+        self.export_btn.clicked.connect(self._on_export_clicked)
+        
+        # Position the buttons in bottom right corner with padding
         self.options_btn.setParent(self)
+        self.export_btn.setParent(self)
         # Position will be set in showEvent when window size is known
         self.options_btn.raise_()  # Bring to front
+        self.export_btn.raise_()  # Bring to front
     
     def showEvent(self, event):
-        """Position button when window is shown."""
+        """Position buttons when window is shown."""
         super().showEvent(event)
-        if hasattr(self, 'options_btn'):
-            self.options_btn.move(self.width() - 70, self.height() - 70)
+        self._position_floating_buttons()
     
     def resizeEvent(self, event):
-        """Handle window resize to keep options button in corner."""
+        """Handle window resize to keep buttons in corner."""
         super().resizeEvent(event)
-        if hasattr(self, 'options_btn'):
-            self.options_btn.move(self.width() - 70, self.height() - 70)
+        self._position_floating_buttons()
+    
+    def _position_floating_buttons(self):
+        """Position floating action buttons in bottom right corner."""
+        if hasattr(self, 'options_btn') and hasattr(self, 'export_btn'):
+            # Stack buttons vertically with spacing
+            button_spacing = 50
+            margin = 20
+            
+            self.options_btn.move(
+                self.width() - self.options_btn.width() - margin,
+                self.height() - self.options_btn.height() - margin
+            )
+            
+            self.export_btn.move(
+                self.width() - self.export_btn.width() - margin,
+                self.height() - self.export_btn.height() - margin - button_spacing
+            )
     
     def _populate_sample_data(self):
         """Populate with sample word sections (new structure: Word > Dictionary)."""
@@ -162,6 +183,7 @@ class UIMockWindow(QWidget):
         taberu_section = WordSection(taberu_data)
         taberu_section.audioRequested.connect(lambda w: self._on_action('Audio', w))
         taberu_section.imageRequested.connect(lambda w: self._on_action('Image', w))
+        taberu_section.exportRequested.connect(lambda w: self._on_export_word(w))
         
         # DIAGNOSTIC CODE
         print("========== DIAGNOSTIC START ==========")
@@ -235,6 +257,7 @@ class UIMockWindow(QWidget):
         benkyou_section = WordSection(benkyou_data)
         benkyou_section.audioRequested.connect(lambda w: self._on_action('Audio', w))
         benkyou_section.imageRequested.connect(lambda w: self._on_action('Image', w))
+        benkyou_section.exportRequested.connect(lambda w: self._on_export_word(w))
         
         # Add JMdict definition (primary)
         benkyou_section.add_dictionary_section(
@@ -378,18 +401,18 @@ class UIMockWindow(QWidget):
             self.results_area.update_theme(theme)
     
     def _update_options_button_style(self):
-        """Update options button styling with current theme colors."""
+        """Update floating button styling with current theme colors."""
         theme = self.theme_manager.current_theme
         
-        # Custom square button style for options button
+        # Custom square button style for floating buttons
         button_style = f"""
             QPushButton {{
                 background-color: {theme.panel_color};
                 color: {theme.text_primary};
                 border: 1px solid {theme.border_color};
-                border-radius: 6px;
+                border-radius: 20px;
                 padding: 0px;
-                font-size: 14px;
+                font-size: 16px;
                 font-weight: bold;
                 width: 40px;
                 height: 40px;
@@ -400,10 +423,13 @@ class UIMockWindow(QWidget):
             }}
             QPushButton:hover {{
                 background-color: {theme.accent_color};
+                transform: scale(1.05);
             }}
         """
         
         self.options_btn.setStyleSheet(button_style)
+        if hasattr(self, 'export_btn'):
+            self.export_btn.setStyleSheet(button_style)
 
 
 
@@ -424,6 +450,53 @@ class UIMockWindow(QWidget):
         except Exception as e:
             logger.error(f"Error opening settings: {e}", exc_info=True)
             self.status_label.setText(f"Error opening settings: {str(e)}")
+    
+    def _on_export_clicked(self):
+        """Handle export button click."""
+        try:
+            from .export_dialog import show_export_dialog
+            
+            # Show export dialog
+            export_data = show_export_dialog(parent=self)
+            if export_data:
+                self.status_label.setText(f"Exported '{export_data['word']}' to Anki")
+            else:
+                self.status_label.setText("Export cancelled")
+            
+        except Exception as e:
+            logger.error(f"Error opening export dialog: {e}", exc_info=True)
+            self.status_label.setText(f"Error opening export dialog: {str(e)}")
+    
+    def _on_export_word(self, word: str):
+        """Handle export request for specific word."""
+        try:
+            from .export_dialog import show_export_dialog
+            
+            # Get word data with definitions
+            source_dict = "JMdict"
+            definitions = []
+            
+            if word == "食べる":
+                definitions = [
+                    {"type": "verb", "text": "to eat"},
+                    {"type": "verb", "text": "to live on (e.g. a salary); to live off; to subsist on"}
+                ]
+            elif word == "勉強":
+                definitions = [
+                    {"type": "noun", "text": "study; studying"},
+                    {"type": "verb", "text": "to study"}
+                ]
+            
+            # Show export dialog with word and definitions pre-filled
+            export_data = show_export_dialog(word=word, source_dict=source_dict, definitions=definitions, parent=self)
+            if export_data:
+                self.status_label.setText(f"Exported '{export_data['word']}' to Anki")
+            else:
+                self.status_label.setText(f"Export cancelled for '{word}'")
+            
+        except Exception as e:
+            logger.error(f"Error exporting word: {e}", exc_info=True)
+            self.status_label.setText(f"Error exporting '{word}': {str(e)}")
 
 
 def show_ui_mock(parent: Optional[QWidget] = None) -> UIMockWindow:
