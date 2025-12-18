@@ -466,19 +466,26 @@ class AnkiDictionaryPlugin:
         Get or create dictionary window (lazy initialization).
         
         Returns:
-            ModernDictionaryWindow instance (using modern UI)
+            DictionaryWindow instance (new modern UI with service integration)
         """
         if self._dictionary_window is None:
-            from ..ui import ModernDictionaryWindow
-            self._dictionary_window = ModernDictionaryWindow(
-                self.mw,
-                self.search_service,
-                self.export_service,
-                self.media_service,
-                self.config_manager,
-                self.addon_path
+            from ...services import DictionaryService, ConfigService, HistoryService
+            from ...ui.dictionary_window import DictionaryWindow
+            
+            # Create modern services
+            dictionary_service = DictionaryService(self.search_service, self.config_manager)
+            config_service = ConfigService(self.config_manager)
+            history_service = HistoryService()
+            
+            # Create new dictionary window with services
+            self._dictionary_window = DictionaryWindow(
+                dictionary_service=dictionary_service,
+                export_coordinator=self.export_coordinator,
+                config_service=config_service,
+                history_service=history_service,
+                media_service=self.media_service
             )
-            logger.debug("Modern dictionary window created")
+            logger.debug("New dictionary window created with service integration")
         return self._dictionary_window
     
     def get_settings_window(self) -> 'SettingsWindow':
