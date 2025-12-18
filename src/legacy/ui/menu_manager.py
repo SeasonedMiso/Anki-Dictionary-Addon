@@ -91,19 +91,13 @@ class MenuManager:
             self.mw.DictMenuSettings.append(settings_action)
             self._menu_settings.append(settings_action)
             
-            # Create dictionary toggle action
+            # Create dictionary toggle action (new modern UI - fully functional)
             shortcut_text = self._get_shortcut_display("Ctrl+Shift+W")
-            dict_action = QAction(f"Open Dictionary ({shortcut_text})", self.mw)
+            dict_action = QAction(f"Dictionary ({shortcut_text})", self.mw)
             dict_action.triggered.connect(self.open_dictionary)
             self.mw.openMiDict = dict_action  # Backward compatibility
             self.mw.DictMenuActions.append(dict_action)
             self._menu_actions.append(dict_action)
-            
-            # Create UI mock action (for design preview)
-            ui_mock_action = QAction("🎨 UI Design Preview (Mock)", self.mw)
-            ui_mock_action.triggered.connect(self.open_ui_mock)
-            self.mw.DictMenuActions.append(ui_mock_action)
-            self._menu_actions.append(ui_mock_action)
             
             # Clear and rebuild menu
             self._main_menu.clear()
@@ -312,32 +306,7 @@ class MenuManager:
                 title="Anki Dictionary"
             )
     
-    def open_ui_mock(self) -> None:
-        """
-        Open UI mock/demo window for design preview.
-        
-        This opens a standalone window showing the complete UI design
-        with sample data for validation before building real functionality.
-        """
-        try:
-            from aqt.qt import Qt
-            # Import from the new modern UI system (go up to root, then into src.ui)
-            from ...ui.ui_mock import show_ui_mock
-            
-            # Create and show mock window
-            mock_window = show_ui_mock(None)  # No parent = independent window
-            
-            logger.info("UI mock window opened")
-            
-        except Exception as e:
-            logger.error(f"Error opening UI mock: {e}", exc_info=True)
-            from aqt.utils import showWarning
-            showWarning(
-                f"Error opening UI mock: {str(e)}",
-                parent=self.mw,
-                title="Anki Dictionary"
-            )
-    
+
     def _search_selected_text(self) -> None:
         """Search for selected text in main window."""
         try:
