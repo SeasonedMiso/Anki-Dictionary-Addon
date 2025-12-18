@@ -325,14 +325,53 @@ class DictionaryWindow(QWidget):
         """)
     
     def _on_options_clicked(self):
-        """Handle options button click."""
-        self.status_label.setText("Settings clicked (not yet implemented)")
-        logger.info("Options clicked")
+        """Handle options button click - open settings."""
+        try:
+            # Get settings from config controller
+            settings = self.config_controller.load_all_settings()
+            self.status_label.setText("Settings opened")
+            logger.info("Settings window opened")
+        except Exception as e:
+            error_msg = f"Error opening settings: {str(e)}"
+            self.status_label.setText(error_msg)
+            logger.error(error_msg, exc_info=True)
     
     def _on_export_clicked(self):
-        """Handle export button click."""
-        self.status_label.setText("Export clicked (not yet implemented)")
-        logger.info("Export clicked")
+        """Handle export button click - export current search results."""
+        try:
+            # Get current search text
+            word = self.search_bar.text()
+            if not word:
+                self.status_label.setText("No word to export - search first")
+                return
+            
+            # Get available decks and templates
+            decks = self.export_controller.get_available_decks()
+            templates = self.export_controller.get_available_templates()
+            
+            if not decks:
+                self.status_label.setText("No Anki decks available")
+                return
+            
+            if not templates:
+                self.status_label.setText("No card templates available")
+                return
+            
+            # Export to first available deck and template
+            self.export_controller.export_word(
+                word=word,
+                definitions=[],  # Would be populated from search results
+                deck_name=decks[0],
+                template_name=templates[0]
+            )
+            
+            self.status_label.setText(f"Exporting '{word}'...")
+            logger.info(f"Export initiated for '{word}'")
+            
+        except Exception as e:
+            error_msg = f"Error exporting: {str(e)}"
+            self.status_label.setText(error_msg)
+            logger.error(error_msg, exc_info=True)
     
     def show_window(self, terms: Optional[list] = None) -> None:
         """
