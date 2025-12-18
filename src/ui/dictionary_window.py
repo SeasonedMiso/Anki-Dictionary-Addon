@@ -333,3 +333,21 @@ class DictionaryWindow(QWidget):
         """Handle export button click."""
         self.status_label.setText("Export clicked (not yet implemented)")
         logger.info("Export clicked")
+    
+    def show_window(self, terms: Optional[list] = None) -> None:
+        """
+        Show the dictionary window.
+        
+        Args:
+            terms: Optional list of terms to search for
+        """
+        self.show()
+        self.raise_()
+        self.activateWindow()
+        
+        if terms:
+            # Search for first term if provided
+            self.search_bar.setText(terms[0])
+            self.search_controller._perform_search(terms[0])
+        
+        logger.info("Dictionary window shown")
