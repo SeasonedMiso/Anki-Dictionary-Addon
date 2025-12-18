@@ -12,6 +12,9 @@ from .media_service import MediaService
 from .export_coordinator import ExportCoordinator
 from .context_manager import ContextManager, get_context_manager
 from .validation_service import ValidationService, get_validation_service
+from .dictionary_service import DictionaryService
+from .config_service import ConfigService
+from .history_service import HistoryService
 
 __all__ = [
     'SearchService',
@@ -22,4 +25,7 @@ __all__ = [
     'get_context_manager',
     'ValidationService',
     'get_validation_service',
+    'DictionaryService',
+    'ConfigService',
+    'HistoryService',
 ]
