@@ -202,13 +202,12 @@ class ConfigController(QObject):
             Dictionary of all settings
         """
         try:
-            result = self.config_service.load_settings()
+            settings = self.config_service.get_all_settings()
             
-            if result.get('error'):
-                self.settingsError.emit(result['error'])
+            if isinstance(settings, dict) and settings.get('error'):
+                self.settingsError.emit(settings['error'])
                 return {}
             
-            settings = result.get('settings', {})
             self.settingsLoaded.emit(settings)
             return settings
             
