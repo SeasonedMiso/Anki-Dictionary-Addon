@@ -151,3 +151,10 @@ ankiDict/pyobjc-core
 ankiDict/HIServices
 ankiDict/pynput
 ankiDict/.idea
+
+.kiro/
+
+ankiSourceCode/
+user_files/
+
+prerefactor_dict/

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Anki Dictionary Plugin - Modern UI">
+    <meta name="theme-color" content="#0ea5e9">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="modern-theme.css" as="style">
+    
+    <!-- Modern Theme CSS -->
+    <link rel="stylesheet" href="modern-theme.css">
+    
+    <!-- Custom Theme Overrides -->
+    <style id="customThemeCss"></style>
+    <style id="fontSpecs"></style>
+    <style id="widthSpecs"></style>
+    <style id="userSelect"></style>
+    
+    <title>Dictionary - Anki</title>
+</head>
+<body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Main Application Container -->
+    <div id="app" class="flex flex-col h-screen overflow-hidden">
+        
+        <!-- Header / Toolbar -->
+        <header role="banner" class="bg-primary border-b" aria-label="Dictionary toolbar">
+            <div id="toolbar" class="flex items-center justify-between px-4 py-3 gap-4">
+                <!-- Search Section -->
+                <div class="flex-1 flex items-center gap-3">
+                    <div class="search-container flex-1">
+                        <label for="search-input" class="sr-only">Search dictionary</label>
+                        <input 
+                            type="search" 
+                            id="search-input"
+                            class="w-full px-4 py-2 rounded-lg border"
+                            placeholder="Search dictionary..."
+                            aria-label="Search dictionary"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2" role="toolbar" aria-label="Dictionary actions">
+                    <button 
+                        id="settings-button"
+                        class="p-2 rounded-md"
+                        aria-label="Open settings"
+                        title="Settings"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content Area -->
+        <main id="main-content" role="main" class="flex-1 flex overflow-hidden">
+            
+            <!-- Sidebar Navigation -->
+            <aside 
+                id="sidebar" 
+                role="navigation" 
+                aria-label="Dictionary navigation"
+                class="sidebar bg-secondary border-r overflow-y-auto"
+                style="width: 250px;"
+            >
+                <div class="p-4">
+                    <h2 class="text-lg font-semibold mb-4">Dictionaries</h2>
+                    
+                    <!-- Dictionary List -->
+                    <nav aria-label="Available dictionaries">
+                        <ul id="dictionary-list" class="space-y-2" role="list">
+                            <!-- Dictionary items will be inserted here dynamically -->
+                        </ul>
+                    </nav>
+                </div>
+                
+                <!-- Resize Handle -->
+                <div 
+                    class="resize-handle absolute right-0 top-0 h-full w-1 cursor-col-resize"
+                    role="separator"
+                    aria-label="Resize sidebar"
+                    aria-orientation="vertical"
+                ></div>
+            </aside>
+            
+            <!-- Results Container -->
+            <section 
+                id="results-container" 
+                role="region" 
+                aria-label="Dictionary results"
+                class="flex-1 overflow-y-auto bg-primary"
+            >
+                <!-- Tab Container -->
+                <div id="tab-container" class="border-b bg-secondary">
+                    <div 
+                        id="tabs" 
+                        role="tablist" 
+                        aria-label="Search tabs"
+                        class="flex items-center gap-1 px-4 overflow-x-auto"
+                    >
+                        <!-- Tabs will be inserted here dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Results Content -->
+                <div id="results-content" class="p-4">
+                    <!-- Loading State -->
+                    <div id="loading-state" class="hidden" role="status" aria-live="polite">
+                        <div class="flex items-center justify-center py-12">
+                            <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+                            <span class="sr-only">Loading results...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <h3 class="mt-4 text-lg font-medium text-primary">No results found</h3>
+                        <p class="mt-2 text-sm text-secondary">Try searching for a different term</p>
+                    </div>
+                    
+                    <!-- Results List -->
+                    <div id="results-list" role="list">
+                        <!-- Result cards will be inserted here dynamically -->
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Settings Modal (Hidden by default) -->
+        <div 
+            id="settings-modal" 
+            class="hidden fixed inset-0 z-modal"
+            role="dialog" 
+            aria-modal="true"
+            aria-labelledby="settings-title"
+        >
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-black opacity-50" aria-hidden="true"></div>
+            
+            <!-- Modal Content -->
+            <div class="fixed inset-0 flex items-center justify-center p-4">
+                <div class="bg-primary rounded-xl shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto">
+                    <!-- Modal Header -->
+                    <div class="flex items-center justify-between p-6 border-b">
+                        <h2 id="settings-title" class="text-2xl font-semibold">Settings</h2>
+                        <button 
+                            id="close-settings"
+                            class="p-2 rounded-md hover:bg-secondary"
+                            aria-label="Close settings"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Modal Body -->
+                    <div id="settings-content" class="p-6">
+                        <!-- Settings tabs and content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Live Region for Screen Reader Announcements -->
+    <div 
+        id="announcements" 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        class="sr-only"
+    ></div>
+    
+    <!-- Scripts -->
+    <script src="modern-ui.js"></script>
+</body>
+</html>

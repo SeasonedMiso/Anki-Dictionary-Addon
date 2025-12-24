@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System Test</title>
+    <link rel="stylesheet" href="modern-theme.css">
+    <style>
+        .demo-section {
+            margin-bottom: var(--space-8);
+            padding: var(--space-6);
+            background: var(--surface-secondary);
+            border-radius: var(--radius-lg);
+        }
+        .demo-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-4);
+            color: var(--text-primary);
+        }
+        .color-swatch {
+            width: 100px;
+            height: 100px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+        .demo-button {
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--easing-standard);
+            border: none;
+        }
+        .demo-button-primary {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+        .demo-button-primary:hover {
+            background: var(--button-bg-hover);
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-screen-xl mx-auto">
+        <h1 class="text-4xl font-bold mb-8">Modern UI Design System Test</h1>
+        
+        <!-- Theme Toggle -->
+        <div class="demo-section">
+            <h2 class="demo-title">Theme Toggle</h2>
+            <button id="theme-toggle" class="demo-button demo-button-primary">
+                Toggle Dark Mode
+            </button>
+            <p class="mt-4 text-secondary">Current theme: <span id="current-theme">light</span></p>
+        </div>
+        
+        <!-- Colors -->
+        <div class="demo-section">
+            <h2 class="demo-title">Color Palette</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="color-swatch" style="background: var(--primary-500); color: white;">Primary</div>
+                <div class="color-swatch" style="background: var(--success); color: white;">Success</div>
+                <div class="color-swatch" style="background: var(--warning); color: white;">Warning</div>
+                <div class="color-swatch" style="background: var(--error); color: white;">Error</div>
+            </div>
+        </div>
+        
+        <!-- Typography -->
+        <div class="demo-section">
+            <h2 class="demo-title">Typography</h2>
+            <div class="space-y-3">
+                <p class="text-4xl">Heading 1 - 36px</p>
+                <p class="text-3xl">Heading 2 - 30px</p>
+                <p class="text-2xl">Heading 3 - 24px</p>
+                <p class="text-xl">Heading 4 - 20px</p>
+                <p class="text-lg">Large Text - 18px</p>
+                <p class="text-base">Base Text - 16px</p>
+                <p class="text-sm">Small Text - 14px</p>
+                <p class="text-xs">Extra Small - 12px</p>
+            </div>
+        </div>
+        
+        <!-- Spacing -->
+        <div class="demo-section">
+            <h2 class="demo-title">Spacing System</h2>
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="p-1 bg-primary-500 text-white rounded">p-1 (4px)</div>
+                    <div class="p-2 bg-primary-500 text-white rounded">p-2 (8px)</div>
+                    <div class="p-3 bg-primary-500 text-white rounded">p-3 (12px)</div>
+                    <div class="p-4 bg-primary-500 text-white rounded">p-4 (16px)</div>
+                    <div class="p-6 bg-primary-500 text-white rounded">p-6 (24px)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shadows -->
+        <div class="demo-section">
+            <h2 class="demo-title">Elevation (Shadows)</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-primary rounded-lg shadow-sm">shadow-sm</div>
+                <div class="p-6 bg-primary rounded-lg shadow">shadow</div>
+                <div class="p-6 bg-primary rounded-lg shadow-md">shadow-md</div>
+                <div class="p-6 bg-primary rounded-lg shadow-lg">shadow-lg</div>
+                <div class="p-6 bg-primary rounded-lg shadow-xl">shadow-xl</div>
+                <div class="p-6 bg-primary rounded-lg shadow-2xl">shadow-2xl</div>
+            </div>
+        </div>
+        
+        <!-- Flexbox -->
+        <div class="demo-section">
+            <h2 class="demo-title">Flexbox Utilities</h2>
+            <div class="flex items-center justify-between gap-4 p-4 bg-primary rounded-lg">
+                <span>Left</span>
+                <span>Center</span>
+                <span>Right</span>
+            </div>
+        </div>
+        
+        <!-- Grid -->
+        <div class="demo-section">
+            <h2 class="demo-title">Grid Utilities</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-primary rounded-lg">Grid Item 1</div>
+                <div class="p-4 bg-primary rounded-lg">Grid Item 2</div>
+                <div class="p-4 bg-primary rounded-lg">Grid Item 3</div>
+            </div>
+        </div>
+        
+        <!-- Animations -->
+        <div class="demo-section">
+            <h2 class="demo-title">Animations</h2>
+            <div class="flex gap-4 flex-wrap">
+                <div class="p-4 bg-primary rounded-lg animate-fade-in">Fade In</div>
+                <div class="p-4 bg-primary rounded-lg animate-slide-up">Slide Up</div>
+                <div class="p-4 bg-primary rounded-lg animate-scale-in">Scale In</div>
+                <div class="p-4 bg-primary rounded-lg animate-pulse">Pulse</div>
+            </div>
+        </div>
+        
+        <!-- Accessibility -->
+        <div class="demo-section">
+            <h2 class="demo-title">Accessibility</h2>
+            <div class="space-y-4">
+                <button class="demo-button demo-button-primary">
+                    Focusable Button (Try Tab)
+                </button>
+                <a href="#" class="text-primary-500 underline">
+                    Focusable Link (Try Tab)
+                </a>
+                <p class="text-secondary">All interactive elements have visible focus indicators</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const currentThemeSpan = document.getElementById('current-theme');
+        const html = document.documentElement;
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            currentThemeSpan.textContent = newTheme;
+            
+            if (newTheme === 'dark') {
+                document.body.classList.add('nightMode');
+            } else {
+                document.body.classList.remove('nightMode');
+            }
+        });
+    </script>
+</body>
+</html>
