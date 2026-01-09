@@ -339,10 +339,10 @@ class ActionButton(ThemedButton):
             self.clicked.connect(callback)
         
         # Set appropriate size based on compact mode
-        # if compact:
-            self.setFixedSize(200, 200)  # Small square button
-        # else:
-            # self.setMinimumHeight(32)  # Normal button height
+        if compact:
+            self.setFixedSize(24, 24)  # Small square button
+        else:
+            self.setMinimumHeight(32)  # Normal button height
         
         # Set font that supports Unicode symbols
         if ANKI_AVAILABLE:
